@@ -287,9 +287,18 @@ sources from whichever it can. Substitutions are proposed back, never applied
 silently.
 
 **Additional selection criterion:** because simulation gates fabrication (§5.8),
-the buck and the eFuse must be parts whose vendor publishes a usable SPICE
-model. TI and ADI generally do; several cheaper LCSC-catalogue alternatives do
-not. This applies before any part is committed to the `.ato`.
+the **buck** must be a part whose vendor publishes a usable SPICE model. TI and
+ADI generally do; several cheaper LCSC-catalogue alternatives do not — including
+the AOZ1280CI on `daikin-esp`'s `esp-daikin-r1p1`, which is why that part is not
+simply carried over. This applies before the buck is committed to the `.ato`.
+
+The criterion does **not** extend to the eFuse. Its deck's question is answered
+by the current limit alone, which a behavioural block models exactly; requiring
+a vendor model there would narrow the field for nothing. Reasoning and
+consequences are in the 2026-09-12 amendment to
+[ADR 0004](adr/0004-current-limited-inrush.md) — in exchange, the eFuse's
+current-limit *accuracy* becomes a first-order selection criterion, because it
+is what sets the appliance requirement.
 
 ### 7.3 Project library
 

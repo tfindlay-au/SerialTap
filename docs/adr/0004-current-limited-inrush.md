@@ -57,3 +57,37 @@ limit on the 5 V input, placed between the input fuse and the ideal-diode OR.
 - Slightly more expensive than a plain slew-limited load switch, and it
   introduces a fault mode — current-limit foldback on a genuinely weak rail —
   that must be distinguished from a brownout during bring-up.
+
+## Amendment, 2026-09-12: the eFuse is modelled behaviourally
+
+SPDD §7.2 made a published vendor SPICE model a *selection criterion* for both
+the buck and the eFuse, on the grounds that simulation gates fabrication.
+
+Running [`sim/inrush.cir`](../../sim/inrush.cir) showed that criterion does no
+real work for the eFuse. The deck's question — what the appliance sees at
+plug-in — is answered by the current limit alone: a flat current into the bulk
+capacitor for Q/I seconds, with success or failure turning entirely on whether
+that current sits below the appliance's own limit. A behavioural constant-current
+block answers it exactly. What a vendor model would add is response time, in
+microseconds, and soft-start shape — neither of which moves the sizing.
+
+That is *not* true of the buck. `buck-load-step` asks a control-loop question,
+and overshoot, undershoot and settling are properties of the compensation, the
+inductor and the output capacitor together. Only a vendor model answers it.
+
+### Decision
+
+The vendor-SPICE-model criterion of SPDD §7.2 applies to the **buck only**. The
+eFuse is chosen on its behaviour — programmable limit, limit accuracy, package,
+what else it protects against — and modelled behaviourally in
+[`sim/models/behavioral.lib`](../../sim/models/behavioral.lib). TPS2553-class
+remains the target.
+
+### Consequences
+
+- The eFuse field is no longer narrowed to parts picked for their model.
+- **Current-limit accuracy becomes the specification that matters most.** It is
+  what collapses the 300–370 mA appliance requirement into a single number; see
+  [sim/README.md](../../sim/README.md).
+- The deck cannot see a real part's response time, so the contact-event current
+  it reports (`ispike`) is indicative only, and is documented as such.
