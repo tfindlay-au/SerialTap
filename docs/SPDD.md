@@ -396,9 +396,11 @@ holding the YAML.
 │   └── harness/                cable pinouts per appliance
 ├── lib/                        project library: symbols, footprints, 3D, datasheets
 ├── sim/                        standalone LTspice decks (§5.8)
-├── pcb/serialtap-rNpM/
-│   ├── kicad-src/              schematic, PCB and project — the source of truth
-│   ├── GERBER-serialtap-rNpM/  fab output
+├── pcb/serialtap-rNpM/         one folder per revision - the KiCad project
+│   ├── serialtap-rNpM.kicad_sch    source of truth
+│   ├── serialtap-rNpM.kicad_pcb
+│   ├── serialtap-rNpM.kicad_pro
+│   ├── GERBER-serialtap-rNpM/  fab output, regenerated
 │   ├── BOM-serialtap-rNpM.csv
 │   ├── CPL-serialtap-rNpM.csv
 │   ├── serialtap-rNpM-sch.pdf
@@ -409,6 +411,13 @@ holding the YAML.
 
 Board name is `serialtap`; revision naming follows the `daikin-esp`
 convention: `serialtap-r1p0`, `serialtap-r1p1`, …
+
+**One folder per revision, and the KiCad project sits directly in it.**
+`daikin-esp` nests a `kicad-src/` inside each board folder, but it carries three
+boards plus a shared library, so all of its levels earn their keep. This repo
+has one board, and a third level for four files does not. Cutting r1p1 is then
+the simplest possible operation — copy the folder, rename the files — and r1p0
+stays frozen as the thing the boards in the field were built from.
 
 ## 11. Requirements traceability
 
