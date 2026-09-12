@@ -21,9 +21,9 @@ These are not negotiable defaults to be optimised away.
    setup, shipping and time; a marginal part that forces a respin costs more
    than it ever saved.
 
-2. **Every part is chosen deliberately.** Pin every component by MPN in the
-   `.ato`, passives included. No automatic "cheapest in stock" picking — it is
-   exactly the behaviour principle 1 rules out.
+2. **Every part is chosen deliberately.** Pin every component by MPN on its
+   schematic symbol, passives included. No automatic "cheapest in stock"
+   picking — it is exactly the behaviour principle 1 rules out.
 
 3. **The project carries its own library.** `lib/` holds symbols, footprints,
    3D models and datasheets for everything in the design, referenced with
@@ -36,10 +36,9 @@ These are not negotiable defaults to be optimised away.
 
 | Tool | Role |
 |---|---|
-| atopile (`ato`) | **Source of truth** for connectivity and parts. `elec/*.ato` |
-| KiCad **10** | Layout only. `pcb/serialtap-rNpM/kicad-src/` |
+| KiCad **10** | **Source of truth.** Schematic → netlist → PCB, all of it in `pcb/serialtap-rNpM/kicad-src/` ([ADR 0005](docs/adr/0005-kicad-native-capture.md)) |
 | `kicad-cli` | `/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli` — ERC, DRC, gerber/drill/BOM/CPL export, STEP and image renders |
-| LTspice | Power-path simulation only. `sim/` — standalone SPICE netlists, outside the atopile flow. Chosen because Homebrew cannot build ngspice on macOS 12 |
+| LTspice | Power-path simulation only. `sim/` — standalone SPICE netlists, hand-written and outside the KiCad flow. Chosen because Homebrew cannot build ngspice on macOS 12 |
 | kicad-happy | Installed plugin (v2.2.1, 11 skills). Design review over the generated `.kicad_sch` / `.kicad_pcb` — EMC, power, ESD, thermal, BOM lifecycle, PCBWay DFM |
 
 ### kicad-happy review gates
@@ -47,7 +46,7 @@ These are not negotiable defaults to be optimised away.
 Run it at three points, not only before fabrication — its findings are cheapest
 to act on early:
 
-1. **After the first `ato build`** — regulator feedback network, decoupling
+1. **After the schematic is captured** — regulator feedback network, decoupling
    adequacy, ESD coverage by connector, fuse sizing, temperature grade, EOL
    parts. Before any layout effort is invested.
 2. **After layout** — thermal via adequacy, ground-plane voids, trace width vs
@@ -58,10 +57,15 @@ It is a **review aid, not a sign-off.** It does not replace `kicad-cli` ERC/DRC,
 the [layout-rules checklist](docs/layout-rules.md), or human review — and it
 cannot measure a real appliance. The risk it introduces is false confidence.
 
-**The rule that keeps this honest:** the KiCad *schematic* is a build artifact of
-`ato build`. Never hand-edit it. If the schematic is wrong, fix the `.ato` and
-rebuild. The `.kicad_pcb` is the exception — it is hand-maintained, and only its
-netlist comes from atopile.
+**The rule that keeps this honest:** nothing here is generated, so nothing can
+be silently regenerated over. The schematic is drawn by hand and is the source
+of truth; the PCB takes its netlist from it through KiCad. Both are checked
+mechanically — `kicad-cli sch erc` and `kicad-cli pcb drc` — and neither
+substitutes for reading the thing.
+
+Do not reintroduce a code-generates-schematic tool without reading
+[ADR 0005](docs/adr/0005-kicad-native-capture.md) first. Three were evaluated
+and rejected on evidence, one of them for silently emitting a wrong netlist.
 
 ## Layout
 
@@ -86,18 +90,34 @@ And: **never split the ground plane.**
 
 ## Current state
 
-Design documented, nothing built. Three things gate fabrication:
+Design documented, nothing built — but the toolchain is now exercised rather
+than assumed, and it cost a rewrite: see
+[ADR 0005](docs/adr/0005-kicad-native-capture.md).
 
-1. Power-path simulation (`sim/`) — yields the minimum source current the design
-   tolerates. **`rail-sag` and `inrush` done** (2026-09-12); they put the
-   requirement at **300–370 mA** and confirm 470 µF is the right bulk value.
-   `buck-load-step` is blocked on the buck MPN and its vendor SPICE model —
-   a behavioural stand-in cannot answer a control-loop question. See
-   [sim/README.md](sim/README.md)
-2. Measuring the Haier's 5 V rail against that number
-3. Confirming the AS50QDFHRA service connector pinout (determines the cable, not
-   a respin)
+**Done**
 
-Next decision up: buck and eFuse MPNs. Both need vendor SPICE models (SPDD
-§7.2); the eFuse's current-limit accuracy is what collapses the 300–370 mA
-range into one number.
+- `sim/rail-sag` and `sim/inrush` (2026-09-12). The appliance rail must supply
+  **300–370 mA**, not the 250 mA originally assumed; 470 µF is the right bulk
+  value and more capacitance would not rescue a weak rail. See
+  [sim/README.md](sim/README.md)
+- The service connector is a **5-pin JST XA**, not 4-pin (2026-09-12)
+- KiCad project set up and verified: 4-layer stackup, DRC rules from
+  [layout-rules.md](docs/layout-rules.md) confirmed *enforced*, ERC and DRC both
+  clean and running
+
+**Gates to fabrication**
+
+1. **Part selection.** Nothing is pinned. Blocks almost everything else: the
+   schematic, `buck-load-step`, and the BOM. The buck needs a vendor SPICE
+   model (SPDD §7.2); the eFuse does not (ADR 0004 amendment), but its
+   current-limit accuracy is what collapses 300–370 mA into one number
+2. **Schematic capture**, then `kicad-happy` review gate 1
+3. **`sim/buck-load-step`** — the deck runs on TI's converted model but does not
+   yet regulate at 3.3 V, so its results are marked untrusted. Blocked on the
+   buck MPN anyway
+4. **Measure the Haier's 5 V rail** against the 300–370 mA figure — open-circuit
+   voltage, current limit, sag under a 250 mA pulsed load, and what it *does* in
+   current limit
+5. **Confirm the connector pin order** and what the fifth pin carries (Saleae
+   capture on all five). Determines the cable, not a respin
+6. Layout, then review gates 2 and 3

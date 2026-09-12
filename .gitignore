@@ -1,10 +1,6 @@
 # macOS
 .DS_Store
 
-# atopile build output - the KiCad schematic is a build artifact (SPDD 6)
-/elec/build/
-/.ato/
-
 # KiCad working files
 *-backups/
 *.kicad_prl
@@ -16,6 +12,5 @@ fp-info-cache
 __pycache__/
 *.pyc
 
-# atopile build output (SPDD 6 - build artifacts are never hand-edited)
-/elec/build/
-/pcb/*/backups/
+# KiCad fabrication output is regenerated, not committed, until release
+/pcb/*/*-backups/

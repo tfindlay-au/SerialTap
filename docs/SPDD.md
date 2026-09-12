@@ -31,7 +31,7 @@ consistently misread as a spirit level.
 
 **In scope**
 
-- Schematic and PCB design (atopile + KiCad 10)
+- Schematic and PCB design (KiCad 10)
 - Fabrication and assembly package for PCBWay: gerbers, drill, BOM, CPL
 - An ESPHome package that runs on the assembled board
 - Harness documentation: cable pinouts per appliance, starting with the Haier
@@ -239,11 +239,11 @@ converter's control loop, which the behavioural blocks in `sim/models/` cannot
 answer, so it is blocked on the buck MPN and its vendor SPICE model (§7.2)
 rather than faked. Fabrication stays gated until it runs.
 
-Simulation lives **outside** the atopile → KiCad flow. KiCad 10's built-in
-ngspice simulates the schematic, and this project's schematic is a build
-artifact (§6) — attaching models to it would either violate the no-hand-edit
-rule or be lost on the next `ato build`. The decks are standalone SPICE
-netlists.
+Simulation lives **outside** the KiCad flow. KiCad 10's built-in ngspice can
+simulate a schematic, but the questions here are about a power path that spans
+an appliance, a cable and a converter — most of which is not on the board and
+has no symbol. The decks are standalone SPICE netlists, which also keeps them
+readable and diffable on their own terms.
 
 **Simulator: LTspice.** Homebrew cannot build ngspice on this machine — macOS
 12.7.6 is past Homebrew's support window, and `brew install ngspice` fails
@@ -255,28 +255,33 @@ SPICE models.
 
 ## 6. Toolchain
 
-`.ato` source is the single source of truth for connectivity and part selection.
-KiCad 10 is used only for board layout and fabrication output.
+**KiCad 10 is the single source of truth**: schematic → netlist → PCB, the
+standard flow, with ERC built in. This reverses the original decision to make
+atopile the source of truth and reduce KiCad to layout. The reasoning, the
+evidence gathered by actually running the tools, and the three
+code-to-schematic generators evaluated and rejected are in
+[ADR 0005](adr/0005-kicad-native-capture.md).
 
 | Artefact | Owner | Hand-edited? |
 |---|---|---|
-| `*.ato` | atopile | Yes — this is the source |
-| netlist | `ato build` | No |
-| `*.kicad_sch` | `ato build` | **No** — build artifact |
-| `*.kicad_pcb` | KiCad 10 | Yes — netlist updated from atopile |
+| `*.kicad_sch` | KiCad 10 | **Yes — this is the source.** Capture lives here |
+| `*.kicad_pcb` | KiCad 10 | Yes — netlist updated from the schematic |
 | `*.kicad_pro` | KiCad 10 | Yes — carries the DRC rules and net classes from [layout-rules.md](layout-rules.md) |
-| gerbers, drill | KiCad 10 | No |
-| BOM | `ato build` | No |
-| `sim/*.cir` | hand-written | Yes — standalone, outside the atopile flow (§5.8) |
+| netlist | `kicad-cli sch export netlist` | No |
+| gerbers, drill | `kicad-cli` | No |
+| BOM | `kicad-cli sch export bom` | No |
+| `-sch.pdf` | `kicad-cli sch export pdf` | No |
+| `sim/*.cir` | hand-written | Yes — standalone, outside the KiCad flow (§5.8) |
+
+Nothing among the design files is generated, so nothing can be silently
+regenerated over — which is why there is no "never hand-edit this" rule any
+more. The checks are mechanical instead: `kicad-cli sch erc` and
+`kicad-cli pcb drc`, both of which run today.
 
 **Review tooling.** `kicad-happy` (v2.2.1, MIT) is installed as a Claude Code
-plugin and reviews the *generated* `.kicad_sch` and the hand-maintained
-`.kicad_pcb`. Reviewing the build artifact rather than the `.ato` source is the
-right place to check: it validates what actually becomes the board, including
-anything lost in translation from source to netlist.
-
-The one rule that keeps this honest: if the schematic is wrong, fix the `.ato`
-and rebuild. Never edit the generated schematic.
+plugin and reviews the `.kicad_sch` and `.kicad_pcb` directly. A hand-drawn
+schematic is precisely the artifact it was built to read, and having one is what
+makes the first review gate (§12.1) possible at all.
 
 ## 7. Components and sourcing
 
@@ -300,11 +305,11 @@ Specific consequences on this board:
 
 ### 7.2 Sourcing
 
-**Every component is pinned by MPN in the `.ato`, passives included.** atopile's
-automatic part picker is not used at all: it resolves to the cheapest in-stock
-LCSC part meeting a value, which is precisely the behaviour §7.1 rules out. A
-substitution reaching the board without a decision having been made is the
-failure mode being designed against.
+**Every component is pinned by MPN on its schematic symbol, passives included.**
+There is no automatic part picker in this flow — removing atopile removed the
+one that had to be suppressed anyway (ADR 0005). A substitution reaching the
+board without a decision having been made is the failure mode being designed
+against, and the defence is now review rather than configuration.
 
 The exported BOM carries MPN plus LCSC and Digi-Key/Mouser numbers, and PCBWay
 sources from whichever it can. Substitutions are proposed back, never applied
@@ -314,7 +319,7 @@ silently.
 the **buck** must be a part whose vendor publishes a usable SPICE model. TI and
 ADI generally do; several cheaper LCSC-catalogue alternatives do not — including
 the AOZ1280CI on `daikin-esp`'s `esp-daikin-r1p1`, which is why that part is not
-simply carried over. This applies before the buck is committed to the `.ato`.
+simply carried over. This applies before the buck is committed to the design.
 
 The criterion does **not** extend to the eFuse. Its deck's question is answered
 by the current limit alone, which a behavioural block models exactly; requiring
@@ -389,11 +394,10 @@ holding the YAML.
 │   ├── adr/                    decision records
 │   ├── layout-rules.md         binding layout rules, DRC, DFM, checklist
 │   └── harness/                cable pinouts per appliance
-├── elec/                       atopile source (.ato), the source of truth
 ├── lib/                        project library: symbols, footprints, 3D, datasheets
 ├── sim/                        standalone LTspice decks (§5.8)
 ├── pcb/serialtap-rNpM/
-│   ├── kicad-src/              layout
+│   ├── kicad-src/              schematic, PCB and project — the source of truth
 │   ├── GERBER-serialtap-rNpM/  fab output
 │   ├── BOM-serialtap-rNpM.csv
 │   ├── CPL-serialtap-rNpM.csv
@@ -426,9 +430,10 @@ convention: `serialtap-r1p0`, `serialtap-r1p1`, …
 Gating tasks, in order. The design is not validated until all pass.
 
 Automated review by `kicad-happy` runs at three points alongside these: after
-the first `ato build` (feedback network, decoupling, ESD coverage by connector,
-fuse sizing, temperature grade, EOL parts), after layout (thermal vias, plane
-voids, trace width, impedance, DFM score), and before upload to PCBWay. It is a
+the schematic is captured (feedback network, decoupling, ESD coverage by
+connector, fuse sizing, temperature grade, EOL parts), after layout (thermal
+vias, plane voids, trace width, impedance, DFM score), and before upload to
+PCBWay. It is a
 review aid — it does not replace `kicad-cli` ERC/DRC, the layout-rules
 checklist, or the physical measurements below.
 
@@ -514,3 +519,4 @@ that result.
 | [0002](adr/0002-c3-and-usb-only-programming.md) | ESP32-C3-MINI-1, programmed over USB only, no TC2050 |
 | [0003](adr/0003-buck-not-ldo.md) | Synchronous buck, not an LDO, for the 3.3 V rail |
 | [0004](adr/0004-current-limited-inrush.md) | Current-limited inrush protection, not slew-rate-limited |
+| [0005](adr/0005-kicad-native-capture.md) | KiCad-native capture; atopile removed, and the code-to-schematic alternatives rejected on evidence |

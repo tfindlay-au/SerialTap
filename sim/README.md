@@ -1,6 +1,6 @@
 # Power-path simulation
 
-Standalone LTspice decks, deliberately outside the atopile → KiCad flow
+Standalone LTspice decks, deliberately outside the KiCad flow
 ([SPDD §5.8](../docs/SPDD.md)). They model the **power path only**; nothing
 else on the board has a usable model or a question worth simulating.
 
