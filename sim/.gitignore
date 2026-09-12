@@ -4,3 +4,9 @@
 
 # The decks' own logs; run.py copies the decoded text into results/.
 /*.log
+
+# Vendor SPICE models and their conversions. Fetched by
+# models/fetch-models.sh, not redistributed - see that script for why.
+/models/vendor/
+/models/*.lib
+!/models/behavioral.lib

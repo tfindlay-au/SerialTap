@@ -11,8 +11,9 @@ against.
 ## Running
 
 ```sh
-./run.py            # every deck
-./run.py rail-sag   # one deck
+./models/fetch-models.sh   # once - vendor SPICE models (see below)
+./run.py                   # every deck
+./run.py rail-sag          # one deck
 ```
 
 `run.py` drives `LTspice -b`, decodes the UTF-16 log it leaves behind, joins
@@ -28,23 +29,79 @@ LTspice lives at `/Applications/LTspice.app/Contents/MacOS/LTspice`.
 |---|---|---|
 | `rail-sag.cir` | Given a current-limited source, bulk capacitance and WiFi transmit bursts, does the 5 V rail stay high enough for the buck to hold 3V3? | runs |
 | `inrush.cir` | What does the appliance see at plug-in, with the eFuse limit set to a given value? | runs |
-| `buck-load-step.cir` | Does the buck recover from a 30 → 250 mA step without undershooting brownout? | **blocked** — see below |
+| `buck-load-step.cir` | Does the buck recover from a 40 → 335 mA step without undershooting brownout? | runs, **result not yet trusted** — see below |
 
-### buck-load-step is blocked, deliberately
+SPDD §5.4 quotes the step as 30 → 250 mA. Those are the **5 V-side** figures;
+seen from the buck's output, where a load step actually happens, the same event
+is 40 → 335 mA, which is what `buck-load-step` applies.
 
-Its question is entirely about the converter's **control loop**: overshoot,
-undershoot and settling on a load step are properties of the compensation, the
-inductor and the output capacitance together. A behavioural constant-power
-block cannot answer it, and a deck that appeared to answer it would be worse
-than no deck at all — it would manufacture exactly the false confidence
-[CLAUDE.md](../CLAUDE.md) warns about.
+## The vendor model
 
-It needs, in this order:
+`buck-load-step` is the one deck a behavioural block cannot answer — overshoot,
+undershoot and settling belong to the control loop, the inductor and the output
+capacitor together. It runs on TI's own model for the **TPS6282x** family.
 
-1. the buck MPN chosen (SPDD §7.2 requires one whose vendor publishes a SPICE
-   model — a selection criterion, not a preference);
-2. that vendor model dropped into `models/`;
-3. the inductor and output capacitors pinned, because they are half the loop.
+`models/fetch-models.sh` downloads TI's *unencrypted* PSpice transient model
+(literature number SLVMCV3) and converts it. Four things are worth knowing:
+
+- **The vendor file is not committed.** TI ships it "as an aid for customers of
+  Texas Instruments" with no redistribution grant, so the repo carries the fetch
+  step and the converter instead of the file. This is the one exception to
+  CLAUDE.md's "the project carries its own library" rule, and it is a licensing
+  exception, not a convenience one — `lib/` still carries every KiCad asset.
+- **One construct needed converting.** LTspice already understands PSpice's
+  `VSWITCH` models, `TABLE {} = () ()` and `VALUE { IF(...) }` — all verified
+  against this build before the converter was written. What defeats it is
+  PSpice bracing a parameter reference *inside* a braced expression
+  (`VALUE {{IF(V(A) > {VTHRESH}, {VDD},{VSS})}}`): the braces end up nested and
+  LTspice reports "Questionable use of curly braces". `pspice2ltspice.py`
+  strips the inner braces and passes everything else through untouched — 29
+  expressions in this model.
+- **`startup` on the `.tran` line is mandatory.** TI wrote the model for PSpice,
+  which always solves an operating point first, so its internal latches and
+  references need one. Plain `.tran` sends LTspice into minutes of Gmin
+  stepping; `.tran ... uic` skips the operating point and the model sits dead,
+  never switching. `startup` solves the operating point with the sources at
+  zero — which converges immediately — then ramps them.
+- **It is slow.** The model's soft-start runs about 1.5 ms and has to complete
+  before a load step means anything, and a 2.2 MHz switcher is resolved
+  throughout. Budget minutes per run and do not add sweeps casually. The `SS`
+  subcircuit parameter looks like a way to skip soft-start — it is the initial
+  condition on the ramp node — but setting it stops the model starting at all.
+  Because a run is expensive, prefer `./run.py --keep-raw buck-load-step` when
+  you might want to look at the waveform afterwards; the default throws the
+  `.raw` away once the measurements are parsed out.
+
+### Open issue: the deck does not yet regulate at 3.3 V
+
+`results/buck-load-step.md` currently reports `vo_ss = 1.55 V` against a 3.3 V
+target, so **its undershoot and overshoot numbers mean nothing yet** and the
+`ok` column should be ignored. The rail is steady at 1.55 V from 2.0 ms to
+2.65 ms, so this is not an unfinished soft-start — the loop is holding the
+wrong level. Implied reference is 0.28 V, where the divider and TI's own
+testbench both say 0.6 V.
+
+What is known so far:
+
+- The model itself is fine: on TI's own component values it comes up and
+  switches.
+- It is not the `SS` parameter. Setting `SS=1` to skip soft-start stops the
+  model starting at all, with or without `startup`, so full soft-start has to
+  run every time.
+- Most likely suspects, in order: feedback-node bias current the model applies
+  but the datasheet divider ignores (the deck's 180k/40k is a higher impedance
+  than TI's 200k/100k), or the loop being unstable with 47 µF where TI used
+  100 µF.
+
+Next step is one run on TI's exact divider and output capacitor at a 3.3 V
+target, to separate "wrong divider impedance" from "wrong compensation". Each
+run is minutes, which is why this is not resolved yet.
+
+**The passives in that deck are placeholders.** TPS62827 is the 4 A member of
+the family and is oversized for this board; the family member, the inductor and
+the output capacitors are still unpinned. The values are scaled from TI's own
+testbench for this model (1.8 V at 4 A, L = 470 nH, COUT = 100 µF). Re-running
+after the real parts are chosen is one command.
 
 ## Model fidelity
 
@@ -59,7 +116,9 @@ from these decks:
 - **No switching.** The buck is a constant-power load, not a converter. Ripple,
   switching harmonics and EMI are not simulated here — EMC is
   `kicad-happy`'s job after layout.
-- **No control loop.** Hence `buck-load-step` being blocked.
+- **No control loop.** The behavioural buck is a constant-power load with a
+  UVLO, which is right for `rail-sag` and `inrush` and useless for a load-step
+  question — hence `buck-load-step` running on the vendor model instead.
 - **Instant limiter response.** `CLIM` reaches its limit in one timestep. A
   real TPS2553-class eFuse takes microseconds, so `inrush`'s `ispike` column
   understates the true contact event. Connector and cable inductance are not
@@ -89,6 +148,16 @@ placeholder for the buck's minimum input, `VBUCKREQ` in the deck:
 **Sag is an average-current problem, not a peak-current one.** The knee sits
 within ~10% of the mean draw in every case. Bulk capacitance rides out an
 individual transmit burst; it cannot manufacture average current.
+
+**And the answer barely depends on the buck.** `VBUCKREQ` is a reporting
+threshold, not a modelling one, so the same results can be re-judged against a
+different minimum input voltage without re-running. Dropping it from 4.0 V to
+3.5 V — roughly dropout for a TPS6282x at this current, and well under any
+candidate's UVLO — moves exactly one corner of the table (220 µF at 20% duty,
+175 → 130 mA) and leaves every other figure unchanged. That is because the
+failure mode is average-current starvation, which collapses the rail entirely
+rather than dipping it marginally below a threshold. So the 300–370 mA
+requirement stands whichever family member is finally chosen.
 
 **This settles how much bulk is worth fitting.** Going 470 µF → 1000 µF buys
 10 mA at light duty and nothing at all under sustained transmit. Dropping to

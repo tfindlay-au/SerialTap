@@ -15,3 +15,7 @@ fp-info-cache
 # Python
 __pycache__/
 *.pyc
+
+# atopile build output (SPDD 6 - build artifacts are never hand-edited)
+/elec/build/
+/pcb/*/backups/

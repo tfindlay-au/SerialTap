@@ -1,0 +1,82 @@
+* SerialTap - buck-load-step
+* ===========================================================================
+* QUESTION (SPDD 5.8): does the buck recover from the C3's transmit load step
+* without the 3.3 V rail undershooting into brownout?
+*
+* This is the one deck that CANNOT be answered behaviourally. Overshoot,
+* undershoot and settling are properties of the converter's control loop, its
+* inductor and its output capacitance together, so it runs on TI's own
+* unencrypted PSpice model, converted for LTspice by
+* models/pspice2ltspice.py. Run models/fetch-models.sh first - the vendor
+* model is not committed (see that script for why).
+*
+* SPDD 5.4 quotes the step as 30 -> 250 mA; those are the 5 V-SIDE figures.
+* Seen from the buck's output, where a load step actually happens, the same
+* event is 40 -> 335 mA, and that is what is applied here.
+*
+* NOTE ON RUNTIME: minutes, not seconds. The model's soft-start takes about
+* 1.5 ms and has to run before any step is meaningful, and a 2.2 MHz switcher
+* is resolved the whole way. Do not add sweeps casually.
+* ===========================================================================
+
+.include models/tps62827.lib
+
+* --- operating point ----------------------------------------------------------
+.param VIN  = 5.0       ; nominal. rail-sag covers what happens when the
++                       ; appliance cannot hold this up
+.param VOUT = 3.3
+
+* --- the power stage - PLACEHOLDER VALUES -------------------------------------
+* TPS62827 is the 4 A member of the TPS6282x family and is oversized for this
+* board; the family member, the inductor and the output capacitors are not yet
+* pinned (SPDD 7.2). The values below are scaled from TI's own testbench for
+* this model, which ran VOUT = 1.8 V at 4 A with L = 470 nH and COUT = 100 uF.
+* Re-run this deck once the real parts are chosen - it is one command.
+.param L     = 1u
+.param DCR   = 0.05
+.param COUT  = 47u      ; ceramic, DC-bias derated (SPDD 7.1)
+.param ESR   = 5m
+.param CIN   = 10u
+.param RFB1  = 180k     ; 0.6 V reference: VOUT = 0.6 * (1 + RFB1/RFB2)
+.param RFB2  = 40k
+.param CFF   = 120p     ; feedforward zero, as on TI's testbench
+
+* --- the load -------------------------------------------------------------------
+.param I33_IDLE = 0.040 ; C3 idle, WiFi connected      (SPDD 5.4)
+.param I33_TX   = 0.335 ; C3 WiFi transmit peak        (SPDD 5.4)
+.param VBROWN   = 3.0   ; the requirement. 3.0 V is the C3's minimum operating
++                       ; supply; its brownout detector trips lower still, so
++                       ; this is the conservative line to hold.
+
+* --- timing -----------------------------------------------------------------------
+.param TSTEP = 2.2m     ; after soft-start has finished and the loop has settled
+.param TON   = 200u
+.param TPER  = 400u
+.param TSTOP = 2.8m
+
+* ===========================================================================
+Vin   vin 0 {VIN}
+Ven   en  0 {VIN}
+Cin   vin 0 {CIN} Rser=5m
+X1    en pg fb 0 sw vin TPS62827_TRANS
+L1    sw vout {L} Rser={DCR}
+Cout  vout 0 {COUT} Rser={ESR}
+Rpg   vout pg 100k
+Rfb1  vout fb {RFB1}
+Cff   vout fb {CFF}
+Rfb2  fb   0  {RFB2}
+Iload vout 0 PULSE({I33_IDLE} {I33_TX} {TSTEP} 1u 1u {TON} {TPER})
+
+* `startup` is required, not cosmetic: it solves the operating point with the
+* sources at zero - which converges - and then ramps them, so the model's
+* internal latches and references initialise. Without it LTspice either fails
+* the operating point or (with uic) starts the model in a dead state.
+.tran 0 {TSTOP} 0 200n startup
+.options trtol=7 plotwinsize=0
+.save V(vout) V(sw) V(fb) V(vin)
+
+.meas TRAN vo_ss  AVG V(vout) FROM 2.0m  TO 2.19m   ; regulated level before the step
+.meas TRAN vo_und MIN V(vout) FROM {TSTEP} TO 2.45m ; undershoot on load-on
+.meas TRAN vo_ovr MAX V(vout) FROM 2.4m  TO 2.65m   ; overshoot on load-off
+.meas TRAN margin PARAM vo_und-{VBROWN}
+.end

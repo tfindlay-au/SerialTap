@@ -1,0 +1,169 @@
+"""
+SerialTap - top-level architecture.
+
+STUB. This file fixes the block structure and how the blocks connect; it does
+NOT yet pin any parts. Every component still has to be chosen deliberately and
+named by MPN (CLAUDE.md design principle 2), and two of them - the buck and the
+eFuse - are gated on the power-path simulation in sim/.
+
+Deliberately no generic passives yet: instantiating a bare Resistor or
+Capacitor invites atopile's automatic part picker to resolve it to the cheapest
+in-stock LCSC part, which is exactly the behaviour the project rules out.
+Passives arrive with their MPNs, not before.
+
+Architecture follows docs/SPDD.md 4.
+"""
+
+import ElectricLogic
+import ElectricPower
+import USB2_0
+
+
+module Port:
+    """
+    The single level-translated UART port: a 4-pin JST XA carrying 5 V, GND, TX
+    and RX. Simultaneously the data path to the target device and the board's
+    primary power source (CONTEXT.md, "Port").
+
+    TX is the pin the board drives, RX the pin it listens on - fixed, with no
+    crossover jumper, because the translators are fixed-direction (ADR 0001).
+    """
+    power = new ElectricPower
+    tx = new ElectricLogic
+    rx = new ElectricLogic
+
+
+module InputProtection:
+    """
+    Resettable fuse plus the current-limited eFuse (TPS2553 class) that bounds
+    inrush by a resistor rather than by the bulk capacitance (ADR 0004).
+
+    The limit resistor is a GATED value: sim/inrush.cir says it must sit
+    strictly below the appliance's own current limit, and the appliance has not
+    been measured yet.
+    """
+    power_in = new ElectricPower
+    power_out = new ElectricPower
+
+
+module SupplyOr:
+    """
+    Ideal-diode OR of the two supply sources, so neither can back-feed the
+    other - in particular so a laptop's USB can never push current into an
+    appliance's rail (FR-6).
+
+    Ideal diodes rather than Schottkys because ~20 mV of drop keeps the rail
+    genuinely at 5 V for the translators' VCCB (SPDD 5.3).
+    """
+    jst_in = new ElectricPower
+    usb_in = new ElectricPower
+    power_out = new ElectricPower
+
+
+module Rail3V3:
+    """
+    Synchronous buck, 5 V -> 3.3 V (ADR 0003). Not an LDO: ~85 mA less peak
+    draw on an appliance rail of unknown capability, and ~0.45 W less heat on a
+    board with no enclosure.
+
+    Part gated on sim/buck-load-step.cir, which needs a vendor SPICE model
+    (SPDD 7.2).
+    """
+    power_in = new ElectricPower
+    power_out = new ElectricPower
+
+
+module LevelTranslator:
+    """
+    One fixed-direction dual-supply buffer channel. Direction is hard-wired in
+    copper - no auto-direction parts (ADR 0001).
+
+    VCCA is the 3.3 V side, VCCB the 5 V side.
+    """
+    power_a = new ElectricPower
+    power_b = new ElectricPower
+    a = new ElectricLogic
+    b = new ElectricLogic
+
+
+module PortProtection:
+    """
+    Series resistors on TX and RX plus the ESD array on the 5 V-side signals
+    (SPDD 5.6). Free at 9600 baud; limits fault current if a line meets 5 V or
+    GND during install.
+    """
+    power = new ElectricPower
+    outer_tx = new ElectricLogic
+    outer_rx = new ElectricLogic
+    inner_tx = new ElectricLogic
+    inner_rx = new ElectricLogic
+
+
+module Module_ESP32C3:
+    """
+    ESP32-C3-MINI-1 (ADR 0002). One UART for the port; console, flashing and
+    debug ride the built-in USB Serial/JTAG on GPIO18/19.
+    """
+    power = new ElectricPower
+    uart_tx = new ElectricLogic
+    uart_rx = new ElectricLogic
+    usb = new USB2_0
+
+
+module BenchAccess:
+    """
+    USB-C receptacle: the sole programming, logging and debug interface
+    (ADR 0002), plus the BOOT and RESET tact switches that are the only way
+    back if firmware wedges the USB peripheral.
+    """
+    power_out = new ElectricPower
+    usb = new USB2_0
+
+
+module SerialTap:
+    """
+    The board. See docs/SPDD.md 4 for the block diagram this mirrors.
+    """
+    port = new Port
+    protection = new InputProtection
+    supply = new SupplyOr
+    rail_3v3 = new Rail3V3
+    bench = new BenchAccess
+    esp32 = new Module_ESP32C3
+    port_protection = new PortProtection
+    translate_tx = new LevelTranslator
+    translate_rx = new LevelTranslator
+
+    # --- power path (SPDD 4) ---------------------------------------------
+    # JST 5 V in through the fuse and eFuse, OR-ed against USB-C VBUS.
+    port.power ~ protection.power_in
+    protection.power_out ~ supply.jst_in
+    bench.power_out ~ supply.usb_in
+
+    # The OR-ed 5 V rail feeds the buck and both translators' VCCB.
+    supply.power_out ~ rail_3v3.power_in
+    supply.power_out ~ translate_tx.power_b
+    supply.power_out ~ translate_rx.power_b
+
+    # 3.3 V feeds the module and both translators' VCCA.
+    rail_3v3.power_out ~ esp32.power
+    rail_3v3.power_out ~ translate_tx.power_a
+    rail_3v3.power_out ~ translate_rx.power_a
+
+    # --- signal path (SPDD 4) --------------------------------------------
+    # Outward: C3 UART TX -> up-translator -> series R and ESD -> port TX.
+    esp32.uart_tx ~ translate_tx.a
+    translate_tx.b ~ port_protection.inner_tx
+    port_protection.outer_tx ~ port.tx
+
+    # Inward: port RX -> series R and ESD -> down-translator -> C3 UART RX.
+    port.rx ~ port_protection.outer_rx
+    port_protection.inner_rx ~ translate_rx.b
+    translate_rx.a ~ esp32.uart_rx
+
+    # The ESD array sits on the 5 V side, so it references that rail.
+    supply.power_out ~ port_protection.power
+
+    # --- bench access ------------------------------------------------------
+    # Console, first flash and debug ride the C3's ROM USB Serial/JTAG.
+    bench.usb ~ esp32.usb
