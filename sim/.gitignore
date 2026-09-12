@@ -1,0 +1,6 @@
+# LTspice output. run.py deletes these unless --keep-raw; belt and braces.
+*.raw
+*.op.raw
+
+# The decks' own logs; run.py copies the decoded text into results/.
+/*.log

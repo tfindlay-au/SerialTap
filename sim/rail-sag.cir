@@ -1,0 +1,114 @@
+* SerialTap - rail-sag
+* ===========================================================================
+* QUESTION (SPDD 5.8): given a current-limited appliance rail, the board's
+* bulk capacitance and the C3's WiFi transmit bursts, does the 5 V rail stay
+* high enough for the buck to hold 3.3 V above the C3's brownout threshold?
+*
+* OUTPUT is not "it works" - it is a NUMBER: the minimum appliance source
+* current this design tolerates. That number is what SPDD 12.1 step 2 goes
+* and measures the Haier against.
+*
+* Modelled path (JST only - USB-C is not live in this deck):
+*
+*   VAPP -[CLIM: appliance limit]- Vsense -Rcable- Rfuse -[CLIM: eFuse]-
+*        -[ideal diode]- 5V rail -+- CBULK(+ESR) -+- ceramics -+- LED
+*                                 |
+*                                 +- buck as a CONSTANT-POWER load -> 3V3 -> C3
+*
+* Sweeps the appliance current limit against how hard the radio is driven.
+* See sim/README.md for how to read the results.
+* ===========================================================================
+
+.include models/behavioral.lib
+
+* --- appliance rail (the unknown being characterised) -----------------------
+.param VAPP  = 5.0      ; open-circuit service-rail voltage
+.param IAPP  = 150m     ; current limit - SWEPT below; this is only a default
+.param RAPP  = 0.5      ; appliance source impedance in its CV region
+
+* --- harness and input protection --------------------------------------------
+.param RCABLE = 0.25    ; ~1 m of 26 AWG, out and back
+.param RFUSE  = 0.20    ; PTC hold resistance; set 0 if the eFuse makes it
++                       ; redundant (ADR 0004)
+.param IEF    = 0.60    ; eFuse current limit - set by inrush.cir; must sit
++                       ; clear of the transmit burst
+.param RDSEF  = 0.090   ; eFuse pass resistance (TPS2553 class)
+
+* --- 5 V rail storage ---------------------------------------------------------
+.param CBULK   = 470u   ; polymer / hybrid aluminium (SPDD 7.1)
+.param ESRBULK = 25m
+.param CCER    = 22u    ; all 5 V ceramics, DC-bias derated (SPDD 7.1)
+.param ESRCER  = 5m
+.param RLED    = 5k     ; power LED branch, ~1 mA
+
+* --- buck and the load behind it ----------------------------------------------
+.param VOUT     = 3.3
+.param ETA      = 0.90
+.param VBUCKUV  = 3.0   ; MODELLING floor: where the converter is made to stop.
++                       ; Set below any candidate part so the deck reports how
++                       ; deep a sag really goes instead of clipping at the
++                       ; threshold being judged. Readings under ~3.6 V are
++                       ; diagnostic only - regulation is already lost there.
+.param VBUCKREQ = 4.0   ; REQUIREMENT: minimum input the chosen buck needs.
++                       ; PLACEHOLDER until the buck MPN is picked; `margin`
++                       ; below is simply v5min - VBUCKREQ, so results can be
++                       ; re-judged against the real number without re-running.
+.param I33_RX = 0.085   ; WiFi connected, normal traffic   (SPDD 5.4)
+.param I33_TX = 0.335   ; WiFi transmit peak, 20 dBm       (SPDD 5.4)
+
+* --- radio duty ----------------------------------------------------------------
+* One transmit burst of TON every TPER. TPER is stepped, so duty is
+* 2 ms / TPER: 10 ms = 20%, 4 ms = 50%, 2.2 ms = 91%.
+.param TON   = 2m
+.param TPER  = 10m
+.param TEDGE = 10u      ; PA ramp; fast, but not stiff
+
+* --- run control ----------------------------------------------------------------
+.param TSTART = 100m    ; rails settle first, then the radio starts
+.param TMEAS  = 200m    ; measure only once the burst train is periodic
+.param TSTOP  = 600m
+
+* ===========================================================================
+* circuit
+* ===========================================================================
+Vapp   app 0 {VAPP}
+Xclapp app appo CLIM ILIM={IAPP} RON={RAPP}
+Vsense appo jst 0                       ; what the appliance actually delivers
+Rcable jst  fi  {RCABLE}
+Rfuse  fi   efi {RFUSE}
+Xefuse efi  efo CLIM ILIM={IEF} RON={RDSEF}
+Dor    efo  v5  IDEALD                  ; ideal-diode OR, JST branch (FR-6)
+
+Xbulk  v5 0 CBULKX C={CBULK} ESR={ESRBULK}
+Xcer   v5 0 CBULKX C={CCER}  ESR={ESRCER}
+Rled   v5 0 {RLED}
+
+Vctl   ctl 0 PULSE({I33_RX} {I33_TX} {TSTART} {TEDGE} {TEDGE} {TON} {TPER})
+Xbuck  v5 0 ctl BUCKLOAD VOUT={VOUT} ETA={ETA} VUV={VBUCKUV}
+
+* ===========================================================================
+* sweeps
+*   IAPP  what the appliance can supply - the unknown being bracketed
+*   TPER  how hard the radio is driven:
+*           10m   20% duty - steady ESPHome traffic
+*            4m   50% duty - busy link
+*          2.2m   91% duty - association / OTA. Effectively sustained
+*                 transmit: the case bulk capacitance CANNOT ride out,
+*                 and the condition SPDD 12.1 step 8 insists on testing.
+*   CBULK the other half of SPDD 5.8's brief - what extra bulk would buy.
+*         220u / 470u (the design value) / 1000u.
+* ===========================================================================
+.step param IAPP list 50m 75m 100m 110m 120m 130m 150m 175m 200m 225m 250m 275m 300m
+.step param TPER list 10m 4m 2.2m
+.step param CBULK list 220u 470u 1000u
+
+.tran 0 {TSTOP} 0 20u
+.options plotwinsize=0
+.save V(v5) V(jst) V(ctl) I(Vsense)
+
+.meas TRAN v5min    MIN V(v5)     FROM {TMEAS} TO {TSTOP}
+.meas TRAN v5avg    AVG V(v5)     FROM {TMEAS} TO {TSTOP}
+.meas TRAN iapp_avg AVG I(Vsense) FROM {TMEAS} TO {TSTOP}
+.meas TRAN iapp_pk  MAX I(Vsense) FROM {TMEAS} TO {TSTOP}
+.meas TRAN margin   PARAM v5min-{VBUCKREQ}
+.end

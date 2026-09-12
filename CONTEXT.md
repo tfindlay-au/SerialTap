@@ -1,0 +1,199 @@
+# Context: SerialTap
+
+## What this project is
+
+**SerialTap** is an open-hardware board that puts an appliance's 5 V serial
+service port on Home Assistant. An ESP32 module plus bidirectional level
+translation, powered by the appliance itself — one 4-wire cable carries 5 V,
+GND, TX and RX.
+
+Primarily a hardware design project: schematic and layout (atopile + KiCad 10),
+gerbers, BOM, CPL and an assembly package for PCBWay. Scope also includes the
+ESPHome package that runs on the returned boards and documented cable pinouts
+per appliance, so that someone else can build one and fit it.
+
+## Design principles
+
+**1. Quality over cost.** This is not a race to the bottom on part count or
+price. Where a branded part yields a better product, use it. Where extra
+decoupling makes the circuit work better, add it. BOM cost on a five-board run
+is dwarfed by assembly setup, shipping and time — and a marginal part that
+forces one respin costs more than it ever saved.
+
+Concretely: polymer or hybrid aluminium for bulk rather than generic
+electrolytic; MLCCs chosen with DC-bias derating in mind, not just nameplate
+capacitance; a shielded branded inductor with real saturation margin; genuine
+JST parts, not clones.
+
+**2. The design is not limited to KiCad's stock libraries.** Parts are chosen
+for the design, and their symbols, footprints and 3D models are sourced from
+SnapEDA or elsewhere as needed.
+
+**3. The project carries its own library.** Everything the design depends on
+lives in the repo, referenced with `${KIPRJMOD}`-relative paths, so the next
+person can open it without having this machine's global library.
+
+## Glossary
+
+### SerialTap
+The project and the board. Named for what it does: it taps an appliance's 5 V
+serial service connector for **both data and power** over a single 4-wire cable.
+
+Deliberately neutral about silicon and vendor — the module already changed once
+mid-design (S3 → C3) and the reference appliance is only the first of many.
+
+Previously named `esp32leveler`, where "leveler" meant *logic level translator*
+and was routinely misread as a spirit level or inclinometer. That name is
+retired; any surviving reference to it means this project.
+
+### Level translator
+The circuit that converts between the ESP32's 3.3 V logic and the target's 5 V
+logic. Informally "level shifter"; use **translator** in schematic and doc text.
+Never "leveler".
+
+### Target device
+The external equipment the board talks to over UART. It drives 5 V logic levels
+and is the reason level translation exists at all.
+
+### Board
+One physical PCB design at a given revision (e.g. `r1p0`), following the
+`daikin-esp` convention of `rNpM` revision suffixes.
+
+### Port
+The board's single level-translated UART channel, translated in both directions
+with fixed-direction buffers.
+
+Physically a 4-pin JST XA connector carrying **5 V, GND, TX, RX**. It is
+simultaneously the data path to the target device and the board's primary power
+source. There is exactly one port: the board is a single-target adapter, not a
+multi-port gateway.
+
+### Primary supply
+The 5 V arriving on the port's JST XA connector. The board is normally powered by
+the target device it is controlling.
+
+### Supply sources
+Two, either of which may be live: the port's JST XA (primary) and USB-C (bench).
+They are OR-ed with ideal diodes so neither can back-feed the other — in
+particular so a laptop's USB cannot push 5 V into the target appliance's rail.
+
+### Bench access
+USB-C only. It carries first flashing (esptool over the C3's ROM USB
+Serial/JTAG), ESPHome console logging over USB CDC, and OpenOCD debug. In
+normal service the board is updated by ESPHome OTA and USB-C is unused.
+
+### Recovery
+BOOT (GPIO9) and RESET (EN) tact switches. Not needed for ordinary flashing —
+esptool resets the chip into download mode over USB by itself — but the only
+way back if firmware repurposes the USB pins, wedges the USB peripheral, or
+boot-loops.
+
+### Reference target
+**Haier AS50QDFHRA** split-system HVAC, spoken to with the hOn protocol over
+UART at 9600 8E1 — handled by ESPHome's built-in `haier` climate component.
+
+It is the *reference* target, not the only one: it is what the first boards are
+validated against and what the connector pinout is chosen to match.
+
+### Generic use
+The board is intended to work with any appliance exposing 5 V power and UART on
+a service connector. Nothing in the hardware may assume Haier specifically — no
+protocol-dependent circuitry, no reliance on a particular idle level, and no
+assumption about how much current the appliance's 5 V rail can supply.
+
+### Port pinout
+Fixed, not selectable. Conventional order **5 V, GND, TX, RX**, silkscreened
+from the *board's* point of view: TX is the pin the board drives, RX is the pin
+the board listens on.
+
+There is no crossover jumper. Because the translators are fixed-direction
+(see ADR 0001), a polarity mistake cannot be corrected in firmware either —
+remapping the C3's UART pins would drive a buffer backwards. Adapting to an
+appliance that orders or labels its pins differently is a **cable** problem, and
+each appliance gets a documented harness.
+
+## Resolved design decisions
+
+| Area | Decision |
+|---|---|
+| Module | ESP32-C3-MINI-1 (ADR 0002) |
+| Port | One, JST XA 4-pin: 5 V, GND, TX, RX |
+| Translation | Fixed-direction dual-supply buffers (ADR 0001) |
+| Supply sources | JST XA 5 V (primary) and USB-C, ideal-diode OR-ed |
+| Inrush / sag | Current-limited eFuse + ≥470 µF low-ESR bulk (ADR 0004) |
+| 3.3 V rail | Synchronous buck, not an LDO (ADR 0003) |
+| Port protection | Series resistors on TX/RX, ESD array, resettable fuse on 5 V |
+| Programming | USB-C only; BOOT (GPIO9) and RESET (EN) tact switches |
+| Source of truth | atopile `.ato` for netlist and BOM; KiCad 10 for layout only |
+| Parts | Every component pinned by MPN; no automatic part picking |
+| Library | Project-local `lib/`, `${KIPRJMOD}`-relative, nothing global |
+| Mechanical | Bare board, mounting holes, no enclosure |
+| Stackup | 4-layer: L1 sig+parts / L2 GND / L3 rails / L4 GND |
+| Outline | ~40 × 25 mm; connectors one short edge, antenna the other |
+| Fab class | PCBWay 5/5 mil, 0.25 mm drill; impedance not controlled |
+| Indicators | Power LED only; no status or activity LEDs |
+| Test points | Pads on 5 V, 3V3, GND, and both sides of each translator channel |
+| First run | 5 boards, single-sided assembly (all parts on top) |
+| Scope | Hardware + ESPHome package + harness documentation |
+| Licence | CERN-OHL-P for hardware, MIT for firmware and docs |
+| Simulation | Power path only, LTspice decks in `sim/`, gates fabrication |
+| Board acceptance | Loopback plug + ESPHome self-test, per board |
+
+### Hot loop
+The buck's input loop — input ceramic → high-side FET → low-side FET → ground →
+back to the ceramic. It carries the fastest di/dt on the board and is the
+dominant EMI source. Minimising its area outranks every other layout
+consideration except the antenna keepout.
+
+Distinct from the **switch node**, which is the dV/dt aggressor and is
+deliberately kept small in *area* rather than poured.
+
+### Project library
+`lib/` at the repo root: symbols, footprints and 3D models for every part in the
+design, plus datasheets. Shared by the atopile source in `elec/` and the KiCad
+layout in `pcb/`, wired up with `${KIPRJMOD}`-relative paths. Follows the
+`daikin-esp/pcb/lib/` convention.
+
+Nothing in the design may depend on a library outside this directory.
+
+### Simulation deck
+A standalone LTspice netlist in `sim/`, hand-written and deliberately outside
+the atopile → KiCad flow. Decks model the power path only; nothing else
+on the board has a usable model or a question worth simulating.
+
+### Loopback plug
+A JST XA shell with TX bridged to RX. Turns the whole signal chain into a
+self-test: firmware transmits a pattern and checks it returns, exercising both
+translation directions, both series resistors and the connector, with no scope
+and no appliance. It does not prove drive strength into a loaded line.
+
+### Build artifact
+Anything regenerated by `ato build` — including the KiCad schematic. Build
+artifacts are never hand-edited. If a change is needed, it is made in the `.ato`
+source and the artifact regenerated. The layout (`.kicad_pcb`) is the one file
+that is *not* a build artifact: it is hand-maintained and only has its netlist
+updated from atopile.
+
+## Known risks
+
+- **Weak appliance rail.** The Haier 5 V service output is current-limited and
+  its capability is not yet measured. Mitigated by the buck (≈250 mA peak draw
+  versus ≈335 mA for an LDO), soft start, and bulk capacitance — but the actual rail must be
+  measured during bring-up before the design is considered validated.
+  Simulation (`sim/`, 2026-09-12) says it needs to supply **300–370 mA**, and
+  that bulk capacitance cannot substitute for source current: sag is set by the
+  *average* draw, so the capacitor rides out one transmit burst and nothing
+  longer.
+- **Bare board in an appliance.** No enclosure means exposed electronics near
+  HVAC condensate and mains wiring. Accepted deliberately; the board is not
+  weather- or touch-protected, and any production use would need one.
+- **No SPICE model for the buck or eFuse.** Simulation gates fabrication, so a
+  part without a usable vendor model cannot be used regardless of price or
+  availability. This constrains selection before atopile resolves anything.
+- **Silent substitution at assembly.** Every part is pinned by MPN precisely so
+  that a cheaper equivalent cannot reach the board unnoticed. Substitutions must
+  be proposed back for a decision, never applied silently.
+- **Unverified Haier pinout.** Pin order on the AS50QDFHRA service connector is
+  assumed, not confirmed. The board uses a conventional fixed pinout, so this is
+  a cable question rather than a respin question — but the harness cannot be
+  built until the unit is opened and probed.

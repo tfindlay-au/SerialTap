@@ -1,0 +1,105 @@
+* SerialTap - inrush
+* ===========================================================================
+* QUESTION (SPDD 5.8): what does the appliance see at plug-in, with the eFuse
+* limit set to a given value?
+*
+* ADR 0004 chose a CURRENT-limited eFuse over a slew-rate-limited load switch
+* precisely so that inrush is set by a resistor and not by the bulk capacitor.
+* This deck sets that resistor: it sweeps the eFuse limit against the
+* appliance's own limit, into a fully discharged board.
+*
+* The failure being designed against is not a slow rise - it is dragging the
+* appliance into ITS current limit, where behaviour is undefined and may
+* include resetting the appliance. V(jst) collapsing is that failure.
+*
+*   VAPP -[CLIM: appliance limit]- Vsense -Rcable- Rfuse -Cin- [CLIM: eFuse]-
+*        -[ideal diode]- 5V rail - CBULK + ceramics - buck - C3 (idle)
+* ===========================================================================
+
+.include models/behavioral.lib
+
+.param VAPP   = 5.0
+.param IAPP   = 300m    ; appliance limit - SWEPT
+.param RAPP   = 0.5
+.param RCABLE = 0.25
+.param RFUSE  = 0.20
+.param IEF    = 300m    ; eFuse limit set by the programming resistor - SWEPT
+.param RDSEF  = 0.090
+.param CINEF  = 0.1u    ; ceramic on the eFuse input
+
+.param CBULK   = 470u
+.param ESRBULK = 25m
+.param CCER    = 22u
+.param ESRCER  = 5m
+.param RLED    = 5k
+
+.param VOUT     = 3.3
+.param ETA      = 0.90
+.param VBUCKUV  = 3.0
+.param I33_IDLE = 0.040 ; the C3 boots and idles; it does not associate until
++                       ; well after this window (SPDD 5.4)
+
+.param VJSTOK = 4.0     ; the appliance's own rail must not be dragged below
++                       ; this while the board charges. A judgement call, not a
++                       ; datasheet number - no appliance publishes what its
++                       ; service rail tolerates.
+.param TPLUG  = 1u      ; the board meets a live rail
+.param TSTOP = 150m
+
+* ===========================================================================
+Vapp   app 0 PWL(0 0 {TPLUG} {VAPP})
+Xclapp app appo CLIM ILIM={IAPP} RON={RAPP}
+Vsense appo jst 0
+Rcable jst  fi  {RCABLE}
+Rfuse  fi   efi {RFUSE}
+Cinef  efi  0   {CINEF}
+Xefuse efi  efo CLIM ILIM={IEF} RON={RDSEF}
+Dor    efo  v5  IDEALD
+
+Xbulk  v5 0 CBULKX C={CBULK} ESR={ESRBULK}
+Xcer   v5 0 CBULKX C={CCER}  ESR={ESRCER}
+Rled   v5 0 {RLED}
+
+Vctl   ctl 0 {I33_IDLE}
+Xbuck  v5 0 ctl BUCKLOAD VOUT={VOUT} ETA={ETA} VUV={VBUCKUV}
+
+* ===========================================================================
+* sweeps
+*   IEF   candidate eFuse programming points. A real TPS2553-class part holds
+*         its limit to about +/-20%, so read these as NOMINAL and check both
+*         ends of that band against the appliance.
+*   IAPP  what the appliance can supply. 250 mA is the sustained-transmit
+*         figure rail-sag produced; 300/500 mA are the more comfortable cases.
+* ===========================================================================
+.step param IEF  list 150m 200m 250m 300m 400m 500m 750m
+.step param IAPP list 250m 300m 500m
+
+.tran 0 {TSTOP} 0 10u
+.options plotwinsize=0
+.save V(v5) V(jst) V(efi) I(Vsense)
+
+* ispike   the sub-microsecond contact event: the discharged 0.1 uF on the
+*          eFuse input, charged straight through the cable before any
+*          limiter can respond. See README "Model fidelity" - CLIM responds
+*          instantly, a real eFuse takes ~2 us, and connector inductance is
+*          not modelled, so treat this as indicative only.
+* icharge  the current the appliance actually delivers while the bulk
+*          capacitor charges. If it equals IEF the eFuse is in control; if it
+*          equals IAPP instead, the appliance is in ITS OWN current limit -
+*          the outcome ADR 0004 is designed to avoid.
+* vjst_min how far the appliance's own rail is dragged while the board's bulk
+*          capacitor charges. THIS is the discriminator. With the eFuse in
+*          control the eFuse takes the whole difference and the appliance sits
+*          near 4.9 V throughout; once the appliance is limiting instead, its
+*          rail is pulled down to follow the charging capacitor, which is what
+*          can reset it.
+* margin   vjst_min - VJSTOK. This is the `ok` column.
+* trise    plug-in to a usable 5 V rail. Blank = never got there.
+* qin      total charge taken from the appliance over the window
+.meas TRAN ispike   MAX I(Vsense) FROM 0 TO 10u
+.meas TRAN icharge  AVG I(Vsense) FROM 1m TO 4m
+.meas TRAN vjst_min MIN V(jst)    FROM 10u TO {TSTOP}
+.meas TRAN trise    WHEN V(v5)=4.5 CROSS=1
+.meas TRAN qin      INTEG I(Vsense) FROM 0 TO {TSTOP}
+.meas TRAN margin   PARAM vjst_min-{VJSTOK}
+.end
