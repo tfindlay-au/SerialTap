@@ -264,6 +264,7 @@ KiCad 10 is used only for board layout and fabrication output.
 | netlist | `ato build` | No |
 | `*.kicad_sch` | `ato build` | **No** — build artifact |
 | `*.kicad_pcb` | KiCad 10 | Yes — netlist updated from atopile |
+| `*.kicad_pro` | KiCad 10 | Yes — carries the DRC rules and net classes from [layout-rules.md](layout-rules.md) |
 | gerbers, drill | KiCad 10 | No |
 | BOM | `ato build` | No |
 | `sim/*.cir` | hand-written | Yes — standalone, outside the atopile flow (§5.8) |

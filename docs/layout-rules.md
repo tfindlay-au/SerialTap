@@ -30,6 +30,14 @@ typically a thin prepreg L1–L2 and a thick core L2–L3. Obtain PCBWay's publi
 stackup before computing any trace geometry; the L1–L2 height sets the USB pair
 dimensions.
 
+**Encoded as of 2026-09-12** in `pcb/serialtap-r1p0/serialtap-r1p0.kicad_pcb`:
+four copper layers named per the table above, on a **provisional** asymmetric
+stackup of 0.2104 mm prepreg / 1.065 mm core / 0.2104 mm prepreg, 35 µm outer
+and 17.5 µm inner copper. Those dielectric figures are the usual nominal values
+for a 1.6 mm four-layer board, **not** PCBWay's published stackup — they are
+placed so KiCad has a physically sensible board to work with, and the rule above
+still stands: get the real numbers before computing the USB geometry.
+
 ## Floorplan
 
 Board outline ~40 × 25 mm. Three zones along the long axis:
@@ -123,6 +131,12 @@ JST pin --> TVS array --> series R (100-330 Ω) --> translator B-side
 - No unstitched copper islands.
 
 ## Design rules (PCBWay 5/5 mil, 0.25 mm drill)
+
+These are encoded in `pcb/serialtap-r1p0/serialtap-r1p0.kicad_pro` and enforced
+by `kicad-cli pcb drc` — verified 2026-09-12 by feeding DRC a deliberately
+undersized track and confirming it was rejected against the 0.127 mm minimum.
+Net classes `Default` (0.20 mm), `Power` (0.50 mm) and `USB` (0.20 mm / 0.13 mm
+gap) are defined there too.
 
 | Rule | Value |
 |---|---|
