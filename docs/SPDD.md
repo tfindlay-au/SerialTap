@@ -115,8 +115,31 @@ buses are out of reach for this board without a revision.
 
 ### 5.2 Port and pinout
 
-One JST XA 4-pin connector, fixed pin order **5 V, GND, TX, RX**, silkscreened
-from the board's point of view — TX is the pin the board drives.
+One JST XA **5-pin** connector (2.5 mm pitch), four of which are used, in fixed
+pin order **5 V, GND, TX, RX**, silkscreened from the board's point of view —
+TX is the pin the board drives.
+
+The pin count follows the reference target: the AS50QDFHRA service connector
+was confirmed on 2026-09-12 to be a 5-pin XA, mated with a JST XARR-05V panel
+housing. Carrying five on the board keeps the harness straight-through.
+
+Board-side candidates, all XA series, 2.5 mm pitch, 5 position:
+
+| MPN | Entry |
+|---|---|
+| `B05B-XASK-1(LF)(SN)` | vertical, top entry, shrouded |
+| `B05B-XASK-1-A(LF)(SN)` | vertical, with locating boss |
+| `S05B-XASK-1(LF)(SN)` | right angle, side entry |
+
+Not yet pinned: entry direction is a mechanical call about how the board sits in
+the appliance, and the gender/mating relationship against XARR-05V should be
+read off the JST XA datasheet rather than a distributor summary before an MPN
+is committed.
+
+**The fifth pin's function is unknown**, so nothing on the board connects to it
+yet — not the ESD array, not a GPIO. It is captured with the other four during
+the Wednesday probe. Committing it to anything before that risks strapping an
+unknown signal, possibly not a 5 V-logic one, to a net that matters.
 
 There is no crossover jumper, and the C3's GPIO matrix cannot substitute for
 one: remapping UART pins would drive a fixed-direction buffer backwards.
@@ -477,7 +500,9 @@ that result.
 - Buck and eFuse MPNs, both of which need vendor SPICE models (§7.2). The buck
   blocks `buck-load-step`; the eFuse's current-limit accuracy is what turns the
   300–370 mA range above into a single number
-- AS50QDFHRA service connector pin order and mating part (blocks the harness)
+- AS50QDFHRA service connector **pin order**, and what the fifth pin carries
+  (blocks the harness). The connector and mating part are now known: 5-pin JST
+  XA, 2.5 mm pitch, XARR-05V panel housing (confirmed 2026-09-12)
 - Whether a board-mounted JST XA or a wire-to-board pigtail suits the install
 
 ## 14. Decision log

@@ -21,9 +21,14 @@ import USB2_0
 
 module Port:
     """
-    The single level-translated UART port: a 4-pin JST XA carrying 5 V, GND, TX
-    and RX. Simultaneously the data path to the target device and the board's
-    primary power source (CONTEXT.md, "Port").
+    The single level-translated UART port: a 5-pin JST XA, of which four are
+    used - 5 V, GND, TX and RX. Simultaneously the data path to the target
+    device and the board's primary power source (CONTEXT.md, "Port").
+
+    Five pins because the reference target has five (confirmed 2026-09-12,
+    XARR-05V panel housing). The fifth is deliberately NOT modelled here: its
+    function is unknown until the Wednesday capture, and connecting an unknown
+    signal to anything is worse than leaving it off.
 
     TX is the pin the board drives, RX the pin it listens on - fixed, with no
     crossover jumper, because the translators are fixed-direction (ADR 0001).

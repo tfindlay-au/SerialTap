@@ -63,10 +63,21 @@ One physical PCB design at a given revision (e.g. `r1p0`), following the
 The board's single level-translated UART channel, translated in both directions
 with fixed-direction buffers.
 
-Physically a 4-pin JST XA connector carrying **5 V, GND, TX, RX**. It is
-simultaneously the data path to the target device and the board's primary power
-source. There is exactly one port: the board is a single-target adapter, not a
-multi-port gateway.
+Physically a **5-pin** JST XA connector (2.5 mm pitch), of which the design
+uses four: **5 V, GND, TX, RX**. It is simultaneously the data path to the
+target device and the board's primary power source. There is exactly one port:
+the board is a single-target adapter, not a multi-port gateway.
+
+Five pins because that is what the reference target has. Confirmed 2026-09-12
+on the AS50QDFHRA, mated with a JST **XARR-05V** panel housing — XA series,
+2.5 mm pitch, contacts sold separately. The board therefore carries a 5-pin XA
+header so the harness can be straight-through, which is the least error-prone
+cable to build and to get wrong.
+
+**What the fifth pin does is unknown.** It is captured along with the other
+four during the Wednesday probe. Until then it connects to nothing on the
+board — not the ESD array, not a GPIO — because strapping an unknown signal to
+a net that matters is a worse failure than losing a pin.
 
 ### Primary supply
 The 5 V arriving on the port's JST XA connector. The board is normally powered by
@@ -117,7 +128,7 @@ each appliance gets a documented harness.
 | Area | Decision |
 |---|---|
 | Module | ESP32-C3-MINI-1 (ADR 0002) |
-| Port | One, JST XA 4-pin: 5 V, GND, TX, RX |
+| Port | One, JST XA **5-pin**, four used: 5 V, GND, TX, RX |
 | Translation | Fixed-direction dual-supply buffers (ADR 0001) |
 | Supply sources | JST XA 5 V (primary) and USB-C, ideal-diode OR-ed |
 | Inrush / sag | Current-limited eFuse + ≥470 µF low-ESR bulk (ADR 0004) |
@@ -193,7 +204,9 @@ updated from atopile.
 - **Silent substitution at assembly.** Every part is pinned by MPN precisely so
   that a cheaper equivalent cannot reach the board unnoticed. Substitutions must
   be proposed back for a decision, never applied silently.
-- **Unverified Haier pinout.** Pin order on the AS50QDFHRA service connector is
-  assumed, not confirmed. The board uses a conventional fixed pinout, so this is
-  a cable question rather than a respin question — but the harness cannot be
-  built until the unit is opened and probed.
+- **Unverified Haier pinout.** Partly resolved. The *connector* is confirmed
+  (2026-09-12): a 5-pin JST XA, 2.5 mm pitch, mated with an XARR-05V panel
+  housing. The *pin order* is still assumed, and the fifth pin's function is
+  entirely unknown. The board uses a conventional fixed pinout, so this stays a
+  cable question rather than a respin question — but the harness cannot be built
+  until all five are captured.
