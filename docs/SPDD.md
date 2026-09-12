@@ -386,8 +386,9 @@ first flash. The YAML lives in an `esphome/` directory.
 ```
 /
 ├── CONTEXT.md                  domain language
-├── LICENSE                     CERN-OHL-P v2
+├── LICENSE                     CERN-OHL-P v2, verbatim
 ├── LICENSE-MIT                 firmware and docs
+├── NOTICE                      which licence covers what, and third-party terms
 ├── docs/
 │   ├── SPDD.md                 this document
 │   ├── adr/                    decision records

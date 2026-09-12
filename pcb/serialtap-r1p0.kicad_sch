@@ -9,6 +9,8 @@
 		(rev "r1p0")
 		(comment 1 "Appliance 5 V serial service port -> Home Assistant")
 		(comment 2 "Capture is the source of truth - see docs/adr/0005-kicad-native-capture.md")
+		(comment 3 "Copyright 2026 Timothy Findlay. Licensed under CERN-OHL-P v2.")
+		(comment 4 "Distributed WITHOUT ANY EXPRESS OR IMPLIED WARRANTY. See LICENSE and NOTICE.")
 	)
 	(lib_symbols)
 	(sheet_instances

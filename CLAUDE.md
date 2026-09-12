@@ -86,14 +86,16 @@ And: **never split the ground plane.**
 - Say **level translator**, not "leveler" — the project was formerly
   `esp32leveler` and that name caused persistent confusion with spirit levels
 - Fab class: PCBWay 5/5 mil, 0.25 mm drill, 4-layer, single-sided assembly
-- Licence: CERN-OHL-P v2 (hardware), MIT (firmware and docs)
+- Licence: CERN-OHL-P v2 (hardware), MIT (firmware and docs). Both permissive;
+  see `NOTICE` for which files fall under which, and for the third-party
+  material that is under neither
 
-**Conventions here stand on their own reasoning.** `../daikin-esp` is a prior
-board by the same author, not a standard — cite it for *evidence* (what part it
-used, how that worked out) and never as precedent for how this repo should be
-shaped. There are thousands of KiCad projects and no canonical layout; if a
-convention cannot be justified on its own terms, it is not a convention worth
-keeping.
+**Conventions here stand on their own reasoning.** `../daikin-esp` is an
+unrelated board by another author (Greg Davill) that happens to sit on this
+machine — not a standard. Cite it for *evidence* (what part it used, how that
+worked out) and never as precedent for how this repo should be shaped. There
+are thousands of KiCad projects and no canonical layout; if a convention cannot
+be justified on its own terms, it is not a convention worth keeping.
 
 ## Current state
 

@@ -1,0 +1,41 @@
+SerialTap
+Copyright 2026 Timothy Findlay
+
+This project is split across two licences.
+
+HARDWARE — the board design: schematic, PCB, project file, the simulation
+decks in sim/, the project library in lib/, and the fabrication outputs
+generated from them.
+
+    Licensed under the CERN Open Hardware Licence Version 2 - Permissive.
+    See LICENSE, or https://ohwr.org/cern_ohl_p_v2.txt
+
+    This source describes Open Hardware and is licensed under CERN-OHL-P v2.
+    You may redistribute and modify this documentation and make products
+    using it under the terms of the CERN-OHL-P v2.
+
+    This documentation is distributed WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTY, INCLUDING OF MERCHANTABILITY, SATISFACTORY QUALITY AND FITNESS
+    FOR A PARTICULAR PURPOSE.
+
+FIRMWARE AND DOCUMENTATION — the ESPHome package in esphome/, the test and
+harness notes, and the written documentation in docs/, CONTEXT.md and
+CLAUDE.md.
+
+    Licensed under the MIT Licence. See LICENSE-MIT.
+
+Both are permissive. You may build this board, modify it, manufacture it and
+sell it, commercially or otherwise, without asking and without any obligation
+to publish your changes. The only requirement either licence makes is that you
+keep the notices intact so the next person knows where it came from and that
+it carries no warranty.
+
+THIRD-PARTY MATERIAL NOT COVERED BY THE ABOVE
+
+  - Vendor SPICE models fetched by sim/models/fetch-models.sh are the property
+    of their respective vendors and are deliberately NOT redistributed here.
+    The script downloads them; the licence terms are the vendor's.
+
+  - Symbols, footprints and 3D models in lib/ sourced from vendors or SnapEDA
+    remain under whatever terms their originators applied. Provenance is
+    recorded alongside them.
