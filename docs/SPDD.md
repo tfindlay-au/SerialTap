@@ -333,7 +333,7 @@ is what sets the appliance requirement.
 
 Every symbol, footprint and 3D model the design uses lives in `lib/` in this
 repo, referenced with `${KIPRJMOD}`-relative paths in `fp-lib-table` and
-`sym-lib-table`, following the `daikin-esp/pcb/lib/` convention.
+`sym-lib-table`.
 
 The design is **not** limited to KiCad's stock libraries — parts are chosen for
 the design and their library assets sourced from SnapEDA or the vendor as
@@ -379,8 +379,7 @@ anything distributed.
 
 ESPHome, using the built-in `haier` climate component in hOn mode at 9600 8E1 on
 the port's UART, with logging over USB CDC. OTA is the normal update path after
-first flash. Repository layout follows `daikin-esp`: an `esphome/` directory
-holding the YAML.
+first flash. The YAML lives in an `esphome/` directory.
 
 ## 10. Deliverables
 
@@ -396,11 +395,11 @@ holding the YAML.
 │   └── harness/                cable pinouts per appliance
 ├── lib/                        project library: symbols, footprints, 3D, datasheets
 ├── sim/                        standalone LTspice decks (§5.8)
-├── pcb/serialtap-rNpM/         one folder per revision - the KiCad project
+├── pcb/
 │   ├── serialtap-rNpM.kicad_sch    source of truth
 │   ├── serialtap-rNpM.kicad_pcb
 │   ├── serialtap-rNpM.kicad_pro
-│   ├── GERBER-serialtap-rNpM/  fab output, regenerated
+│   ├── GERBER-serialtap-rNpM/      fab output, regenerated
 │   ├── BOM-serialtap-rNpM.csv
 │   ├── CPL-serialtap-rNpM.csv
 │   ├── serialtap-rNpM-sch.pdf
@@ -409,15 +408,13 @@ holding the YAML.
 └── test/                       loopback plug build notes, acceptance checklist
 ```
 
-Board name is `serialtap`; revision naming follows the `daikin-esp`
-convention: `serialtap-r1p0`, `serialtap-r1p1`, …
+Board name is `serialtap`; revisions are `serialtap-r1p0`, `serialtap-r1p1`, …
 
-**One folder per revision, and the KiCad project sits directly in it.**
-`daikin-esp` nests a `kicad-src/` inside each board folder, but it carries three
-boards plus a shared library, so all of its levels earn their keep. This repo
-has one board, and a third level for four files does not. Cutting r1p1 is then
-the simplest possible operation — copy the folder, rename the files — and r1p0
-stays frozen as the thing the boards in the field were built from.
+**Flat.** Everything for the board lives directly in `pcb/`, with the revision
+carried in the file name rather than in a folder. One board and a handful of
+files do not need a directory tree, and freezing a revision is what version
+control is already for — a folder per revision would only duplicate what a tag
+does better.
 
 ## 11. Requirements traceability
 

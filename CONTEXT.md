@@ -56,8 +56,9 @@ The external equipment the board talks to over UART. It drives 5 V logic levels
 and is the reason level translation exists at all.
 
 ### Board
-One physical PCB design at a given revision (e.g. `r1p0`), following the
-`daikin-esp` convention of `rNpM` revision suffixes.
+One physical PCB design at a given revision, written `rNpM` — `r1p0`, `r1p1`,
+and so on. The revision is part of the file name rather than a directory, so a
+revision is a set of files in `pcb/`, not a folder.
 
 ### Port
 The board's single level-translated UART channel, translated in both directions
@@ -162,7 +163,7 @@ deliberately kept small in *area* rather than poured.
 ### Project library
 `lib/` at the repo root: symbols, footprints and 3D models for every part in the
 design, plus datasheets. Referenced by the KiCad project in `pcb/` with
-`${KIPRJMOD}`-relative paths. Follows the `daikin-esp/pcb/lib/` convention.
+`${KIPRJMOD}`-relative paths.
 
 Nothing in the design may depend on a library outside this directory.
 

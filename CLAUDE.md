@@ -81,12 +81,19 @@ And: **never split the ground plane.**
 
 ## Conventions
 
-- Board and revision naming: `serialtap-r1p0`, `serialtap-r1p1`, … (follows
-  `../daikin-esp`)
+- Board and revision naming: `serialtap-r1p0`, `serialtap-r1p1`, …
+  The revision is in the **filename**, not a folder: `pcb/serialtap-r1p0.kicad_sch`
 - Say **level translator**, not "leveler" — the project was formerly
   `esp32leveler` and that name caused persistent confusion with spirit levels
 - Fab class: PCBWay 5/5 mil, 0.25 mm drill, 4-layer, single-sided assembly
 - Licence: CERN-OHL-P v2 (hardware), MIT (firmware and docs)
+
+**Conventions here stand on their own reasoning.** `../daikin-esp` is a prior
+board by the same author, not a standard — cite it for *evidence* (what part it
+used, how that worked out) and never as precedent for how this repo should be
+shaped. There are thousands of KiCad projects and no canonical layout; if a
+convention cannot be justified on its own terms, it is not a convention worth
+keeping.
 
 ## Current state
 
