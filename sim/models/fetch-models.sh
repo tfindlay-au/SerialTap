@@ -32,7 +32,7 @@ mkdir -p vendor
 # TPS62827 - unencrypted PSpice transient model, SLVSEF9 datasheet family.
 # Models start-up, steady state, current limit and hiccup, pre-bias, line and
 # load transients. Temperature and leakage are NOT modelled.
-fetch SLVMCV3 TPS62827 TPS62827_TRANS.LIB
+fetch SLVMCV3A TPS62827 TPS62827_TRANS.LIB
 
 echo
 echo "Done. Decks .include these from sim/models/."
