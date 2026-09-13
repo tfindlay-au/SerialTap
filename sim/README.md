@@ -29,7 +29,7 @@ LTspice lives at `/Applications/LTspice.app/Contents/MacOS/LTspice`.
 |---|---|---|
 | `rail-sag.cir` | Given a current-limited source, bulk capacitance and WiFi transmit bursts, does the 5 V rail stay high enough for the buck to hold 3V3? | runs |
 | `inrush.cir` | What does the appliance see at plug-in, with the eFuse limit set to a given value? | runs |
-| `buck-load-step.cir` | Does the buck recover from a 40 → 335 mA step without undershooting brownout? | runs, **result not yet trusted** — see below |
+| `buck-load-step.cir` | Does the buck recover from a 40 → 335 mA step without undershooting brownout? | runs — **yes, with ~290 mV of margin** |
 
 SPDD §5.4 quotes the step as 30 → 250 mA. Those are the **5 V-side** figures;
 seen from the buck's output, where a load step actually happens, the same event
@@ -72,30 +72,30 @@ capacitor together. It runs on TI's own model for the **TPS6282x** family.
   you might want to look at the waveform afterwards; the default throws the
   `.raw` away once the measurements are parsed out.
 
-### Open issue: the deck does not yet regulate at 3.3 V
+### What it found
 
-`results/buck-load-step.md` currently reports `vo_ss = 1.55 V` against a 3.3 V
-target, so **its undershoot and overshoot numbers mean nothing yet** and the
-`ok` column should be ignored. The rail is steady at 1.55 V from 2.0 ms to
-2.65 ms, so this is not an unfinished soft-start — the loop is holding the
-wrong level. Implied reference is 0.28 V, where the divider and TI's own
-testbench both say 0.6 V.
+Run 2026-09-13, on TI's TPS62162 model and Coilcraft's XGL4020-222 `_sat`
+model — no behavioural stand-ins anywhere in the power stage.
 
-What is known so far:
+| COUT | regulated | undershoot on 40 → 335 mA | overshoot | margin to 3.0 V |
+|---|---|---|---|---|
+| 4.7 µF | 3.2994 V | 3.2857 V | 3.3107 V | **+286 mV** |
+| 10 µF | 3.2994 V | 3.2905 V | 3.3091 V | +291 mV |
+| 22 µF | 3.2994 V | 3.2927 V | 3.3074 V | +293 mV |
 
-- The model itself is fine: on TI's own component values it comes up and
-  switches.
-- It is not the `SS` parameter. Setting `SS=1` to skip soft-start stops the
-  model starting at all, with or without `startup`, so full soft-start has to
-  run every time.
-- Most likely suspects, in order: feedback-node bias current the model applies
-  but the datasheet divider ignores (the deck's 180k/40k is a higher impedance
-  than TI's 200k/100k), or the loop being unstable with 47 µF where TI used
-  100 µF.
+**Passes with roughly 290 mV in hand, at every capacitor value tried.**
+Undershoot is 14 mV at worst — which is better than a 22 µF output capacitor on
+a 295 mA step has any right to be, and implies the loop reacts within a switching
+cycle or two. DCS-Control is genuinely that fast, but the model is TI's
+behavioural one, so treat the absolute figure with suspicion. The conclusion
+survives the doubt: the margin would have to be wrong by a factor of twenty
+before this fails.
 
-Next step is one run on TI's exact divider and output capacitor at a 3.3 V
-target, to separate "wrong divider impedance" from "wrong compensation". Each
-run is minutes, which is why this is not resolved yet.
+**It also settles the output capacitor.** Going 22 µF → 4.7 µF costs 7 mV of
+undershoot, so DC-bias derating cannot hurt us here: a 22 µF 0603 part that
+derates to a third of its nameplate at 3.3 V still leaves the rail nowhere near
+brownout. Size the output capacitor for ripple and stability, not for the load
+step.
 
 **The passives in that deck are placeholders.** TPS62827 is the 4 A member of
 the family and is oversized for this board; the family member, the inductor and

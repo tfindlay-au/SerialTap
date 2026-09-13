@@ -341,8 +341,14 @@ schematic symbols carry the MPNs and this table points at the reasoning.
 | Buck inductor | **XGL4020-222MEC** (Coilcraft) | 2.2 µH, 19.5 mΩ DCR against the XFL3012's 97 mΩ — buys back ~0.8 of the ~2 points conceded above. Isat 2.7 A sits clear of the IC's ~1.6–2 A current limit, so the IC protects before the inductor saturates. Coilcraft publishes a `_sat` LTspice model, verified against the datasheet before use. 2.0 mm tall, confirmed to clear the enclosure |
 | Port connector | **B05B-XASK-1-A(LF)(SN)** (JST XA, 5-pin, vertical, with boss) | Matches the appliance's XARR-05V panel housing, so the harness is straight-through (§5.2). Vertical entry confirmed against the enclosure. `-A` for the boss: this is the board's only permanent mechanical interface and takes every insertion force in a unit that vibrates, so the boss carries that into the board rather than the solder joints. Tin, not `-GU` gold — plating should match across a mating pair, and standard XA crimps are tin. **Through-hole**, so it needs a selective- or hand-solder step on an otherwise all-SMD board |
 
-**Not yet pinned:** eFuse, ideal-diode OR, level translators, ESD array, module,
-USB-C receptacle, bulk capacitor, and all passives.
+| Level translator | **TXU0204** (package TBD) | 4-bit fixed-direction, two channels each way — TI names UART as the application. Direction fixed in *silicon*, so there is no DIR pin to mis-strap; Schmitt-trigger inputs for a metre of harness; integrated pull-downs, which retire ADR 0001's own warning about floating unused inputs. Push-pull ±12 mA at 4.5 V against the ~4 kΩ of the auto-direction parts ADR 0001 rejected. Two channels unused. See the 2026-09-13 amendment to [ADR 0001](adr/0001-fixed-direction-level-translation.md) |
+
+**Not yet pinned:** eFuse, ideal-diode OR, ESD array, module, USB-C receptacle,
+bulk capacitor, and all passives.
+
+**No library assets exist yet for anything above.** `lib/` has not been started:
+no symbols, no footprints, no 3D models, no datasheets. Selection and library
+are separate jobs, and only the first is done.
 
 ### 7.3 Project library
 
