@@ -346,8 +346,12 @@ schematic symbols carry the MPNs and this table points at the reasoning.
 | eFuse | **TPS2553** (SOT-23-6 DBV) | ADR 0004's part. 75 mA–1.7 A adjustable limit, 2.5–6.5 V, 85 mΩ, active-high enable, **reverse blocking**, thermal shutdown, constant-current limiting rather than latch-off (the `-1` suffix latches; we do not want that). Unencrypted PSpice model exists, though ADR 0004's amendment means one is not required here. **R<sub>ILIM</sub> is deliberately unset** — it is gated on measuring the Haier rail, exactly as ADR 0004 requires |
 | Ideal-diode OR | **LM66200** (dual) | 1.6–5.5 V, 40 mΩ, 2.5 A, low I<sub>Q</sub>, **two ideal diodes in one package** — both OR branches in a single part instead of two LM66100s. Unencrypted PSpice model |
 
-**Not yet pinned:** ESD array, module variant, USB-C receptacle, bulk capacitor,
-and all passives.
+| ESD array | **TPD4E05U06QDQARQ1** (TI, AEC-Q101) | Quad, 0.5 pF, V<sub>RWM</sub> 5.5 V, min breakdown 6.5 V, ±12 kV, 2.5 A / 40 W surge. Two channels for TX and RX at the connector, per [layout-rules.md](layout-rules.md); two spare. The `-Q1` is taken for its temperature grade, not automotive compliance — this board lives in a warm appliance with no enclosure. **Caveat:** 5.5 V standoff against 5 V logic is 0.5 V of margin, so the Haier's open-circuit rail voltage must be confirmed (already on the bench list) |
+| USB-C receptacle | **USB4085-GF-A** (GCT) | USB 2.0, 16 contacts, through-hole, horizontal top-mount, four PCB retention/grounding posts, 10 000 mating cycles, 3.46 mm profile. Through-hole retention is what §7.1 asked for, and it shares the selective-solder step the JST already needs. **KiCad 10 ships both a reviewed footprint and a STEP model** for it, which is not true of any vertical receptacle. Vertical was considered: it would free ~9 mm of long edge we do not need, in exchange for the cable levering perpendicular to the board and hand-sourced library assets |
+
+**Not yet pinned:** module variant, bulk capacitor, BOOT/RESET switches, power
+LED, and all passives — including the **two 5.1 kΩ CC pulldowns** the USB-C sink
+needs to be recognised and offered 5 V.
 
 **No library assets exist yet for anything above.** `lib/` has not been started:
 no symbols, no footprints, no 3D models, no datasheets. Selection and library
