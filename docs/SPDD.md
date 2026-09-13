@@ -339,7 +339,7 @@ schematic symbols carry the MPNs and this table points at the reasoning.
 |---|---|---|
 | 3.3 V buck | **TPS62162** (package TBD) | Fixed 3.3 V, so no feedback divider and no sense trace for layout to special-case. 1 A against a 335 mA peak. The only candidate with both a fixed output *and* an unencrypted SPICE model — TPS6282533 has no published model, TPS62901's is 74% Cadence-encrypted. Costs ~2 efficiency points against the TPS6282x, worth ~5 mA of appliance current, which is noise against a 300–370 mA requirement ([ADR 0003](adr/0003-buck-not-ldo.md), §5.8) |
 | Buck inductor | **XGL4020-222MEC** (Coilcraft) | 2.2 µH, 19.5 mΩ DCR against the XFL3012's 97 mΩ — buys back ~0.8 of the ~2 points conceded above. Isat 2.7 A sits clear of the IC's ~1.6–2 A current limit, so the IC protects before the inductor saturates. Coilcraft publishes a `_sat` LTspice model, verified against the datasheet before use. 2.0 mm tall, confirmed to clear the enclosure |
-| Port connector | **B05B-XASK-1** class (JST XA, 5-pin, vertical) | Matches the appliance's XARR-05V panel housing, so the harness is straight-through (§5.2). Vertical entry confirmed against the enclosure. Exact variant — plain or `-A` with locating boss — still open |
+| Port connector | **B05B-XASK-1-A(LF)(SN)** (JST XA, 5-pin, vertical, with boss) | Matches the appliance's XARR-05V panel housing, so the harness is straight-through (§5.2). Vertical entry confirmed against the enclosure. `-A` for the boss: this is the board's only permanent mechanical interface and takes every insertion force in a unit that vibrates, so the boss carries that into the board rather than the solder joints. Tin, not `-GU` gold — plating should match across a mating pair, and standard XA crimps are tin. **Through-hole**, so it needs a selective- or hand-solder step on an otherwise all-SMD board |
 
 **Not yet pinned:** eFuse, ideal-diode OR, level translators, ESD array, module,
 USB-C receptacle, bulk capacitor, and all passives.
@@ -366,7 +366,7 @@ matters most for an open-hardware release.
 | Outline | **22 × 54 mm** — drop-in for the OEM Haier board. JST on one short edge, USB-C on an adjacent long edge, antenna at the far short edge |
 | Fab class | PCBWay 5/5 mil, 0.25 mm drill |
 | Impedance | Not controlled; USB pair geometry targeted from the stackup |
-| Assembly | Single-sided, all parts on top |
+| Assembly | Single-sided, all parts on top. All SMD except the JST XA port connector, which is through-hole and needs a selective- or hand-solder step |
 | Quantity | 5 (first run) |
 | Enclosure | None — bare board |
 | Mounting | Mounting holes |
