@@ -532,6 +532,12 @@ that result.
   (blocks the harness). The connector and mating part are now known: 5-pin JST
   XA, 2.5 mm pitch, XARR-05V panel housing (confirmed 2026-09-12)
 - Whether a board-mounted JST XA or a wire-to-board pigtail suits the install
+- ~~PCB antenna or external?~~ **Settled: PCB antenna (ESP32-C3-MINI-1).** The
+  OEM board provides a U.FL footprint but it was never populated — that unit ran
+  on its own antenna inside this chassis for its service life. The reference
+  install also has an access point ~3 m away with line of sight. The **-1U**
+  variant is the fallback if bring-up shows poor RF
+  ([haier-oem-board.md](haier-oem-board.md))
 
 ## 14. Decision log
 

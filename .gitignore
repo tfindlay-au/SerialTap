@@ -14,3 +14,6 @@ __pycache__/
 
 # KiCad fabrication output is regenerated, not committed, until release
 /pcb/*/*-backups/
+
+# Reference photos of third-party hardware: kept locally, not carried in the repo
+/images/
