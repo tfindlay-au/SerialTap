@@ -40,18 +40,27 @@ still stands: get the real numbers before computing the USB geometry.
 
 ## Floorplan
 
-Board outline ~40 × 25 mm. Three zones along the long axis:
+Board outline **22 × 54 mm**, chosen to drop into the OEM Haier board's place.
+Zones run along the 54 mm axis:
 
 ```
- [ ANTENNA ]  [ C3-MINI-1 ]  [ translators ]  [ power ]  [ USB-C | JST ]
-  overhang,     module        + TVS + Rs      OR/eFuse     both connectors
-  no copper                                   bulk, buck   same short edge
-  any layer
+  |<--------------------------- 54 mm --------------------------->|
+  +----------------------------------------------------------------+
+  | ANTENNA  |  C3-MINI-1  | translators  |   power    |    JST     |  22
+  | overhang |   module     | + TVS + Rs   | OR/eFuse   |  5-pin XA  |  mm
+  | no copper|              |              | bulk, buck |            |
+  +-------------------------------------------[ USB-C ]-------------+
+                                               long edge
 ```
 
 - Antenna at one short edge, outline relieved so it overhangs.
-- Both connectors at the opposite short edge: one cable exit direction, and the
-  two 5 V sources land next to the ideal-diode OR that combines them.
+- **JST on the far short edge; USB-C on a long edge beside it.** They do not
+  both fit across 22 mm: a 5-position XA header is ~14.6 mm and a USB-C
+  receptacle ~8.9 mm, which needs ~26 mm with edge clearance between them.
+  The JST keeps the short edge because it is the permanent harness and wants a
+  clean cable exit; USB-C is bench-only and unused after first flash (ADR 0002).
+  Both still land at the same end, so the two 5 V sources still meet at the
+  ideal-diode OR without crossing the board.
 - Buck biased toward the connector end — maximum distance from the antenna.
 - TVS and series resistors **at the JST**, not at the translators. The
   unprotected side of the ESD devices must be as short as possible; the 3.3 V
