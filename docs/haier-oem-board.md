@@ -115,7 +115,9 @@ on-board antenna was insufficient *here*.
 The evidence in fact points the other way: in this exact appliance, in this
 exact chassis, an on-board antenna was enough.
 
-**Decision: ESP32-C3-MINI-1, with its PCB trace antenna.** The reference
+**Decision: ESP32-C3-MINI-1-H4X, with its PCB trace antenna.** Note the absence
+of a `U`: `-1U` denotes a U.FL connector *instead of* an antenna, not as well as
+one. The reference
 installation has an access point about 3 m away with direct line of sight, so
 the link budget is not demanding. The **-1U** variant remains the fallback if
 bring-up shows poor RF — it is the same module with U.FL instead — but it is

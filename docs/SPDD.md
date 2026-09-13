@@ -351,9 +351,11 @@ schematic symbols carry the MPNs and this table points at the reasoning.
 
 | Bulk capacitor | **PCL1A471MCL1GS** (Nichicon) | 470 µF, 10 V ±20%, conductive polymer aluminium **solid** — no liquid electrolyte, so nothing to dry out, which is the entire reason for this class of part here. 8 × 10 mm SMD, ESR 17 mΩ, ripple 3.8 A, −55 to +105 °C. Double the voltage margin on a 5 V rail; the ±20% worst case of 376 µF is still comfortable, since `rail-sag` showed even 220 µF costs only 55 mA at light duty. ESR and ripple ratings are enormously in excess of what is asked of them, and deliberately not paid for |
 
-**Not yet pinned:** module variant, BOOT/RESET switches, power LED, and all
-passives — including the **two 5.1 kΩ CC pulldowns** the USB-C sink needs to be
-recognised and offered 5 V.
+| Module | **ESP32-C3-MINI-1-H4X** (Espressif) | 4 MB flash — ample for an ESPHome image plus OTA partitions, with no filesystem to speak of. **H = 105 °C** ambient rather than the N variant's 85 °C, for a bare board in an HVAC unit. **X = chip revision v1.1, and it is not optional: every non-X variant is NRND.** Plain `-1`, *not* `-1U` — the U denotes a U.FL connector and no antenna at all, whereas `-1` carries the PCB trace antenna this design settled on ([haier-oem-board.md](haier-oem-board.md)). Keeping the PCB antenna is what makes the antenna keepout layout priority #1; `-1U` has no keepout, but needs an external antenna and a pigtail inside the chassis |
+
+**Not yet pinned:** BOOT/RESET switches, power LED, and all passives —
+including the **two 5.1 kΩ CC pulldowns** the USB-C sink needs to be recognised
+and offered 5 V.
 
 **Two things to confirm from datasheets before ordering:** the PCL series
 endurance figure (sources disagree between 2 000 h and 20 000 h at 105 °C, and
