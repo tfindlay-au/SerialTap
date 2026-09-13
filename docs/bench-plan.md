@@ -71,33 +71,68 @@ and the ESD array (TPD4E05U06, 5.5 V standoff) has only 0.5 V of margin over
 
 ### 2.2 The V–I curve — the number the whole project waits on
 
-Load the rail in steps and record the voltage at each. Resistors are fine; an
-electronic load is nicer.
+**You do not have to find the current limit.** The requirement is that the rail
+holds up past **370 mA**. Proving that is a pass/fail, and much safer than
+hunting for the cliff edge.
 
-| Target current | Resistor at 5 V | Dissipation — **rate the resistor for it** |
-|---|---|---|
-| 100 mA | 50 Ω | 0.5 W |
-| 200 mA | 25 Ω | 1.0 W |
-| 300 mA | 16.7 Ω | 1.5 W |
-| 400 mA | 12.5 Ω | 2.0 W |
-| 500 mA | 10 Ω | 2.5 W |
+#### Method: add one resistor at a time
 
-Use 5 W parts, or wirewounds, and do not leave them connected while you read the
-meter and think.
+Do not build a heavy load and plug it in. Build it up in place, watching the
+voltage, and stop the moment it starts to fall.
 
-From this curve fall out **two** numbers the simulations are parameterised on:
+A **130 Ω** resistor across 5 V draws 38.5 mA and dissipates **0.19 W** — 38% of
+a 0.5 W part's rating. Parallel resistors share the current, so *each* part
+still sees only 0.19 W however many are fitted. The array carries the watts; no
+individual resistor is ever stressed.
 
-- the **current limit**, where the voltage collapses
-- **`RAPP`**, the source impedance — currently a 0.5 Ω guess in `rail-sag.cir`,
-  and simply the slope of the curve before the knee
+| 130 Ω resistors | Load | Each dissipates | Array total |
+|---|---|---|---|
+| 3 | 115 mA | 0.19 W | 0.6 W |
+| 5 | 192 mA | 0.19 W | 1.0 W |
+| 8 | 308 mA | 0.19 W | 1.5 W |
+| 11 | 423 mA | 0.19 W | 2.1 W |
 
-**Pass condition:** holds up to **370 mA**. Between 250 and 300 mA means OTA and
-association on appliance power are at risk. Below 250 mA the design needs
-rethinking — and *not* with more capacitance, which `rail-sag` already ruled out.
+**Never fit anything below ~130 Ω on its own** — at 5 V a 50 Ω part would be at
+its full 0.5 W rating, and anything lower exceeds it.
 
-**Expectation: it passes.** The OEM board ran a Realtek RTL8720CM from this rail,
-rated 450 mA at 3.3 V through its own buck — about 330 mA at 5 V, with an
-800 mA inrush rating. We are asking for less than the board it replaces.
+#### Record it with the Saleae's analog channel
+
+Logic Pro 8 takes ±10 V on its analog inputs, so probe the 5 V rail directly —
+no divider. Record continuously while adding resistors and the result is a
+**voltage staircase**, one plateau per resistor.
+
+No ammeter is needed. With N resistors of value R, the current is exactly:
+
+```
+I = V × N / R
+```
+
+so the measured voltage and the count give the current. **The analog trace is
+the V–I curve.** Measure two or three of the resistors with a meter first to
+confirm their actual value.
+
+#### What the curve yields
+
+- the **slope before the knee** is `RAPP`, the source impedance — currently a
+  0.5 Ω guess in `rail-sag.cir`
+- the **knee**, if reached, is the current limit
+- **holding ≥370 mA is the pass condition**, and is enough on its own
+
+**Expectation: it passes.** The OEM board ran a Realtek RTL8720CM from this
+rail, rated 450 mA at 3.3 V through its own buck — about 330 mA at 5 V, with an
+800 mA inrush rating. We are asking for less than the board being replaced.
+
+#### Safety
+
+- Work up from light to heavy. Never start with the biggest load
+- **Stop as soon as the voltage begins to sag** — that is the answer, not a
+  problem to push through
+- Check polarity twice before connecting. 5 V and GND, nothing else
+- Keep the load connected for seconds at a time, not minutes
+- Resistors will be warm at 0.19 W. Hot enough to notice, not to damage
+- Have a way to kill power quickly
+- Never short the rail. A dead short is the one thing that could damage the
+  appliance's supply, and it proves nothing
 
 ### 2.3 Behaviour *in* limit — assumed, never verified
 
