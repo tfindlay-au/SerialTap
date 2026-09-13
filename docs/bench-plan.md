@@ -95,6 +95,66 @@ individual resistor is ever stressed.
 **Never fit anything below ~130 Ω on its own** — at 5 V a 50 Ω part would be at
 its full 0.5 W rating, and anything lower exceeds it.
 
+#### Wiring — both across the rail, never in series
+
+The load and the probe both connect **across** 5 V and ground. The Saleae is a
+voltmeter with 1 MΩ inputs; nothing passes through it.
+
+```
+  appliance 5V ──┬───────────────┬── Saleae AN0 (+)
+                 │               │
+            [resistors]          │        <- load: 5 V to GND
+                 │               │
+  appliance GND ─┴───────────────┴── Saleae GND
+```
+
+Load the pin that **test 1.1 confirmed is the 5 V supply** — not connector pin
+5, which is the unknown one this design deliberately leaves unconnected.
+
+A small breadboard is a good way to hold the array: resistors go in one at a
+time with no hot parts held by hand. Two cautions — **spread them out** rather
+than bunching, since 0.19 W runs a part at 50–70 °C and breadboard plastic
+softens around 80 °C; and keep each step to seconds.
+
+#### Use two analog channels, because breadboard resistance would corrupt this
+
+Breadboard contacts and rails come to perhaps 50–200 mΩ. At 400 mA that is
+20–80 mV — against an expected droop of only 100–200 mV, so it would land
+squarely on top of the measurement. Logic Pro 8 has eight analog channels;
+spend two:
+
+| Channel | Where | Gives |
+|---|---|---|
+| `AN0` | at the appliance connector pins | what the appliance actually delivers |
+| `AN1` | at the breadboard rails, by the resistors | what the load actually sees |
+
+Then:
+
+- **current** is `I = V_AN1 × N / R` — accurate, because AN1 is the voltage
+  genuinely across the resistors
+- the **appliance's curve** is that current against `AN0`
+- `AN0 − AN1` is the test rig's own drop, now measured and subtractable rather
+  than silently folded into `RAPP`
+
+#### Resistor count
+
+7 × 130 Ω reaches 269 mA — short of the 370 mA pass condition. Options:
+
+| Combination | Load | Parts |
+|---|---|---|
+| 7 × 130 Ω | 269 mA | 7 |
+| 7 × 130 + 8 × 390 Ω | **372 mA** | 15 |
+| 7 × 130 + 12 × 390 Ω | 423 mA | 19 |
+| one 15 Ω 5 W | 333 mA | 1 |
+| one 12 Ω 10 W | 417 mA | 1 |
+
+390 Ω contributes 12.8 mA at 0.064 W each — very safe, just small steps.
+
+Even if only 269 mA is reached, the result is not wasted: if the curve is still
+straight and stiff there, with no sign of bending, the limit is comfortably
+above — which, with the OEM module's 450 mA rating, is strong evidence though
+not proof.
+
 #### Record it with the Saleae's analog channel
 
 Logic Pro 8 takes ±10 V on its analog inputs, so probe the 5 V rail directly —
