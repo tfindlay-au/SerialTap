@@ -512,7 +512,7 @@ that result.
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Haier 5 V rail too weak for WiFi TX bursts | Board browns out on association; may reset the appliance | Buck over LDO, current-limited turn-on, ≥470 µF bulk. Simulated (§5.8): the rail must supply **300–370 mA**, and more bulk would not buy the shortfall back. **Measure before committing to fab** (§12.1-2) |
+| Haier 5 V rail too weak for WiFi TX bursts | Board browns out on association; may reset the appliance | Buck over LDO, current-limited turn-on, ≥470 µF bulk. Simulated (§5.8): the rail must supply **300–370 mA**, and more bulk would not buy the shortfall back. **Risk substantially reduced:** the OEM board this replaces ran a Realtek RTL8720CM from the same rail, rated 450 mA at 3.3 V — more than our C3's 335 mA — through its own buck ([haier-oem-board.md](haier-oem-board.md)). Still **measure before committing to fab** (§12.1-2) |
 | Haier connector pinout assumed, not confirmed | Cable is wrong; nothing communicates | Fixed board pinout makes this a cable fix, not a respin (§12.3) |
 | Buck switching noise coupling into the antenna | Degraded WiFi range inside an appliance | Zoned floorplan (buck at the connector end, antenna at the far edge), minimised switch node, two ground planes — see layout-rules.md |
 | Silent part substitution at assembly | A cheaper equivalent lands on the board and changes behaviour | Every part pinned by MPN (§7.2); substitutions proposed back, never applied silently |

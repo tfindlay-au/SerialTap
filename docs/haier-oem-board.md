@@ -38,12 +38,36 @@ through a buck converter, with a bursty transmit load** — the same shape of lo
 SerialTap presents, from the same connector. A Realtek Wi-Fi+BT combo draws
 broadly what an ESP32-C3 draws during transmit.
 
-That is the strongest available evidence that the 300–370 mA requirement from
-[sim/README.md](../sim/README.md) is met in practice. It is still an inference:
-it gives no margin figure, and says nothing about what the rail does *in*
-current limit — which the decks assume is a droop rather than a foldback or a
-reset. **Measure it anyway** (SPDD §12.1 step 2); this just makes a nasty
-surprise less likely.
+### And it can be quantified
+
+The FCC filing's internal photograph shows the part under the shield: **U101,
+a Realtek `RTL8720CM`** — the Ameba-Z II Wi-Fi + BLE SoC. Its datasheet,
+Table 20:
+
+| Symbol | Parameter | Max |
+|---|---|---|
+| `IDD33` | 3.3 V rating current (internal regulator + integrated CMOS PA) | **450 mA** |
+| `IRSH33` | 3.3 V inrush current | **800 mA** |
+
+Referred through the OEM's own buck at ~90%, that is **≈330 mA at 5 V steady**
+and **≈590 mA at 5 V inrush**.
+
+Our ESP32-C3 peaks at 335 mA on 3.3 V — **less than the Realtek part's 450 mA
+rating.** Its "ultra-low-power" billing refers to sleep states, not transmit;
+the PA is subject to the same physics as everyone's.
+
+So the appliance's service rail was specified to feed a load that peaks *higher*
+than ours, and to survive an inrush larger than ours. Our requirement of
+300–370 mA at 5 V sits inside that envelope, and the current-limited eFuse
+(ADR 0004) makes SerialTap strictly better behaved at plug-in than the board it
+replaces.
+
+This is a chip *rating* rather than a measurement of the rail, so it is evidence
+about what the OEM designed for, not proof of what the supply delivers. It says
+nothing about what the rail does *in* current limit — which the decks assume is
+a droop rather than a foldback or a reset. **Measure it anyway**
+(SPDD §12.1 step 2). But the largest risk in this project just got
+substantially smaller.
 
 ## The UART front end — independent validation
 
