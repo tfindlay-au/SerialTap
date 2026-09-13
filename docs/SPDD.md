@@ -295,7 +295,7 @@ Specific consequences on this board:
 
 | Part | Policy |
 |---|---|
-| Bulk capacitor | Polymer or hybrid aluminium (Panasonic, Nichicon, Würth), not generic electrolytic. Far lower ESR, no dry-out, and this board sits in a warm appliance |
+| Bulk capacitor | Polymer or hybrid aluminium (Panasonic, Nichicon, Würth), not generic electrolytic. The reason is **no dry-out** in a warm appliance, *not* ESR — the load step needs only 185 mA, so even 200 mΩ would cost 37 mV. Do not pay for exotic ESR here |
 | MLCCs | Chosen with **DC-bias derating** accounted for. A 10 µF 0603 6.3 V X5R can lose most of its capacitance at 5 V; use larger case sizes and 16–25 V ratings so the nameplate value is close to the real one |
 | Inductor | Shielded, branded (Coilcraft, Würth, TDK, Bourns), with genuine saturation margin over the peak — and a published SPICE model (§5.8) |
 | Buck, eFuse, ideal diodes | Branded silicon with vendor SPICE models and real datasheets |
@@ -349,9 +349,16 @@ schematic symbols carry the MPNs and this table points at the reasoning.
 | ESD array | **TPD4E05U06QDQARQ1** (TI, AEC-Q101) | Quad, 0.5 pF, V<sub>RWM</sub> 5.5 V, min breakdown 6.5 V, ±12 kV, 2.5 A / 40 W surge. Two channels for TX and RX at the connector, per [layout-rules.md](layout-rules.md); two spare. The `-Q1` is taken for its temperature grade, not automotive compliance — this board lives in a warm appliance with no enclosure. **Caveat:** 5.5 V standoff against 5 V logic is 0.5 V of margin, so the Haier's open-circuit rail voltage must be confirmed (already on the bench list) |
 | USB-C receptacle | **USB4085-GF-A** (GCT) | USB 2.0, 16 contacts, through-hole, horizontal top-mount, four PCB retention/grounding posts, 10 000 mating cycles, 3.46 mm profile. Through-hole retention is what §7.1 asked for, and it shares the selective-solder step the JST already needs. **KiCad 10 ships both a reviewed footprint and a STEP model** for it, which is not true of any vertical receptacle. Vertical was considered: it would free ~9 mm of long edge we do not need, in exchange for the cable levering perpendicular to the board and hand-sourced library assets |
 
-**Not yet pinned:** module variant, bulk capacitor, BOOT/RESET switches, power
-LED, and all passives — including the **two 5.1 kΩ CC pulldowns** the USB-C sink
-needs to be recognised and offered 5 V.
+| Bulk capacitor | **PCL1A471MCL1GS** (Nichicon) | 470 µF, 10 V ±20%, conductive polymer aluminium **solid** — no liquid electrolyte, so nothing to dry out, which is the entire reason for this class of part here. 8 × 10 mm SMD, ESR 17 mΩ, ripple 3.8 A, −55 to +105 °C. Double the voltage margin on a 5 V rail; the ±20% worst case of 376 µF is still comfortable, since `rail-sag` showed even 220 µF costs only 55 mA at light duty. ESR and ripple ratings are enormously in excess of what is asked of them, and deliberately not paid for |
+
+**Not yet pinned:** module variant, BOOT/RESET switches, power LED, and all
+passives — including the **two 5.1 kΩ CC pulldowns** the USB-C sink needs to be
+recognised and offered 5 V.
+
+**Two things to confirm from datasheets before ordering:** the PCL series
+endurance figure (sources disagree between 2 000 h and 20 000 h at 105 °C, and
+polymer life doubles per 20 °C rather than per 10 °C, so it matters), and stock
+for every line above — none of which has been checked against a distributor.
 
 **No library assets exist yet for anything above.** `lib/` has not been started:
 no symbols, no footprints, no 3D models, no datasheets. Selection and library
