@@ -136,6 +136,42 @@ Then:
 - `AN0 − AN1` is the test rig's own drop, now measured and subtractable rather
   than silently folded into `RAPP`
 
+#### Terminology: the resistors *are* the load
+
+A "load" is anything that draws current from a supply. The resistors are not
+connected *to* a load — they **are** it.
+
+Resistors rather than an LED or a spare ESP32, because the method depends on
+knowing the current without an ammeter. A resistor obeys `I = V/R` exactly; an
+LED's non-linear forward curve does not, and draws only milliamps anyway. A real
+ESP32 draws a realistic but uncontrolled and bursty profile that cannot be swept
+or calculated — and would brown out under precisely the conditions being
+measured, so the instrument would fail at the same moment as the subject.
+
+The real board does become the load eventually. That is SPDD §12.1 step 4, bench
+bring-up, and it happens after fabrication — which this test gates.
+
+#### Step sequence
+
+Work upward. **Swap, do not stack:** adding the 15 Ω on top of all seven 130 Ω
+jumps straight to 602 mA in one step, which is both too coarse and more than
+needs asking of the appliance.
+
+| Phase | Fitted | Load |
+|---|---|---|
+| A | 1 × 130 Ω | 38 mA |
+| A | 2 × 130 Ω | 77 mA |
+| A | 4 × 130 Ω | 154 mA |
+| A | 7 × 130 Ω | 269 mA |
+| — | *remove the 130s, fit the 15 Ω* | |
+| B | 15 Ω | 333 mA |
+| C | 15 Ω + 1 × 130 Ω | **372 mA** — clears the pass condition |
+| C | 15 Ω + 2 × 130 Ω | 410 mA |
+| C | 15 Ω + 3 × 130 Ω | 449 mA |
+
+**Stop at the first sign of sag, or around 450 mA.** Beyond that proves nothing
+the design needs to know.
+
 #### Resistor count
 
 7 × 130 Ω reaches 269 mA — short of the 370 mA pass condition. Options:
