@@ -3,80 +3,86 @@
 * QUESTION (SPDD 5.8): does the buck recover from the C3's transmit load step
 * without the 3.3 V rail undershooting into brownout?
 *
-* This is the one deck that CANNOT be answered behaviourally. Overshoot,
-* undershoot and settling are properties of the converter's control loop, its
-* inductor and its output capacitance together, so it runs on TI's own
-* unencrypted PSpice model, converted for LTspice by
-* models/pspice2ltspice.py. Run models/fetch-models.sh first - the vendor
-* model is not committed (see that script for why).
+* This is the one deck a behavioural block cannot answer - overshoot,
+* undershoot and settling belong to the control loop, the inductor and the
+* output capacitor together. It runs on TI's own model for the TPS62162,
+* converted for LTspice by models/pspice2ltspice.py. Run
+* models/fetch-models.sh first; the vendor model is not committed.
 *
 * SPDD 5.4 quotes the step as 30 -> 250 mA; those are the 5 V-SIDE figures.
-* Seen from the buck's output, where a load step actually happens, the same
-* event is 40 -> 335 mA, and that is what is applied here.
+* Seen from the buck's output, where the step actually happens, the same event
+* is 40 -> 335 mA, and that is what is applied here.
 *
-* NOTE ON RUNTIME: minutes, not seconds. The model's soft-start takes about
-* 1.5 ms and has to run before any step is meaningful, and a 2.2 MHz switcher
-* is resolved the whole way. Do not add sweeps casually.
+* Sweeps the output capacitor, because DC-bias derating means a 22 uF
+* nameplate part is worth well under 22 uF at 3.3 V (SPDD 7.1) - the sweep
+* says how far that can fall before it matters.
+*
+* RUNTIME: about 5 minutes per step. Do not add sweeps casually.
 * ===========================================================================
 
-.include models/tps62827.lib
+.include models/tps62162.lib
+.include models/vendor/CoilcraftLTAdvLib/XGL4020.lib
 
 * --- operating point ----------------------------------------------------------
 .param VIN  = 5.0       ; nominal. rail-sag covers what happens when the
 +                       ; appliance cannot hold this up
-.param VOUT = 3.3
+.param VOUT = 3.3       ; FIXED - TPS62162 sets it internally. There is no
++                       ; feedback divider and no feedforward cap, which is
++                       ; half the reason this part was chosen: it deletes the
++                       ; sense trace that layout-rules.md has to special-case.
 
-* --- the power stage - PLACEHOLDER VALUES -------------------------------------
-* TPS62827 is the 4 A member of the TPS6282x family and is oversized for this
-* board; the family member, the inductor and the output capacitors are not yet
-* pinned (SPDD 7.2). The values below are scaled from TI's own testbench for
-* this model, which ran VOUT = 1.8 V at 4 A with L = 470 nH and COUT = 100 uF.
-* Re-run this deck once the real parts are chosen - it is one command.
-.param L     = 1u
-.param DCR   = 0.05
-.param COUT  = 47u      ; ceramic, DC-bias derated (SPDD 7.1)
-.param ESR   = 5m
-.param CIN   = 10u
-.param RFB1  = 180k     ; 0.6 V reference: VOUT = 0.6 * (1 + RFB1/RFB2)
-.param RFB2  = 40k
-.param CFF   = 120p     ; feedforward zero, as on TI's testbench
+* --- power stage ----------------------------------------------------------------
+* Inductor: Coilcraft XGL4020-222MEC, 2.2 uH. Modelled with Coilcraft's own
+* _sat model, which carries DCR, winding capacitance and a real saturation
+* curve - not an L + Rser stand-in. Verified against the datasheet before use:
+* 19.5 mOhm DCR and 2.17 uH, both matching.
+*
+* 2.2 uH is TI's nominal value, and the high ripple it gives at our current is
+* wanted: power save is entered below dIL/2, which is 113 mA at 2.2 uH but
+* only 76 mA at 3.3 uH. The board's two common states are 40 mA idle and
+* 85 mA normal traffic, so 2.2 uH keeps BOTH in power save.
+.param COUT = 22u       ; SWEPT below
+.param ESR  = 5m
+.param CIN  = 10u
 
-* --- the load -------------------------------------------------------------------
+* --- the load ---------------------------------------------------------------------
 .param I33_IDLE = 0.040 ; C3 idle, WiFi connected      (SPDD 5.4)
 .param I33_TX   = 0.335 ; C3 WiFi transmit peak        (SPDD 5.4)
 .param VBROWN   = 3.0   ; the requirement. 3.0 V is the C3's minimum operating
 +                       ; supply; its brownout detector trips lower still, so
 +                       ; this is the conservative line to hold.
 
-* --- timing -----------------------------------------------------------------------
-.param TSTEP = 2.2m     ; after soft-start has finished and the loop has settled
+.param TSTEP = 600u     ; after the loop has settled
 .param TON   = 200u
 .param TPER  = 400u
-.param TSTOP = 2.8m
+.param TSTOP = 1m
 
+* ===========================================================================
+* TPS62162_TRANS pins: VIN EN AGND PGND ETPAD PG FB VOS SW
+* VOS is the output sense pin and goes to the output; FB is unused on the
+* fixed-voltage members and is tied off inside the model.
 * ===========================================================================
 Vin   vin 0 {VIN}
 Ven   en  0 {VIN}
 Cin   vin 0 {CIN} Rser=5m
-X1    en pg fb 0 sw vin TPS62827_TRANS
-L1    sw vout {L} Rser={DCR}
+X1    vin en 0 0 0 pg fb vout sw TPS62162_TRANS
+XL1   sw   vout XGL4020-222_sat
 Cout  vout 0 {COUT} Rser={ESR}
 Rpg   vout pg 100k
-Rfb1  vout fb {RFB1}
-Cff   vout fb {CFF}
-Rfb2  fb   0  {RFB2}
 Iload vout 0 PULSE({I33_IDLE} {I33_TX} {TSTEP} 1u 1u {TON} {TPER})
 
 * `startup` is required, not cosmetic: it solves the operating point with the
-* sources at zero - which converges - and then ramps them, so the model's
-* internal latches and references initialise. Without it LTspice either fails
-* the operating point or (with uic) starts the model in a dead state.
+* sources at zero - which converges - then ramps them, so the model's internal
+* latches and references initialise. Plain .tran sends LTspice into minutes of
+* Gmin stepping; `uic` starts the model dead and it never switches.
 .tran 0 {TSTOP} 0 200n startup
 .options trtol=7 plotwinsize=0
-.save V(vout) V(sw) V(fb) V(vin)
+.save V(vout) V(sw) V(vin)
 
-.meas TRAN vo_ss  AVG V(vout) FROM 2.0m  TO 2.19m   ; regulated level before the step
-.meas TRAN vo_und MIN V(vout) FROM {TSTEP} TO 2.45m ; undershoot on load-on
-.meas TRAN vo_ovr MAX V(vout) FROM 2.4m  TO 2.65m   ; overshoot on load-off
+.step param COUT list 4.7u 10u 22u
+
+.meas TRAN vo_ss  AVG V(vout) FROM 400u TO 590u    ; regulated level before the step
+.meas TRAN vo_und MIN V(vout) FROM {TSTEP} TO 700u ; undershoot on load-on
+.meas TRAN vo_ovr MAX V(vout) FROM 800u TO 900u    ; overshoot on load-off
 .meas TRAN margin PARAM vo_und-{VBROWN}
 .end

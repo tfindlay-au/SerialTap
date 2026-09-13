@@ -329,6 +329,21 @@ consequences are in the 2026-09-12 amendment to
 current-limit *accuracy* becomes a first-order selection criterion, because it
 is what sets the appliance requirement.
 
+### 7.4 Parts register
+
+Filled in as parts are pinned. Every entry is a decision with a reason, not a
+search result. Until the schematic exists this is the record; afterwards the
+schematic symbols carry the MPNs and this table points at the reasoning.
+
+| Function | MPN | Why this one |
+|---|---|---|
+| 3.3 V buck | **TPS62162** (package TBD) | Fixed 3.3 V, so no feedback divider and no sense trace for layout to special-case. 1 A against a 335 mA peak. The only candidate with both a fixed output *and* an unencrypted SPICE model — TPS6282533 has no published model, TPS62901's is 74% Cadence-encrypted. Costs ~2 efficiency points against the TPS6282x, worth ~5 mA of appliance current, which is noise against a 300–370 mA requirement ([ADR 0003](adr/0003-buck-not-ldo.md), §5.8) |
+| Buck inductor | **XGL4020-222MEC** (Coilcraft) | 2.2 µH, 19.5 mΩ DCR against the XFL3012's 97 mΩ — buys back ~0.8 of the ~2 points conceded above. Isat 2.7 A sits clear of the IC's ~1.6–2 A current limit, so the IC protects before the inductor saturates. Coilcraft publishes a `_sat` LTspice model, verified against the datasheet before use. 2.0 mm tall, confirmed to clear the enclosure |
+| Port connector | **B05B-XASK-1** class (JST XA, 5-pin, vertical) | Matches the appliance's XARR-05V panel housing, so the harness is straight-through (§5.2). Vertical entry confirmed against the enclosure. Exact variant — plain or `-A` with locating boss — still open |
+
+**Not yet pinned:** eFuse, ideal-diode OR, level translators, ESD array, module,
+USB-C receptacle, bulk capacitor, and all passives.
+
 ### 7.3 Project library
 
 Every symbol, footprint and 3D model the design uses lives in `lib/` in this
