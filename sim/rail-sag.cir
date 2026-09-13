@@ -28,8 +28,10 @@
 
 * --- harness and input protection --------------------------------------------
 .param RCABLE = 0.25    ; ~1 m of 26 AWG, out and back
-.param RFUSE  = 0.20    ; PTC hold resistance; set 0 if the eFuse makes it
-+                       ; redundant (ADR 0004)
+.param RFUSE  = 0.0     ; No PTC fitted: TPS2553's own limiting, thermal
++                       ; shutdown and reverse blocking make one redundant, and
++                       ; its 0.2-0.5 ohm would cost ~75 mV at 250 mA on a rail
++                       ; with no headroom (SPDD 5.3, ADR 0004)
 .param IEF    = 0.60    ; eFuse current limit - set by inrush.cir; must sit
 +                       ; clear of the transmit burst
 .param RDSEF  = 0.090   ; eFuse pass resistance (TPS2553 class)

@@ -155,7 +155,7 @@ Appliances that order or label their pins differently are accommodated by a
 | Inrush | Current-limited switch / eFuse (TPS2553 class), programmable limit ([ADR 0004](adr/0004-current-limited-inrush.md)) |
 | Bulk | ≥470 µF low-ESR on the 5 V rail, plus local ceramics |
 | 3.3 V | Synchronous buck ([ADR 0003](adr/0003-buck-not-ldo.md)) |
-| Fusing | Resettable fuse on the 5 V input, unless the chosen eFuse's own overcurrent protection makes it redundant |
+| Fusing | **None.** TPS2553 provides constant-current limiting, thermal shutdown and reverse blocking, which is stronger and faster than a PTC's thermal trip. A PTC would only add cover for the eFuse itself failing short, and would cost 0.2–0.5 Ω in series — ~75 mV at 250 mA on a rail with no headroom to spare. Recorded as a deliberate removal, not an omission (ADR 0004 anticipated this) |
 
 Ideal diodes rather than Schottkys because ~20 mV of drop keeps the 5 V rail
 genuinely at 5 V for the translators' VCCB, and because a laptop must never be
@@ -343,8 +343,11 @@ schematic symbols carry the MPNs and this table points at the reasoning.
 
 | Level translator | **TXU0204** (package TBD) | 4-bit fixed-direction, two channels each way — TI names UART as the application. Direction fixed in *silicon*, so there is no DIR pin to mis-strap; Schmitt-trigger inputs for a metre of harness; integrated pull-downs, which retire ADR 0001's own warning about floating unused inputs. Push-pull ±12 mA at 4.5 V against the ~4 kΩ of the auto-direction parts ADR 0001 rejected. Two channels unused. See the 2026-09-13 amendment to [ADR 0001](adr/0001-fixed-direction-level-translation.md) |
 
-**Not yet pinned:** eFuse, ideal-diode OR, ESD array, module, USB-C receptacle,
-bulk capacitor, and all passives.
+| eFuse | **TPS2553** (SOT-23-6 DBV) | ADR 0004's part. 75 mA–1.7 A adjustable limit, 2.5–6.5 V, 85 mΩ, active-high enable, **reverse blocking**, thermal shutdown, constant-current limiting rather than latch-off (the `-1` suffix latches; we do not want that). Unencrypted PSpice model exists, though ADR 0004's amendment means one is not required here. **R<sub>ILIM</sub> is deliberately unset** — it is gated on measuring the Haier rail, exactly as ADR 0004 requires |
+| Ideal-diode OR | **LM66200** (dual) | 1.6–5.5 V, 40 mΩ, 2.5 A, low I<sub>Q</sub>, **two ideal diodes in one package** — both OR branches in a single part instead of two LM66100s. Unencrypted PSpice model |
+
+**Not yet pinned:** ESD array, module variant, USB-C receptacle, bulk capacitor,
+and all passives.
 
 **No library assets exist yet for anything above.** `lib/` has not been started:
 no symbols, no footprints, no 3D models, no datasheets. Selection and library
