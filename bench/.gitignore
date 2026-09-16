@@ -1,0 +1,11 @@
+.venv/
+
+# Capture payloads: raw sample data and Logic 2 session files. A rail sweep is
+# ~12.5 MB per step, so these do not belong in the repo. The decoded CSVs beside
+# them are kept - they are the evidence behind the findings in
+# docs/bench-results.md, and they are kilobytes.
+captures/**/*.bin
+captures/**/*.sal
+
+# Instrument calibration is committed deliberately, not ignored: it is specific
+# to Logic Pro 8 id 5701262AE78884C9 and the results depend on it.

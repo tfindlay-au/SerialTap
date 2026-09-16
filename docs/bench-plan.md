@@ -5,6 +5,8 @@ requirements had accumulated across the SPDD, three ADRs, `sim/README.md` and
 the OEM board notes; this is the consolidated list, so nothing is discovered
 missing after the unit is closed up again.
 
+**Results from the 2026-09-16 session are in [bench-results.md](bench-results.md)** — the rail voltage and the logic levels are answered; the power tests are not.
+
 **Write the predictions down first.** Each test below states what we expect. A
 measurement that can only confirm is decoration; one that can refute is
 evidence.
@@ -32,7 +34,7 @@ Record: connector pin number → signal, for all five.
 |---|---|
 | Channels | 5 |
 | Sample rate | ≥ 2 MS/s (≈200× oversampled at 9600 baud) |
-| Threshold | 5 V logic — **set it for 5 V, not 3.3 V** |
+| Threshold | a comparator level **between** the bus's low and high — **not 5.0 V**, which sits at the high rail and reads as all-low. Default 1.2 V; see `bench/capture_uart.py` |
 | Duration | long enough to catch idle *and* traffic; poll intervals may be seconds apart |
 
 Capture through a state change — set the unit to heat or cool, change the
@@ -80,20 +82,21 @@ hunting for the cliff edge.
 Do not build a heavy load and plug it in. Build it up in place, watching the
 voltage, and stop the moment it starts to fall.
 
-A **130 Ω** resistor across 5 V draws 38.5 mA and dissipates **0.19 W** — 38% of
-a 0.5 W part's rating. Parallel resistors share the current, so *each* part
-still sees only 0.19 W however many are fitted. The array carries the watts; no
+A **120 Ω** resistor across 5 V draws 41.7 mA and dissipates **0.21 W** — 35% of
+a 0.6 W part's rating. Parallel resistors share the current, so *each* part
+still sees only 0.21 W however many are fitted. The array carries the watts; no
 individual resistor is ever stressed.
 
-| 130 Ω resistors | Load | Each dissipates | Array total |
+| 120 Ω resistors | Load | Each dissipates | Array total |
 |---|---|---|---|
-| 3 | 115 mA | 0.19 W | 0.6 W |
-| 5 | 192 mA | 0.19 W | 1.0 W |
-| 8 | 308 mA | 0.19 W | 1.5 W |
-| 11 | 423 mA | 0.19 W | 2.1 W |
+| 3 | 125 mA | 0.21 W | 0.6 W |
+| 6 | 250 mA | 0.21 W | 1.3 W |
+| 9 | 375 mA | 0.21 W | 1.9 W |
+| 11 | 458 mA | 0.21 W | 2.3 W |
 
-**Never fit anything below ~130 Ω on its own** — at 5 V a 50 Ω part would be at
-its full 0.5 W rating, and anything lower exceeds it.
+**Never fit anything below ~100 Ω on its own** — at 5 V, 0.6 W is reached at
+42 Ω, and a part run at its full rating is a part run too hot to touch. 120 Ω
+sits at about a third of rating, which is where a resistor should live.
 
 #### Wiring — both across the rail, never in series
 
@@ -113,7 +116,7 @@ Load the pin that **test 1.1 confirmed is the 5 V supply** — not connector pin
 
 A small breadboard is a good way to hold the array: resistors go in one at a
 time with no hot parts held by hand. Two cautions — **spread them out** rather
-than bunching, since 0.19 W runs a part at 50–70 °C and breadboard plastic
+than bunching, since 0.21 W runs a part at 50–70 °C and breadboard plastic
 softens around 80 °C; and keep each step to seconds.
 
 #### Use two analog channels, because breadboard resistance would corrupt this
@@ -153,43 +156,101 @@ bring-up, and it happens after fabrication — which this test gates.
 
 #### Step sequence
 
-Work upward. **Swap, do not stack:** adding the 15 Ω on top of all seven 130 Ω
-jumps straight to 602 mA in one step, which is both too coarse and more than
-needs asking of the appliance.
+Work upward, adding one resistor at a time. Twenty 120 Ω parts make this a
+single uniform staircase — **41.7 mA per step, all the way**. No swapping
+between resistor values, and no step large enough to jump past a knee.
 
 | Phase | Fitted | Load |
 |---|---|---|
-| A | 1 × 130 Ω | 38 mA |
-| A | 2 × 130 Ω | 77 mA |
-| A | 4 × 130 Ω | 154 mA |
-| A | 7 × 130 Ω | 269 mA |
-| — | *remove the 130s, fit the 15 Ω* | |
-| B | 15 Ω | 333 mA |
-| C | 15 Ω + 1 × 130 Ω | **372 mA** — clears the pass condition |
-| C | 15 Ω + 2 × 130 Ω | 410 mA |
-| C | 15 Ω + 3 × 130 Ω | 449 mA |
+| A | 1 × 120 Ω | 42 mA |
+| A | 2 × 120 Ω | 83 mA |
+| A | 4 × 120 Ω | 167 mA |
+| A | 6 × 120 Ω | 250 mA |
+| B | 8 × 120 Ω | 333 mA |
+| B | 9 × 120 Ω | 375 mA — nominally clears the pass condition |
+| **C** | **10 × 120 Ω** | **417 mA — the pass condition, with margin** |
+| C | 11 × 120 Ω | 458 mA |
 
-**Stop at the first sign of sag, or around 450 mA.** Beyond that proves nothing
-the design needs to know.
+Take the **pass at 10, not 9**. 375 mA is the figure at a stiff 5.00 V; the
+actual current is lower, because the rail droops under load and the breadboard
+drops its own share. Run the numbers through `analyse_rail.py` with a plausible
+0.4 Ω source impedance and 0.15 Ω of rig resistance and nine resistors deliver
+**365 mA — a fail**, on a rail that is in fact perfectly healthy. Ten delivers
+404 mA and settles it.
+
+This is the trap in reading the pass condition off the nominal table: 370 mA is
+required *at the appliance*, and every millivolt of droop between the connector
+and the resistors takes current out of the number. The `AN0`/`AN1` pair below
+is what makes that visible rather than silent.
+
+**Stop at the first sign of sag, or at 11.** Beyond that proves nothing the
+design needs to know.
 
 #### Resistor count
 
-7 × 130 Ω reaches 269 mA — short of the 370 mA pass condition. Options:
+**Twenty 120 Ω 0.6 W parts are in hand, and that is comfortably enough** — the
+whole sweep needs eleven. The surplus is useful anyway: the spares cover a
+duff part, and let the pulsed-load test of §2.4 be built up separately without
+dismantling this array.
 
-| Combination | Load | Parts |
+| Fitted | Load | Note |
 |---|---|---|
-| 7 × 130 Ω | 269 mA | 7 |
-| 7 × 130 + 8 × 390 Ω | **372 mA** | 15 |
-| 7 × 130 + 12 × 390 Ω | 423 mA | 19 |
-| one 15 Ω 5 W | 333 mA | 1 |
-| one 12 Ω 10 W | 417 mA | 1 |
+| 6 | 250 mA | the pulsed-load figure for §2.4 |
+| 9 | 375 mA | nominal pass |
+| 10 | 417 mA | **pass with margin — the target** |
+| 11 | 458 mA | stop here |
 
-390 Ω contributes 12.8 mA at 0.064 W each — very safe, just small steps.
+No second resistor value is needed, and no 5 W wirewound. An earlier version of
+this plan mixed 130 Ω with a single 15 Ω to reach the target; that was a
+workaround for having only seven parts, and it cost the uniform step size.
+Dropping it is a straight improvement — see [the slope note](#what-the-curve-yields).
 
-Even if only 269 mA is reached, the result is not wasted: if the curve is still
-straight and stiff there, with no sign of bending, the limit is comfortably
-above — which, with the OEM module's 450 mA rating, is strong evidence though
-not proof.
+#### The scripts that drive this
+
+`bench/` holds the tooling, against Logic 2's automation server (2.4.46) and
+the Logic Pro 8:
+
+| Script | Does |
+|---|---|
+| `check.py` | pre-flight — is Logic 2 reachable, is the device present |
+| `probe.py` | quick voltmeter on any channels; check probe placement before trusting a run |
+| `calibrate.py` | measures the AN0/AN1 channel offset — **required before a rail run** |
+| `capture_uart.py` | Part 1.2, five digital channels with an Async Serial decode |
+| `capture_rail.py` | this test — a short capture per step, read out before you fit the next |
+| `analyse_rail.py` | the summary pass — `RAPP`, the knee, the verdict |
+
+Measured on the Logic Pro 8 (id `5701262AE78884C9`) on 2026-09-16, against a
+bench PSU:
+
+| | Value | Consequence |
+|---|---|---|
+| Analog rates accepted | **781.25 k, 1.5625 M, 3.125 M, 6.25 M, 12.5 M, 50 MS/s** — the same set for one or two channels, and 25 MS/s is *not* accepted | 781.25 kS/s is the floor and is already far more than the staircase needs, which is why each step is a separate short capture rather than one long recording. Go higher only for the transients of 2.3 and 2.4. Logic 2's UI offers slower rates via downsampling — **do not use them**: the precision here comes from taking a median over ~1.5 M samples, and it would also alias the appliance's own switching noise |
+| CSV export precision | **3 decimals — 1 mV** | too coarse for a 6 mV rig drop, so the scripts export **binary** (float32) and parse it directly; also 6× smaller and 7× faster |
+| Channel mismatch | **not a fixed offset** — `offset(V) = 3.083 mV/V × V − 11.714 mV`, perfectly linear over 4.5/5.0/5.5 V (worst residual 0.000 mV) | comparable to the rig drop itself, so `capture_rail.py` refuses to run without `calibrate.py`. A single-point correction at 5 V would leave up to 0.62 mV across a 200 mV droop; the linear form leaves ~0 |
+| Noise | ~2.5 mV rms, averaged over ~1.5 M samples per step | negligible after the median; sub-millivolt resolution |
+| AN0 absolute error | within ~3 mV of the PSU's dial across 4.5–5.5 V | that figure is PSU error and Saleae error combined and cannot be separated without a reference meter — which does not matter, because every quantity here is a *difference* |
+| Repeatability | +3.701 mV measured twice, minutes apart, with an excursion to 4.5 V between — identical to the microvolt | the medians are trustworthy to well under a millivolt |
+
+Two prerequisites, both one-time:
+
+1. **Logic 2 → Preferences → Automation → "Enable automation server"**, then
+   restart Logic 2. It is off by default and nothing here works without it.
+2. The **`logic2-automation`** package, in `bench/.venv`. Note that the
+   similarly named `saleae` package on PyPI is the *Logic 1.x* library and does
+   not talk to Logic 2 at all.
+
+`analyse_rail.py` was checked against synthetic staircases with a known source
+impedance before the bench session — a healthy rail and one with a knee at a
+known current. It recovers `RAPP` and the open-circuit intercept exactly in
+both. The knee case earned its keep: the first version reported **PASS on a
+rail that had collapsed**, because it judged the result on current alone. A rail
+in foldback will happily push 370 mA through a resistor while being useless to
+the buck. The pass condition is now **both** parts of `sim/README.md`'s
+requirement — 370 mA *while the rail stays above `VBUCKREQ`, 4.0 V* — and
+`RAPP` is fitted only over the linear region, since points past the knee
+otherwise corrupt the very line they are judged against.
+
+It is a tested instrument, not a first draft written at the appliance.
 
 #### Record it with the Saleae's analog channel
 
@@ -204,8 +265,14 @@ I = V × N / R
 ```
 
 so the measured voltage and the count give the current. **The analog trace is
-the V–I curve.** Measure two or three of the resistors with a meter first to
-confirm their actual value.
+the V–I curve.**
+
+Measure the resistors with a meter first — and measure *all* of the ones going
+in, not a sample. It costs a couple of minutes and buys two things. Use their
+**mean** as `R`: parallel conductances add, so individual tolerance errors
+average down rather than accumulating, and the array's effective value is known
+far better than any single 5% part. And a resistor that reads wrong gets found
+on the bench rather than as an unexplained kink in the curve.
 
 #### What the curve yields
 
@@ -225,7 +292,7 @@ rail, rated 450 mA at 3.3 V through its own buck — about 330 mA at 5 V, with a
   problem to push through
 - Check polarity twice before connecting. 5 V and GND, nothing else
 - Keep the load connected for seconds at a time, not minutes
-- Resistors will be warm at 0.19 W. Hot enough to notice, not to damage
+- Resistors will be warm at 0.21 W. Hot enough to notice, not to damage
 - Have a way to kill power quickly
 - Never short the rail. A dead short is the one thing that could damage the
   appliance's supply, and it proves nothing

@@ -1,0 +1,31 @@
+{
+  "channel_source": 0,
+  "channel_load": 1,
+  "offset_volts": 0.0037028164698624344,
+  "calibrated_at_volts": 5.0,
+  "offset_fit_const_volts": -0.011714234617533303,
+  "offset_fit_gain_per_volt": 0.0030833419759635507,
+  "sweep_points": [
+    {
+      "set": 4.5,
+      "an_src": 4.496570110321045,
+      "an_load": 4.494420051574707,
+      "offset": 0.0021500587463378906
+    },
+    {
+      "set": 5.0,
+      "an_src": 4.999478816986084,
+      "an_load": 4.995777606964111,
+      "offset": 0.0037012100219726562
+    },
+    {
+      "set": 5.5,
+      "an_src": 5.497307300567627,
+      "an_load": 5.492071628570557,
+      "offset": 0.0052356719970703125
+    }
+  ],
+  "sample_rate": 781250,
+  "seconds": 5.0,
+  "stable": false
+}
