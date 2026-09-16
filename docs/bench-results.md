@@ -46,9 +46,57 @@ Evidence, from 311 clean pulses across six bursts over 180 s:
 line is shorter than a single 9600 bit time. 460800 fits comparably well
 because it is the harmonic — but of 290 matching multiples, 289 are even and
 one is odd, which is what a 230400 signal looks like measured against a 2.17 µs
-ruler. Framing is 8N1 (67% of frames validate) rather than 8E1 (6%).
+ruler. Framing is 8N1: see the independent review below — **88 of 88 frames**
+across all captures carry a valid start and stop bit at 10 bits per frame;
+11-bit framings validate 2–4 of 9. (An earlier figure of "67%" was the first
+decoder's failure to resync between frames, not a property of the signal.)
 
 ---
+
+## Independent review of the capture
+
+Re-analysed from the raw edge lists the same day, by a second pass that
+reconstructed the bitstream itself rather than reusing either decoder.
+
+**The capture is sound.** Three captures on two independent sample clocks
+(500 MS/s and 6.25 MS/s), threshold 1.2 V on a 5 V line. Eight bursts. Refit
+from raw edges, the bit period is **4.326 µs → 231,158 baud**, 0.33% from
+230400 and inside the 160 ns sample resolution. At 8N1 every burst decodes to
+exactly 11 frames, **all 88 with a valid start and stop bit**, same bytes each
+time. 11-bit framings fail. And a structural check nobody designed in: every
+burst spans exactly **106.0 bit-times**, which is precisely where the last edge
+must fall if the final byte is `E3` (`11100011` LSB-first — bits 5–7 and the
+stop bit are high and merge into idle, so the last edge sits at 100+1+5).
+
+**230400 8N1 is verified and stands.**
+
+**"Not hOn" is two claims with different truth values:**
+
+- *This heartbeat is not an hOn frame* — **true, and sourced.** The hOn
+  transport frame is `FF FF <len> <flags> <5 reserved> <type> <data>
+  <checksum> <crc16>`
+  ([paveldn, protocol_overview.rst](https://github.com/paveldn/haier-esphome/blob/master/docs/protocol_overview.rst)).
+  Ours has no `FF FF`, and none of sum8 / xor8 / ten common CRC-8 variants
+  produce the last byte. Independently, hOn is **controller-polled** — odd
+  request types from the module, even responses from the appliance — whereas
+  this appliance transmits *unsolicited* every 30.004 s. Two mismatches, not
+  one.
+- *This appliance does not speak hOn* — **not established.** A listen-only
+  capture of the unpaired idle state cannot show what the appliance does when
+  a controller addresses it. The earlier withdrawal of this claim was correct.
+
+**Prior art:** every documented ESPHome-on-Haier success is a `KZW-W001/W002`
+or an `ESP32-for-Haier` module
+([goral.net.pl](https://goral.net.pl/post/replacing-haier-wifi-modules/),
+[HA thread](https://community.home-assistant.io/t/esp-haier-haier-air-conditioner-esp-home-wemos-d1-mini/127880),
+[esphaier](https://github.com/MiguelAngelLV/esphaier)). **Nothing was found
+for the Realtek `WCATA008` / `Combo_RTK_PP` generation.** That absence is not
+proof, but it means there is no one to copy.
+
+**One unsourced number:** the SPDD states hOn as 8E1. The ESPHome doc page
+does not state parity and the component inherits it from the `uart:` block.
+It is probably 8N1 (ESPHome's default) and "8E1" appears never to have been
+sourced. Irrelevant to the above; relevant before FR-3 is cited again.
 
 ## What the traffic actually is
 
@@ -95,10 +143,27 @@ An earlier draft of this document concluded "this is probably not the hOn bus".
 changes not appearing in the traffic — which has a simpler explanation that
 requires nothing to be wrong.
 
-**No design change follows from the baud finding.** SPDD FR-3 already requires
-the design to "impose no design ceiling below 1 Mbaud"; 230400 sits well inside
-that and the TXU0204 handles it with room to spare. **This changes the ESPHome
-configuration, not the board.**
+**No hardware change follows from the baud finding.** SPDD FR-3 already
+requires the design to "impose no design ceiling below 1 Mbaud"; 230400 sits
+well inside that and the TXU0204 handles it with room to spare.
+
+## What this means for the project — the critical path has moved
+
+The SPDD scopes firmware as "configuring ESPHome's existing `haier`
+component" and puts protocol work **out of scope**. That was a bet that the
+component works on this unit. Today produced the first evidence against the
+bet — wrong baud, wrong framing, wrong direction on the only line that talks,
+and no prior art for this module generation — and no evidence for it.
+
+**If the protocol on this port cannot be learnt, the power gate and the board
+are moot.** A UART bridge with nothing to say is not a product. So the order
+of work changes:
+
+1. **Establish that the protocol is knowable** — before any further hardware
+   investment, including the load test.
+2. Only then the power gate, and fabrication behind it.
+
+The hardware is not wrong. It is, for the moment, unproven to be *useful*.
 
 ## Observed pin behaviour — provisional
 
@@ -174,6 +239,21 @@ which is the difference between sizing R<sub>s</sub> and mis-sizing it.
 
 ## The test to run next
 
+**Plug the `WCATA008` back into the appliance and sniff pins 3 and 4 with it
+running.** That captures the real conversation, both directions, at its real
+baud. It is the only test that answers the question that now matters:
+
+- `FF FF …` at 9600 → ESPHome `haier` is viable; the 230400 heartbeat is an
+  unrelated idle-mode behaviour, and the project resumes as planned.
+- 230400 with no `FF FF` → the protocol is not hOn. Then the question is
+  whether it can be learnt from the module's traffic, and the SPDD's scope
+  needs an ADR before anything else is spent.
+
+If piggybacking the connector with the module fitted is impractical, the
+fallback is below.
+
+### Fallback: the module on a bench PSU
+
 **Power the OEM Realtek module on a bench PSU and watch its five pins.** It is
 already off the appliance and on the desk, so this needs no ladder and no
 dismantling. It answers more than the continuity check would:
@@ -205,7 +285,7 @@ and a limit set too low will brown the module into a reboot loop.
 
 | | Why it matters |
 |---|---|
-| **Part 2 entirely — the V–I curve** | **the fabrication gate.** `RILIM`, `RAPP`, and SPDD §12.1 step 2 all wait on it |
+| **Part 2 entirely — the V–I curve** | the fabrication gate — `RILIM`, `RAPP`, SPDD §12.1 step 2. **Now deferred behind the protocol question**; see above |
 | Behaviour in current limit (2.3) | the one result that could still force a design change |
 | Sag under pulsed load (2.4) | confirms `RAPP` dynamically |
 | RX pull-up (2.5) | sizes R<sub>s</sub>, currently a 100–330 Ω guess. **Partially attempted** — see the DMM readings above |

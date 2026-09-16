@@ -101,8 +101,11 @@ way back if firmware repurposes the USB pins, wedges the USB peripheral, or
 boot-loops.
 
 ### Reference target
-**Haier AS50QDFHRA** split-system HVAC, spoken to with the hOn protocol over
-UART at 9600 8E1 — handled by ESPHome's built-in `haier` climate component.
+**Haier AS50QDFHRA** split-system HVAC, *assumed* to speak the hOn protocol
+over UART at 9600 8E1 — handled by ESPHome's built-in `haier` climate
+component. **That assumption is unverified and the first measurement points
+against it**: the unit's service port, unpaired, transmits at 230400 8N1 in a
+frame that is not hOn's. See [docs/bench-results.md](docs/bench-results.md).
 
 It is the *reference* target, not the only one: it is what the first boards are
 validated against and what the connector pinout is chosen to match.
@@ -207,6 +210,14 @@ rule against editing them.
 - **Silent substitution at assembly.** Every part is pinned by MPN precisely so
   that a cheaper equivalent cannot reach the board unnoticed. Substitutions must
   be proposed back for a decision, never applied silently.
+- **Unverified protocol — now the critical path.** The SPDD puts protocol work
+  out of scope on the assumption that ESPHome's `haier` component works on
+  this unit. The 2026-09-16 capture found the service port transmitting at
+  230400 8N1, unsolicited, in a frame that is not hOn's, and no documented
+  ESPHome success exists for this unit's Realtek `WCATA008` module generation.
+  If the protocol cannot be learnt, the board has nothing to say and the power
+  gate is moot. Resolve before further hardware investment: sniff the port
+  with the OEM module fitted ([docs/bench-results.md](docs/bench-results.md)).
 - **Unverified Haier pinout.** Partly resolved. The *connector* is confirmed
   (2026-09-12): a 5-pin JST XA, 2.5 mm pitch, mated with an XARR-05V panel
   housing. The *pin order* is still assumed, and the fifth pin's function is
