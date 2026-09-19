@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "serialtap")(type "KiCad")(uri "${KIPRJMOD}/../lib/serialtap.kicad_sym")(options "")(descr "SerialTap project symbols - the only symbol library this design may use"))
+)

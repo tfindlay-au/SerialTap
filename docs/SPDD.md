@@ -343,11 +343,11 @@ schematic symbols carry the MPNs and this table points at the reasoning.
 
 | Function | MPN | Why this one |
 |---|---|---|
-| 3.3 V buck | **TPS62162** (package TBD) | Fixed 3.3 V, so no feedback divider and no sense trace for layout to special-case. 1 A against a 335 mA peak. The only candidate with both a fixed output *and* an unencrypted SPICE model — TPS6282533 has no published model, TPS62901's is 74% Cadence-encrypted. Costs ~2 efficiency points against the TPS6282x, worth ~5 mA of appliance current, which is noise against a 300–370 mA requirement ([ADR 0003](adr/0003-buck-not-ldo.md), §5.8) |
+| 3.3 V buck | **TPS62162DSG** (WSON-8, 2×2 mm) | Fixed 3.3 V, so no feedback divider and no sense trace for layout to special-case. 1 A against a 335 mA peak. The only candidate with both a fixed output *and* an unencrypted SPICE model — TPS6282533 has no published model, TPS62901's is 74% Cadence-encrypted. Costs ~2 efficiency points against the TPS6282x, worth ~5 mA of appliance current, which is noise against a 300–370 mA requirement ([ADR 0003](adr/0003-buck-not-ldo.md), §5.8) |
 | Buck inductor | **XGL4020-222MEC** (Coilcraft) | 2.2 µH, 19.5 mΩ DCR against the XFL3012's 97 mΩ — buys back ~0.8 of the ~2 points conceded above. Isat 2.7 A sits clear of the IC's ~1.6–2 A current limit, so the IC protects before the inductor saturates. Coilcraft publishes a `_sat` LTspice model, verified against the datasheet before use. 2.0 mm tall, confirmed to clear the enclosure |
 | Port connector | **B05B-XASK-1-A(LF)(SN)** (JST XA, 5-pin, vertical, with boss) | Matches the appliance's XARR-05V panel housing, so the harness is straight-through (§5.2). Vertical entry confirmed against the enclosure. `-A` for the boss: this is the board's only permanent mechanical interface and takes every insertion force in a unit that vibrates, so the boss carries that into the board rather than the solder joints. Tin, not `-GU` gold — plating should match across a mating pair, and standard XA crimps are tin. **Through-hole**, so it needs a selective- or hand-solder step on an otherwise all-SMD board |
 
-| Level translator | **TXU0204** (package TBD) | 4-bit fixed-direction, two channels each way — TI names UART as the application. Direction fixed in *silicon*, so there is no DIR pin to mis-strap; Schmitt-trigger inputs for a metre of harness; integrated pull-downs, which retire ADR 0001's own warning about floating unused inputs. Push-pull ±12 mA at 4.5 V against the ~4 kΩ of the auto-direction parts ADR 0001 rejected. Two channels unused. See the 2026-09-13 amendment to [ADR 0001](adr/0001-fixed-direction-level-translation.md) |
+| Level translator | **TXU0204** (`PW` TSSOP-14 provisional — confirm) | 4-bit fixed-direction, two channels each way — TI names UART as the application. Direction fixed in *silicon*, so there is no DIR pin to mis-strap; Schmitt-trigger inputs for a metre of harness; integrated pull-downs, which retire ADR 0001's own warning about floating unused inputs. Push-pull ±12 mA at 4.5 V against the ~4 kΩ of the auto-direction parts ADR 0001 rejected. Two channels unused. See the 2026-09-13 amendment to [ADR 0001](adr/0001-fixed-direction-level-translation.md) |
 
 | eFuse | **TPS2553** (SOT-23-6 DBV) | ADR 0004's part. 75 mA–1.7 A adjustable limit, 2.5–6.5 V, 85 mΩ, active-high enable, **reverse blocking**, thermal shutdown, constant-current limiting rather than latch-off (the `-1` suffix latches; we do not want that). Unencrypted PSpice model exists, though ADR 0004's amendment means one is not required here. **R<sub>ILIM</sub> is deliberately unset** — it is gated on measuring the Haier rail, exactly as ADR 0004 requires |
 | Ideal-diode OR | **LM66200** (dual) | 1.6–5.5 V, 40 mΩ, 2.5 A, low I<sub>Q</sub>, **two ideal diodes in one package** — both OR branches in a single part instead of two LM66100s. Unencrypted PSpice model |
@@ -368,9 +368,14 @@ endurance figure (sources disagree between 2 000 h and 20 000 h at 105 °C, and
 polymer life doubles per 20 °C rather than per 10 °C, so it matters), and stock
 for every line above — none of which has been checked against a distributor.
 
-**No library assets exist yet for anything above.** `lib/` has not been started:
-no symbols, no footprints, no 3D models, no datasheets. Selection and library
-are separate jobs, and only the first is done.
+**`lib/` is started (2026-09-19).** Symbols and footprints exist for every part
+above except three, 3D models for six, and datasheets for eight. It validates
+under `kicad-cli` and references nothing outside the repo.
+[lib/README.md](../lib/README.md) carries the per-asset provenance, the gap
+list, and the pin tables extracted from the datasheets for the symbols still to
+be authored. Gaps needing an external source: the `XGL4020` footprint and 3D
+model, the `LM66200` DRL-8 footprint and 3D model, 3D models for the JST XA and
+TI's DSG0008A, and the JST and Nichicon datasheets.
 
 ### 7.3 Project library
 

@@ -36,6 +36,28 @@ THIRD-PARTY MATERIAL NOT COVERED BY THE ABOVE
     of their respective vendors and are deliberately NOT redistributed here.
     The script downloads them; the licence terms are the vendor's.
 
-  - Symbols, footprints and 3D models in lib/ sourced from vendors or SnapEDA
-    remain under whatever terms their originators applied. Provenance is
-    recorded alongside them.
+  - Symbols, footprints and 3D models in lib/ sourced from vendors, from the
+    KiCad project or from SnapEDA remain under whatever terms their originators
+    applied. Provenance for every asset is recorded in lib/README.md.
+
+    As of 2026-09-19 lib/ contains material from two such sources, both under
+    the Creative Commons CC-BY-SA 4.0 licence with the same design exception:
+
+      * the KiCad project's official libraries
+        (https://www.kicad.org/libraries/license/)
+      * Espressif's KiCad libraries, for the ESP32-C3-MINI-1
+        (https://github.com/espressif/kicad-libraries, LICENSE.md)
+
+    That exception is what makes them usable here: to the extent an electronic
+    design using the licensed material could be considered adapted material,
+    the copyright holder waives article 3 of CC-BY-SA with respect to the
+    design and to files generated from it. So SerialTap's schematic, PCB and
+    fabrication outputs are NOT made CC-BY-SA by using these assets, and the
+    CERN-OHL-P v2 grant above stands for them.
+
+    The library files themselves are a different matter. Redistributing them,
+    as this repository does, carries CC-BY-SA 4.0 attribution and share-alike
+    obligations on those files. They are therefore NOT covered by the
+    CERN-OHL-P v2 grant above, notwithstanding that it names lib/. Assets
+    authored for this project are; imported ones are not. lib/README.md says
+    which is which, per asset.

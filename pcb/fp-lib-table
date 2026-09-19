@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "serialtap")(type "KiCad")(uri "${KIPRJMOD}/../lib/serialtap.pretty")(options "")(descr "SerialTap project footprints - the only footprint library this design may use"))
+)

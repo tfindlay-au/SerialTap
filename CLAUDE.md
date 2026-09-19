@@ -128,9 +128,10 @@ than assumed, and it cost a rewrite: see
 
 **Gates to fabrication**
 
-1. **Project library.** `lib/` has not been started: no symbols, no footprints,
-   no 3D models, no datasheets, for any of the pinned parts. This is now the
-   real blocker on schematic capture
+1. **Project library.** Started 2026-09-19 and validating under `kicad-cli`.
+   Three symbols and two footprints still to author or source; see
+   [lib/README.md](lib/README.md) for the gap list and the datasheet pin tables
+   already extracted for them. Confirm the **TXU0204 package** before capture
 2. **Remaining part detail.** Passives, the two 5.1 kΩ USB-C CC pulldowns,
    BOOT/RESET switches, power LED, packages for the TPS62162 and TXU0204, and a
    distributor stock check for every line. Selection is done; detail is not
