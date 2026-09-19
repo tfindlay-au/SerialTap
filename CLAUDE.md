@@ -128,18 +128,23 @@ than assumed, and it cost a rewrite: see
   [ADR 0006](docs/adr/0006-gea3-not-hon.md), [docs/gea3.md](docs/gea3.md)
 - **The rail load test no longer gates fabrication** (2026-09-19). Its only
   design output was one resistor. [ADR 0007](docs/adr/0007-rail-limit-inferred-not-measured.md)
+- **Every pinned part is sourceable, and the eFuse blocker is retired**
+  (2026-09-20). `TPS2553DBVR` — the plain non-latching part — is stocked at LCSC
+  (44k) and Mouser (882); Digi-Key is out until 2026-10-26, which is what the
+  2026-09-19 check actually saw. No single distributor can fill the board, and
+  the thinnest line is now the Nichicon bulk cap at 69 pieces in one place.
+  ~US$11.46/board. [bom/README.md](bom/README.md)
 
 **Gates to fabrication**
 
-1. **Project library.** Complete for every pinned part as of 2026-09-19 and
-   validating under `kicad-cli`: 12 symbols, 10 footprints, a 3D model on every
-   footprint, nothing referencing outside the repo. Complete and validating:
-   12 symbols, 10 footprints, a 3D model on every footprint, nothing referencing
-   outside the repo. **`TPS2553DBVR` sourcing is a live problem** — only the `-1` latch-off variant
-   had stock, and that variant is ruled out; see SPDD §13
+1. **Project library.** ~~Gate~~ **Closed.** Complete for every pinned part as
+   of 2026-09-19 and validating under `kicad-cli`: 12 symbols, 10 footprints, a
+   3D model on every footprint, nothing referencing outside the repo
 2. **Remaining part detail.** Passives, the two 5.1 kΩ USB-C CC pulldowns,
-   BOOT/RESET switches, power LED, packages for the TPS62162 and TXU0204, and a
-   distributor stock check for every line. Selection is done; detail is not
+   BOOT/RESET switches and power LED — none of which can be pinned sensibly
+   before the schematic says how many of each there are. The packages are
+   settled (TPS62162 `DSG`, TXU0204 `RUT`) and the **distributor stock check is
+   done for all ten pinned parts** (2026-09-20, [bom/](bom/))
 3. **Schematic capture**, then `kicad-happy` review gate 1
 4. **`sim/buck-load-step`** — the deck runs on TI's converted model but does not
    yet regulate at 3.3 V, so its results are marked untrusted. Not blocked on a

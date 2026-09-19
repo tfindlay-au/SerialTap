@@ -369,8 +369,11 @@ the same page. The 2 000 h figure some sources carry is wrong. That datasheet al
 confirms this entry's 17 mΩ ESR and 3.8 A ripple, gives the case as 8 × 10 mm, and
 adds leakage of 940 µA at rated voltage.
 
-**Still to confirm before ordering:** stock for every line above. Only the eFuse
-has been checked, and it is a problem — see §13.
+**Stock confirmed for every line above (2026-09-20).** All ten are obtainable,
+but across three distributors — Digi-Key, LCSC and Mouser — and three of them
+are single-source. The eFuse problem is resolved; see §13. Per-line stock,
+distributor part numbers and cost are in [bom/](../bom/); the numbers go stale,
+so re-check before ordering.
 
 **`lib/` is started (2026-09-19).** Symbols and footprints exist for every part
 above except three, 3D models for six, and datasheets for eight. It validates
@@ -584,17 +587,27 @@ that result.
 - ~~Buck and eFuse MPNs~~ **Both pinned (§7.4):** TPS62162 and TPS2553.
   `buck-load-step` is blocked on the deck not yet regulating at 3.3 V, not on
   the part. `RILIM` is set per ADR 0007
-- **`TPS2553DBVR` availability.** The non-latching part was out of stock at
-  Digi-Key on 2026-09-19 and only the **`-1` latch-off variant** was available.
-  The `-1` is explicitly ruled out by §7.4 and ADR 0004: it latches off on
-  overcurrent instead of limiting, and with 470 µF of bulk the plug-in charge
-  time is the same order as the part's 8 ms fault deglitch, so it could latch at
-  every plug-in and would need a physical unplug to recover — inside an
-  appliance. Three ways out, in order: find the plain part at another
-  distributor; use **`TPS2552DBVR`**, same family and constant-current but
-  active-low enable; or fit the `-1` with the auto-retry circuit the datasheet
-  documents in its §10.2.2, which restores self-recovery with two passives. The
-  library's symbol and footprint serve any of these unchanged.
+- ~~**`TPS2553DBVR` availability.**~~ **Resolved 2026-09-20 by the first of the
+  three escape routes: another distributor.** The plain non-latching part is
+  stocked at **LCSC (C55266, 44,248)** and **Mouser (882)**. Digi-Key remains out
+  until 2026-10-26 — the 2026-09-19 finding was correct about Digi-Key, and only
+  the conclusion drawn from it was wrong. `TPS2552DBVR` and the
+  `-1`-plus-auto-retry circuit of the datasheet's §10.2.2 are therefore both
+  unnecessary; the reasoning for rejecting the `-1` (it latches off on
+  overcurrent, and with 470 µF of bulk the plug-in charge time is the same order
+  as its 8 ms fault deglitch, so it could latch at every plug-in inside an
+  appliance) stands unchanged. No design or library change.
+  **One check owed at goods-in:** LCSC's auto-generated listing text mentions
+  latch protection, which is boilerplate for the whole TPS2553 family and says
+  nothing about the suffix — verify the package marking on receipt.
+- **`PCL1A471MCL1GS` depth.** Not a blocker, but the thinnest line on the BOM:
+  **69 pieces at Mouser, and nowhere else.** Digi-Key is non-stock at 24-week
+  lead and a 500-piece minimum; LCSC does not list it, and the sister
+  `PCR1E471MCL1GS` shows 22-week lead and no stock at Arrow, so this is the
+  series rather than the one part number. Buy spares in the same order. If that
+  stock goes first, the fallback is a different 470 µF / 10 V polymer — a
+  substitution, proposed back and never applied silently (CLAUDE.md, §13 risk
+  table).
 - **Which ERD carries which control** on the reference appliance. Firmware only,
   no hardware impact. Ten of the 64 ERDs are unnamed in GE's public definition
   set, and the appliance reads ERD `0x6003` from the module every 30 s for
