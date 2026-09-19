@@ -53,7 +53,7 @@ no reference points outside this directory. Validated 2026-09-19: 12 symbols and
 | **TPS62162DSGT** buck | KiCad (extends `TPS62170DSG`) | KiCad `Texas_DSG0008A…ThermalVias` ✅ **matches TI** | SamacSys |
 | **TPD4E05U06QDQARQ1** ESD | KiCad (extends `TPD4EUSB30`) | KiCad `USON-10_2.5x1.0mm` | KiCad |
 | **TPS2553DBVR** eFuse | UltraLibrarian | KiCad `SOT-23-6` | KiCad |
-| **TXU0204PWR** translator | SamacSys | KiCad `TSSOP-14_4.4x5mm` | KiCad |
+| **TXU0204RUTR** translator | SamacSys, **renumbered to the 12-pin RUT pinout** | **authored from TI's drawing** ✅ | vendor STEP |
 | **LM66200DRLR** ideal-diode OR | SamacSys | **`SOT8`, repaired** ✅ **matches TI** | vendor STEP |
 | **XGL4020-222MEC** inductor | SamacSys | **SamacSys** ✅ **matches Coilcraft** | vendor STEP |
 | **B05B-XASK-1-A(LF)(SN)** JST | KiCad generic 1x05 | KiCad, exact part, **boss hole present** | vendor STEP |
@@ -102,6 +102,38 @@ across, overall 3.35 mm.
 Spacing matters most here: this is the buck's hot loop, and misplaced pads move
 the termination relative to the land.
 
+**TXU0204 — neither candidate; authored from TI.** The package changed from
+TSSOP-14 to UQFN-12 on 2026-09-20 (see below). TI's RUT0012A drawing specifies
+pads 0.2 × 0.7 mm on 0.4 mm pitch, side rows 1.4 mm apart and end pads 1.7 mm
+apart.
+
+| Candidate | Pad | Side rows | End pads | Toe extension |
+|---|---|---|---|---|
+| **authored from TI** | 0.2 × 0.7 | 1.40 | 1.70 | 0.20 mm |
+| UltraLibrarian `QFN_04RUTR_TEX` | 0.254 × 0.5588 | 1.25 | 1.55 | 0.054 mm |
+
+The supplied one is imperial-rounded — 0.254 mm is exactly 10 mil and 0.5588 mm
+is 22 mil — with every pad wider, shorter and pulled inboard. That narrows the
+copper gap from 0.200 mm to 0.146 mm *and* cuts the toe extension to a quarter of
+TI's, on a no-lead part where the toe fillet is the only joint you can inspect.
+Strictly worse on both counts, so it was not used.
+
+Authoring was safe here in a way it was not for the XGL4020, because TI's figures
+check out two independent ways against the package outline on the facing page:
+
+- the land's inner edge lands at 0.35 mm, exactly flush with the terminal inner
+  edge (body half-width 0.85 less the 0.50 terminal length);
+- the toe extends 0.20 mm past the body on *both* axes — 0.70 + 0.35 − 0.85 on
+  the short axis, 0.85 + 0.35 − 1.00 on the long one.
+
+Two figures that agree from different dimensions are not a coincidence. The
+written footprint reads back at exactly 1.40, 1.70 and 0.4 mm.
+
+**Flag for DFM review:** 0.2 mm pads on 0.4 mm pitch leave a 0.200 mm copper gap,
+comfortably inside the 5/5 mil fab class, but at TI's specified 0.05 mm mask
+expansion the solder mask bridge is **0.1 mm** — at PCBWay's floor. Same flag as
+the LM66200.
+
 **TPS62162 — KiCad won.** TI's DSG0008A drawing: signal pads 0.25 mm wide, rows
 1.9 mm apart, thermal pad 0.9 × 1.6 mm.
 
@@ -147,9 +179,20 @@ arrives, by checking the terminals sit inside the pads with fillet showing.
 1. **JST XA series datasheet.** No direct URL found. The footprint is KiCad's for
    the exact part, so nothing is blocked; this is for completeness.
 
-2. **Package confirmation for `TXU0204`**: TSSOP-14 (`PW`) is in the library. The
-   alternatives are WQFN-14, UQFN-12 and X2QFN-12. TSSOP is the only leaded
-   option and area is not scarce. Confirm before capture.
+2. ~~Package confirmation for `TXU0204`~~ **Settled 2026-09-20: UQFN-12 (`RUT`),
+   `TXU0204RUTR`.** The author chose to trade servicing access for board area, on
+   the grounds that space is easier to fill than to free and that a smaller part
+   gives the router more room. The X2QFN-12 (`DTR`) was considered and rejected:
+   TI's land pattern for it is irregular, with four different pad sizes and
+   spacing down to 0.2 mm, which is at or past this project's 5/5 mil class and
+   PCBWay's mask-bridge floor. The RUT captures 89% of the TSSOP's 32 mm² anyway;
+   the DTR would have saved a further 1.7 mm², or 0.14% of the board.
+
+   **The RUT is a different pinout, not just a different footprint.** Ground moves
+   from 7 to 6, the output enable from 8 to 12, the whole B side shifts down by
+   three, and the two no-connects disappear. The symbol was renumbered from the
+   datasheet's own PW/RUT table; the pin table at the end of this file gives both
+   columns.
 
 ## Notes for schematic capture
 

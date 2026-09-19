@@ -133,9 +133,9 @@ than assumed, and it cost a rewrite: see
 
 1. **Project library.** Complete for every pinned part as of 2026-09-19 and
    validating under `kicad-cli`: 12 symbols, 10 footprints, a 3D model on every
-   footprint, nothing referencing outside the repo. One open item in
-   [lib/README.md](lib/README.md): the **`TXU0204` package** needs confirming.
-   **`TPS2553DBVR` sourcing is a live problem** — only the `-1` latch-off variant
+   footprint, nothing referencing outside the repo. Complete and validating:
+   12 symbols, 10 footprints, a 3D model on every footprint, nothing referencing
+   outside the repo. **`TPS2553DBVR` sourcing is a live problem** — only the `-1` latch-off variant
    had stock, and that variant is ruled out; see SPDD §13
 2. **Remaining part detail.** Passives, the two 5.1 kΩ USB-C CC pulldowns,
    BOOT/RESET switches, power LED, packages for the TPS62162 and TXU0204, and a
