@@ -58,10 +58,28 @@ it stays unconnected.
 
 ---
 
-## Part 2 — Power (multimeter and a load) — **this is the fabrication gate**
+## Part 2 — Power (multimeter and a load) — **no longer the fabrication gate**
 
-A logic analyser cannot do any of this. This is SPDD §12.1 step 2, and it is
-the last thing standing between the design and ordering boards.
+> **Revised 2026-09-19 by
+> [ADR 0007](adr/0007-rail-limit-inferred-not-measured.md).** Sections 2.2 and
+> 2.3 below, the resistor-loaded current-voltage curve and the behaviour in
+> limit, are **demoted to optional bring-up characterisation.** Their only
+> design output is `RILIM`, one resistor, which ADR 0004 deliberately made
+> independent of everything else on the board. Getting it wrong costs a resistor
+> swap, not a revision, so it cannot gate fabrication. `RILIM` is now set from
+> inference; read ADR 0007 for the reasoning, the three lines of evidence behind
+> it, the rigour it gives up, and the conditions that would reinstate the test.
+>
+> **Still required, and all cheap:** 2.1 (done), 2.5 the RX pull-up, a meter in
+> series with the 5 V lead for the first measured current, and a cold
+> power-cycle test for the unexplained manual reset of 2026-09-19. Section 2.4,
+> sag under a pulsed load, should be done with the **ESP32 as its own load**
+> rather than with resistors.
+>
+> The rest of Part 2 is kept verbatim: the method is sound and the wiring,
+> Kelvin-sensing and safety notes all still apply if the test is reinstated.
+
+A logic analyser cannot do any of this. This was SPDD §12.1 step 2.
 
 ### 2.1 Open-circuit rail voltage
 

@@ -91,3 +91,17 @@ remains the target.
   [sim/README.md](../../sim/README.md).
 - The deck cannot see a real part's response time, so the contact-event current
   it reports (`ispike`) is indicative only, and is documented as such.
+
+## Amendment, 2026-09-19: `RILIM` is set from inference
+
+See [ADR 0007](0007-rail-limit-inferred-not-measured.md). The rail measurement
+this ADR made `RILIM` conditional on is not being taken, because the only design
+output of that measurement is `RILIM` itself, and this ADR's own decision made
+that a single resistor rather than a layout or part commitment.
+
+The consequence above — "the limit can be set deliberately below a *measured*
+appliance capability, so the board is provably polite to the rail it is plugged
+into" — no longer holds as written. It weakens to politely designed against
+inferred limits, and the named foldback fault mode becomes more likely to be met
+for the first time at bring-up rather than on the bench. ADR 0007 records the
+evidence, the residual risk and the reversal condition.

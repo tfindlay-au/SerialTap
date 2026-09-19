@@ -211,12 +211,20 @@ rule against editing them.
 - **Silent substitution at assembly.** Every part is pinned by MPN precisely so
   that a cheaper equivalent cannot reach the board unnoticed. Substitutions must
   be proposed back for a decision, never applied silently.
-- **Protocol — resolved 2026-09-19, ADR pending.** The port speaks GEA3,
-  which GE publishes (tiny-gea-api) and for which an ESPHome component exists
-  (esphome-gea). The remaining firmware work is a climate entity over the
-  ERDs in [docs/gea3.md](docs/gea3.md). The SPDD's "configure ESPHome's
-  `haier` component" scope is wrong and must be replaced by an ADR before it
-  is cited again.
+- **Protocol — resolved.** The port speaks GEA3, which GE publishes
+  (tiny-gea-api) and for which an ESPHome component exists (esphome-gea).
+  Decoded 2026-09-18, confirmed two-way 2026-09-19, recorded in
+  [ADR 0006](docs/adr/0006-gea3-not-hon.md) with the ERD map in
+  [docs/gea3.md](docs/gea3.md). No hardware consequence; it *validates*
+  ADR 0001, because GEA3 is full duplex with a fixed direction per line.
+  Remaining work is firmware only: which ERD carries which control, the ten
+  ERDs GE's public set does not name, and ERD `0x6003`.
+- **Rail capability — inferred, not measured.** The resistor load test no longer
+  gates fabrication; `RILIM` is set from inference instead
+  ([ADR 0007](docs/adr/0007-rail-limit-inferred-not-measured.md)). What that
+  gives up is written down there, along with the conditions that reinstate the
+  test. The unexplained manual reset on first power-up from the rail is the one
+  open item that could still change the design.
 - **Unverified Haier pinout.** Partly resolved. The *connector* is confirmed
   (2026-09-12): a 5-pin JST XA, 2.5 mm pitch, mated with an XARR-05V panel
   housing. The *pin order* is still assumed, and the fifth pin's function is

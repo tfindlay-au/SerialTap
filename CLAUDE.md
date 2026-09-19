@@ -115,28 +115,39 @@ than assumed, and it cost a rewrite: see
 - KiCad project set up and verified: 4-layer stackup, DRC rules from
   [layout-rules.md](docs/layout-rules.md) confirmed *enforced*, ERC and DRC both
   clean and running
+- **Every major active is pinned by MPN with reasoning** (SPDD §7.4): buck
+  TPS62162, inductor XGL4020-222MEC, translator TXU0204, eFuse TPS2553,
+  ideal-diode OR LM66200, ESD array TPD4E05U06QDQARQ1, module
+  ESP32-C3-MINI-1-H4X, bulk PCL1A471MCL1GS, both connectors
+- **The protocol is GE Appliances GEA3, not hOn** (2026-09-19). Decoded, then
+  confirmed two-way on the appliance. Public, with a C library and an existing
+  ESPHome component. No hardware consequence, and it *validates* ADR 0001.
+  [ADR 0006](docs/adr/0006-gea3-not-hon.md), [docs/gea3.md](docs/gea3.md)
+- **The rail load test no longer gates fabrication** (2026-09-19). Its only
+  design output was one resistor. [ADR 0007](docs/adr/0007-rail-limit-inferred-not-measured.md)
 
 **Gates to fabrication**
 
-1. **Part selection.** Nothing is pinned. Blocks almost everything else: the
-   schematic, `buck-load-step`, and the BOM. The buck needs a vendor SPICE
-   model (SPDD §7.2); the eFuse does not (ADR 0004 amendment), but its
-   current-limit accuracy is what collapses 300–370 mA into one number
-2. **Schematic capture**, then `kicad-happy` review gate 1
-3. **`sim/buck-load-step`** — the deck runs on TI's converted model but does not
-   yet regulate at 3.3 V, so its results are marked untrusted. Blocked on the
-   buck MPN anyway
-4. **Measure the Haier's 5 V rail** against the 300–370 mA figure — open-circuit
-   voltage (done: 5.0257 V), current limit, sag under a pulsed load, and what it
-   *does* in current limit. A TinyS3 now runs from the rail
-   ([docs/gea3.md](docs/gea3.md)); a DMM in series on that lead is the first
-   real number
-5. **Confirm the connector pin order.** Roles are confirmed by a working
-   two-way conversation (2026-09-19); the numbering direction is still
-   provisional. Determines the cable, not a respin
-6. Layout, then review gates 2 and 3
+1. **Project library.** `lib/` has not been started: no symbols, no footprints,
+   no 3D models, no datasheets, for any of the pinned parts. This is now the
+   real blocker on schematic capture
+2. **Remaining part detail.** Passives, the two 5.1 kΩ USB-C CC pulldowns,
+   BOOT/RESET switches, power LED, packages for the TPS62162 and TXU0204, and a
+   distributor stock check for every line. Selection is done; detail is not
+3. **Schematic capture**, then `kicad-happy` review gate 1
+4. **`sim/buck-load-step`** — the deck runs on TI's converted model but does not
+   yet regulate at 3.3 V, so its results are marked untrusted. Not blocked on a
+   part: the buck is pinned
+5. Layout, then review gates 2 and 3
 
-**Protocol (resolved 2026-09-19, ADR pending):** the port speaks GEA3, which
-is public. Firmware becomes esphome-gea plus a climate entity writing the
-ERDs listed in [docs/gea3.md](docs/gea3.md). The SPDD and CONTEXT.md still
-describe the hOn assumption until the ADR lands.
+**Not gates, but cheap and still owed** ([ADR 0007](docs/adr/0007-rail-limit-inferred-not-measured.md))
+
+- A meter in series with the TinyS3's 5 V lead. First measured current in the
+  project. Needs no added load
+- Cold power-cycle the appliance twice. The board needed a manual reset on its
+  first power-up from the rail and that is unexplained. The one open item that
+  could still change the design
+- RX pull-up measurement, unit off. Sizes R<sub>s</sub>, currently a 100–330 Ω
+  guess
+- Connector pin-order direction. Roles are confirmed by a working conversation;
+  the numbering is not. Determines the cable, not a respin

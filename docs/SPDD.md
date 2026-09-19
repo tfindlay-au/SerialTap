@@ -33,13 +33,16 @@ consistently misread as a spirit level.
 
 - Schematic and PCB design (KiCad 10)
 - Fabrication and assembly package for PCBWay: gerbers, drill, BOM, CPL
-- An ESPHome package that runs on the assembled board
+- A firmware package that runs on the assembled board, ESPHome by default
 - Harness documentation: cable pinouts per appliance, starting with the Haier
 
 **Out of scope**
 
 - Any enclosure. The board ships bare (§8).
-- Protocol work beyond configuring ESPHome's existing `haier` component
+- Reverse engineering an appliance protocol from scratch. The reference
+  appliance speaks **GEA3**, which is public and has both a portable C library
+  and an existing ESPHome component ([ADR 0006](adr/0006-gea3-not-hon.md)).
+  Mapping which ERD carries which control is observation, and is in scope.
 - Certification, EMC testing, or commercial production
 
 ## 3. Functional requirements
@@ -48,7 +51,7 @@ consistently misread as a spirit level.
 |---|---|
 | FR-1 | Provide one bidirectionally level-translated UART channel between the ESP32's 3.3 V logic and a target's 5 V logic |
 | FR-2 | Accept 5 V from the target on the same connector as the data lines, and run the whole board from it |
-| FR-3 | Operate reliably at 9600 8E1 (the reference target's rate) and impose no design ceiling below 1 Mbaud |
+| FR-3 | Operate reliably at 230400 8N1 (the reference target's measured rate, [ADR 0006](adr/0006-gea3-not-hon.md)) and impose no design ceiling below 1 Mbaud |
 | FR-4 | Be flashable from a bare, unprogrammed state over USB-C with no jig or external adapter |
 | FR-5 | Be recoverable by hand if firmware renders USB unusable |
 | FR-6 | Never source current into a target appliance's rail from a bench supply, or vice versa |
@@ -236,8 +239,11 @@ below the appliance's own limit, which puts the appliance requirement at
 
 `buck-load-step` is **not** written. Its question is entirely about the
 converter's control loop, which the behavioural blocks in `sim/models/` cannot
-answer, so it is blocked on the buck MPN and its vendor SPICE model (§7.2)
-rather than faked. Fabrication stays gated until it runs.
+answer, so it needs the buck's vendor SPICE model (§7.2) rather than faking it.
+The buck is now pinned — **TPS62162**, chosen partly for having an unencrypted
+model — so the deck is blocked on itself, not on a part: it runs but does not
+yet regulate at 3.3 V, and its results are marked untrusted until it does.
+Fabrication stays gated until it runs.
 
 Simulation lives **outside** the KiCad flow. KiCad 10's built-in ngspice can
 simulate a schematic, but the questions here are about a power path that spans
@@ -414,9 +420,24 @@ anything distributed.
 
 ## 9. Firmware
 
-ESPHome, using the built-in `haier` climate component in hOn mode at 9600 8E1 on
-the port's UART, with logging over USB CDC. OTA is the normal update path after
-first flash. The YAML lives in an `esphome/` directory.
+ESPHome, using the **`esphome-gea` external component in GEA3 mode at 230400
+8N1** on the port's UART, with logging over USB CDC. OTA is the normal update
+path after first flash. The YAML lives in an `esphome/` directory.
+
+The reference appliance speaks GE Appliances GEA3, **not** Haier hOn, and
+ESPHome's built-in `haier` component does not apply to it. Decoded 2026-09-18
+and confirmed two-way on the appliance 2026-09-19; see
+[ADR 0006](adr/0006-gea3-not-hon.md) and [gea3.md](gea3.md) for the evidence
+and the ERD map. SerialTap takes bus address `0xBF`; the appliance is `0xC0`.
+
+`esphome-gea` provides sensor, binary_sensor, switch, select, number and
+text_sensor entities over ERDs. It has no climate entity, so that is the one
+piece of firmware still to write. Control is writing ERDs `0x7A0F` power,
+`0x7A01` mode, `0x7003` setpoint, `0x7A00` fan and `0x7B07`/`0x7B08` swing.
+
+Because GEA3 also has a plain C implementation in GE's `tiny-gea-api`, nothing
+in this design depends on ESPHome or on Home Assistant. Neither is load-bearing
+for the hardware.
 
 ## 10. Deliverables
 
@@ -498,7 +519,7 @@ checklist, or the physical measurements below.
    respin.
 4. Bench bring-up: rails correct, current draw within §5.4, no brownout at
    plug-in.
-5. Scope both sides of both translator channels at 9600 8E1 against a
+5. Scope both sides of both translator channels at **230400 8N1** against a
    USB-serial adapter. Confirm clean push-pull levels, not RC-shaped edges.
 6. ESPHome flashes over USB-C on a virgin board with no button presses.
 7. Manual recovery works: hold BOOT, tap RESET, device enters download mode.
@@ -545,11 +566,22 @@ that result.
 
 **Open questions**
 
-- Actual current capability of the Haier 5 V service rail — needs ≥ 370 mA
-  (blocks §12.1 step 2)
-- Buck and eFuse MPNs, both of which need vendor SPICE models (§7.2). The buck
-  blocks `buck-load-step`; the eFuse's current-limit accuracy is what turns the
-  300–370 mA range above into a single number
+- ~~Actual current capability of the Haier 5 V service rail~~ **No longer a
+  fabrication gate ([ADR 0007](adr/0007-rail-limit-inferred-not-measured.md)).**
+  `RILIM` is set from inference instead: above SerialTap's worst-case draw and
+  below the OEM-implied floor of the rail. The rail has been observed carrying a
+  TinyS3 with Wi-Fi live (2026-09-19). Still unmeasured, and the cost of that is
+  recorded in ADR 0007
+- ~~Buck and eFuse MPNs~~ **Both pinned (§7.4):** TPS62162 and TPS2553.
+  `buck-load-step` is blocked on the deck not yet regulating at 3.3 V, not on
+  the part. `RILIM` is set per ADR 0007
+- **Which ERD carries which control** on the reference appliance. Firmware only,
+  no hardware impact. Ten of the 64 ERDs are unnamed in GE's public definition
+  set, and the appliance reads ERD `0x6003` from the module every 30 s for
+  reasons unknown ([gea3.md](gea3.md))
+- **Why the board needed a manual reset** on its first power-up from the
+  appliance rail (2026-09-19). The one open item that could still change the
+  design, because it concerns enable and reset timing on a rising rail
 - AS50QDFHRA service connector **pin order**, and what the fifth pin carries
   (blocks the harness). The connector and mating part are now known: 5-pin JST
   XA, 2.5 mm pitch, XARR-05V panel housing (confirmed 2026-09-12)
@@ -570,3 +602,5 @@ that result.
 | [0003](adr/0003-buck-not-ldo.md) | Synchronous buck, not an LDO, for the 3.3 V rail |
 | [0004](adr/0004-current-limited-inrush.md) | Current-limited inrush protection, not slew-rate-limited |
 | [0005](adr/0005-kicad-native-capture.md) | KiCad-native capture; atopile removed, and the code-to-schematic alternatives rejected on evidence |
+| [0006](adr/0006-gea3-not-hon.md) | The appliance protocol is GE Appliances GEA3, not Haier hOn |
+| [0007](adr/0007-rail-limit-inferred-not-measured.md) | The rail's current limit is inferred, not measured; the load test stops gating fabrication |
