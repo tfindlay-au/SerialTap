@@ -20,3 +20,6 @@ __pycache__/
 
 # Local ESPHome working copy with real credentials; the sanitised version is bench/esphome/as50qdfhra.yaml
 esphome.cfg
+
+# Vendor CAD downloads staged for import into lib/; not part of the design
+import/

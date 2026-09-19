@@ -25,7 +25,10 @@ lib/
 CLI=/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli
 "$CLI" sym export svg --output /tmp/s lib/serialtap.kicad_sym   # mkdir the output dir first
 "$CLI" fp  export svg --output /tmp/f lib/serialtap.pretty
-grep -rn 'KICAD[0-9]*_3DMODEL_DIR\|KICAD[0-9]*_3RD_PARTY' lib/   # must return nothing
+# 3D refs: catches bare/unquoted paths too, which a quoted-only grep misses
+grep -rhoE '\(model[[:space:]]+("[^"]*"|[^[:space:]")]+)' lib/serialtap.pretty/ | sort -u
+# footprint links must all be serialtap:
+grep -o '(property "Footprint" "[^"]*"' lib/serialtap.kicad_sym | grep -v '"serialtap:'
 ```
 
 That last grep is the rule that matters. Imported assets arrive with paths into
@@ -35,58 +38,124 @@ anyone else.
 
 ## Provenance
 
-`KiCad 10` means copied from this machine's KiCad 10 installation.
-`Espressif` means the vendor's own KiCad library. Both are CC-BY-SA 4.0 with a
-design exception; see [NOTICE](../NOTICE).
+`KiCad 10` = this machine's KiCad installation. `Espressif` = the vendor's own
+KiCad library. `UltraLibrarian` / `SamacSys` = supplied 2026-09-19 via
+componentsearchengine and UltraLibrarian. All are CC-BY-SA 4.0 with a design
+exception, or vendor-supplied; see [NOTICE](../NOTICE).
 
-| Part (MPN) | Symbol | Footprint | 3D |
+Every footprint carries a 3D model, every referenced model file is present, and
+no reference points outside this directory. Validated 2026-09-19: 12 symbols and
+10 footprints render under `kicad-cli`, `sch erc` reports 0 violations.
+
+| Part | Symbol | Footprint | 3D |
 |---|---|---|---|
-| **ESP32-C3-MINI-1-H4X** | ✅ Espressif | ✅ Espressif | ✅ Espressif STEP + WRL |
-| **TPS62162DSG** buck | ✅ KiCad `Regulator_Switching` (+ parent `TPS62170DSG`) | ✅ KiCad `Texas_DSG0008A_WSON-8…ThermalVias` | ❌ **gap** |
-| **TPD4E05U06QDQARQ1** ESD | ✅ KiCad `Power_Protection` (+ parent `TPD4EUSB30`) | ✅ KiCad `USON-10_2.5x1.0mm` | ✅ KiCad |
-| **TPS2553DBV** eFuse | ❌ **gap** (pin table below) | ✅ KiCad `SOT-23-6` | ✅ KiCad |
-| **TXU0204PW** translator | ❌ **gap** (pin table below) | ✅ KiCad `TSSOP-14_4.4x5mm` *(package pending, see below)* | ✅ KiCad |
-| **LM66200DRL** ideal-diode OR | ❌ **gap** (pin table below) | ❌ **gap** — KiCad has DRL-5 and DRL-6, not DRL-8 | ❌ **gap** |
-| **XGL4020-222MEC** inductor | generic `L` ✅ | ❌ **gap** | ❌ **gap** |
-| **B05B-XASK-1-A(LF)(SN)** JST | generic `Conn_01x05_Pin` ✅ | ✅ KiCad, **exact part incl. the `-A` boss** | ❌ **gap** |
-| **USB4085-GF-A** USB-C | generic `USB_C_Receptacle_USB2.0_16P` ✅ | ✅ KiCad, **exact part** | ✅ KiCad STEP |
-| **PCL1A471MCL1GS** bulk | generic `C_Polarized` ✅ | ⚠️ KiCad `CP_Elec_8x10` — **land pattern unverified against the Nichicon drawing** | ✅ KiCad |
+| **ESP32-C3-MINI-1-H4X** | Espressif | Espressif | Espressif STEP + WRL |
+| **TPS62162DSGT** buck | KiCad (extends `TPS62170DSG`) | KiCad `Texas_DSG0008A…ThermalVias` ✅ **matches TI** | SamacSys |
+| **TPD4E05U06QDQARQ1** ESD | KiCad (extends `TPD4EUSB30`) | KiCad `USON-10_2.5x1.0mm` | KiCad |
+| **TPS2553DBVR** eFuse | UltraLibrarian | KiCad `SOT-23-6` | KiCad |
+| **TXU0204PWR** translator | SamacSys | KiCad `TSSOP-14_4.4x5mm` | KiCad |
+| **LM66200DRLR** ideal-diode OR | SamacSys | **`SOT8`, repaired** ✅ **matches TI** | vendor STEP |
+| **XGL4020-222MEC** inductor | SamacSys | **SamacSys** ✅ **matches Coilcraft** | vendor STEP |
+| **B05B-XASK-1-A(LF)(SN)** JST | KiCad generic 1x05 | KiCad, exact part, **boss hole present** | vendor STEP |
+| **USB4085-GF-A** USB-C | KiCad generic 16P | KiCad, exact part | KiCad STEP |
+| **PCL1A471MCL1GS** bulk | KiCad generic polarised | ⚠️ KiCad `CP_Elec_8x10` — **still unverified**, see below | KiCad |
 
-Generic symbols are used where the part needs no special pin semantics. Per
-CLAUDE.md principle 2 each instance still carries its MPN as a symbol property;
-that happens at schematic capture, not here.
+Symbol names are the part, not a generic type, so an MPN cannot be silently
+inherited by a second part of the same class later. Each carries `MPN` and
+`Manufacturer` properties and points at its footprint in this library.
 
-**SPDD §7.4's claim about the USB-C receptacle is confirmed:** KiCad 10 ships
-both a reviewed footprint and a STEP model for the USB4085. That was the stated
-reason for choosing it over a vertical part, and it holds.
+**Pin electrical types were set from the datasheet I/O columns** on all three
+imported IC symbols. The supplied symbols had every pin as `passive`, which
+makes ERC blind to undriven power nets and output conflicts — unacceptable when
+`kicad-cli sch erc` is a release gate. 26 pins corrected.
 
-## Gaps
+## Footprints adjudicated against vendor land patterns
 
-**Needs sourcing — SnapEDA, UltraLibrarian or the vendor:**
+Where two sources disagreed, the vendor's own published land pattern decided it.
+This is why two supplied footprints were rejected and one was repaired.
 
-1. `XGL4020` footprint and 3D model. Coilcraft distributes CAD through
-   UltraLibrarian. The datasheet is in `datasheets/` but its land-pattern
-   drawing does not survive text extraction well enough to author from: the
-   numbers are recoverable, which number belongs to which dimension is not.
-   **Not authored deliberately** rather than guessed.
-2. `LM66200` DRL-8 footprint and 3D model. SOT-5X3, 8-pin, 2.1 × 1.6 mm. KiCad
-   has DRL-5 and DRL-6 only.
-3. 3D model for the JST `B05B-XASK-1-A`. KiCad ships the footprint but no STEP.
-4. 3D model for TI's `DSG0008A` WSON-8 2 × 2 mm.
-5. Datasheets not retrievable by direct URL: **JST XA series** and **Nichicon
-   PCL series**. The Nichicon one also settles the two open questions in
-   SPDD §7.4 — the land pattern above, and the endurance figure that sources
-   disagree on.
+**LM66200 — the supplied "unofficial" one won.** TI's DRL0008A drawing specifies
+pads 0.3 × 0.67 mm, 0.5 mm pitch, rows 1.48 mm apart.
 
-**Two package decisions still open (SPDD §7.4 says "package TBD"):**
+| Candidate | Pad | Row separation | Verdict |
+|---|---|---|---|
+| `SOT8` (unofficial) | 0.3 × 0.67 | 1.48 | **exact match** |
+| `SOTFL50P160X60-8N` (SamacSys) | 0.3 × 0.475 | 1.676 | rejected: 29% short, rows 0.2 mm too far apart |
 
-- **TXU0204** has four: TSSOP-14 `PW` 5 × 6.4 mm, WQFN-14 `BQA` 3 × 2.5 mm,
-  UQFN-12 `RUT` 2 × 1.7 mm, X2QFN-12 `DTR` 1 × 1.7 mm. TSSOP-14 is provisionally
-  in the library as the only leaded option: visible, inspectable, reworkable
-  joints, and area is not scarce on a 22 × 54 mm board. **Confirm before
-  capture.** KiCad has footprints for all four.
-- **TPS62162** resolves to `DSG` = WSON-8 2 × 2 mm, the package KiCad's own
-  symbol targets. Treat as settled unless there is a reason not to.
+`SOT8` had two defects, both repaired: pad 5 sat 20 µm out of line with the rest
+of its row, and all eight pads carried an inherited 0.102 mm solder-mask margin.
+At 0.5 mm pitch with 0.3 mm pads there is only 0.2 mm between pads, so a 0.102 mm
+expansion each side would have erased the mask bridge entirely and invited
+bridging. Removed, so the board's own mask settings govern. **Flag for DFM
+review:** TI asks for 0.05 mm mask around, which is a 0.1 mm bridge — at or below
+PCBWay's minimum. Confirm at review gate 3.
+
+**XGL4020 — SamacSys won.** Coilcraft's four land-pattern figures are mutually
+consistent only one way: pad 0.98 mm wide, centres 2.37 mm apart, pad 3.25 mm
+across, overall 3.35 mm.
+
+| Candidate | Pad width | Centre spacing | Verdict |
+|---|---|---|---|
+| SamacSys | 0.98 | 2.37 | **matches**; pad 3.4 across vs 3.25 typ, benign, extra solder outward |
+| UltraLibrarian | 0.864 | 2.692 | rejected: pads 0.32 mm too far apart, under the terminal |
+
+Spacing matters most here: this is the buck's hot loop, and misplaced pads move
+the termination relative to the land.
+
+**TPS62162 — KiCad won.** TI's DSG0008A drawing: signal pads 0.25 mm wide, rows
+1.9 mm apart, thermal pad 0.9 × 1.6 mm.
+
+| Candidate | Rows apart | Thermal pad | Verdict |
+|---|---|---|---|
+| KiCad | 1.9 | 0.9 × 1.6 | **exact match**, and ships thermal vias |
+| SamacSys | 2.1 | 1.0 × 1.7 | rejected |
+
+**JST B05B-XASK-1-A — KiCad won, and the boss is there.** SPDD §7.4 chose the
+`-A` specifically for its boss. KiCad's footprint carries an unnamed non-plated
+hole for it, and its plain variant has 5 pads against this one's 6. It also has
+larger annular rings than the supplied alternative, which is what a through-hole
+connector taking insertion force wants. No alternative needed.
+
+## Still open
+
+1. **`PCL1A471MCL1GS` land pattern — the last unverified footprint.** The two
+   candidates disagree and neither can be adjudicated without Nichicon's drawing.
+
+   | Candidate | Pad | Centres |
+   |---|---|---|
+   | KiCad `CP_Elec_8x10`, generic, currently linked | 3.5 × 2.5 | ±3.25 |
+   | SamacSys `CAPAE830X1040N`, part-specific | 3.8 × 2.15 | ±3.4 |
+
+   Part-specific normally wins, but SamacSys was wrong on the LM66200 and right
+   on the XGL4020, so it cannot be trusted by origin. **Needs the Nichicon PCL
+   series datasheet**, which also settles SPDD §7.4's endurance question.
+
+2. **JST XA series datasheet.** No direct URL found.
+
+3. **Package confirmation for `TXU0204`**: TSSOP-14 (`PW`) is in the library. The
+   alternatives are WQFN-14, UQFN-12 and X2QFN-12. TSSOP is the only leaded
+   option and area is not scarce. Confirm before capture.
+
+## Notes for schematic capture
+
+From the datasheets read while building this library. All three bear on §5.3 and
+are recorded so they are not rediscovered late.
+
+- **`TPS62162` has a `VOS` pin** that the datasheet calls the "output voltage
+  sense pin and connection for the control loop circuitry". SPDD §7.4 says the
+  fixed-output part means "no feedback divider **and no sense trace for layout to
+  special-case**". The first half is right, the second is not: `VOS` must run
+  back to the output capacitor and it is in the control loop, so layout does have
+  to treat it carefully. Worth a rule in
+  [layout-rules.md](layout-rules.md).
+- **`TPS62162` `FB` should be tied to `AGND`** on fixed-output versions, per the
+  datasheet, for thermal performance. It is not a no-connect.
+- **`LM66200` `ON` gates both channels together**, so it cannot be used to prefer
+  one source over the other. Its `ST` pin reports which input is live, which is
+  free diagnostics for a GPIO or an LED.
+- **`TPS2553` `EN` is active high** (the TPS2552 is active low), `FAULT` is
+  active-low open drain, and `RILIM` must be between 15 kΩ and 232 kΩ — which
+  bounds [ADR 0007](adr/0007-rail-limit-inferred-not-measured.md)'s sizing.
 
 ## Pin tables extracted from the datasheets here
 

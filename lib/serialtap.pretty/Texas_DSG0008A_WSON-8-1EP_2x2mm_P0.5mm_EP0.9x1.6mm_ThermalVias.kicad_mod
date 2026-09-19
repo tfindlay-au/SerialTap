@@ -292,7 +292,7 @@
 		(remove_unused_layers no)
 	)
 	(embedded_fonts no)
-	(model "${KIPRJMOD}/../lib/3dmodels/Texas_DSG0008A_WSON-8-1EP_2x2mm_P0.5mm_EP0.9x1.6mm.step"
+	(model "${KIPRJMOD}/../lib/3dmodels/TPS62162DSGR.stp"
 		(offset
 			(xyz 0 0 0)
 		)

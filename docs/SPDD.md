@@ -343,14 +343,14 @@ schematic symbols carry the MPNs and this table points at the reasoning.
 
 | Function | MPN | Why this one |
 |---|---|---|
-| 3.3 V buck | **TPS62162DSG** (WSON-8, 2×2 mm) | Fixed 3.3 V, so no feedback divider and no sense trace for layout to special-case. 1 A against a 335 mA peak. The only candidate with both a fixed output *and* an unencrypted SPICE model — TPS6282533 has no published model, TPS62901's is 74% Cadence-encrypted. Costs ~2 efficiency points against the TPS6282x, worth ~5 mA of appliance current, which is noise against a 300–370 mA requirement ([ADR 0003](adr/0003-buck-not-ldo.md), §5.8) |
+| 3.3 V buck | **TPS62162DSGT** (WSON-8, 2×2 mm; `T` = 250-piece reel) | Fixed 3.3 V, so no feedback divider and no sense trace for layout to special-case. 1 A against a 335 mA peak. The only candidate with both a fixed output *and* an unencrypted SPICE model — TPS6282533 has no published model, TPS62901's is 74% Cadence-encrypted. Costs ~2 efficiency points against the TPS6282x, worth ~5 mA of appliance current, which is noise against a 300–370 mA requirement ([ADR 0003](adr/0003-buck-not-ldo.md), §5.8) |
 | Buck inductor | **XGL4020-222MEC** (Coilcraft) | 2.2 µH, 19.5 mΩ DCR against the XFL3012's 97 mΩ — buys back ~0.8 of the ~2 points conceded above. Isat 2.7 A sits clear of the IC's ~1.6–2 A current limit, so the IC protects before the inductor saturates. Coilcraft publishes a `_sat` LTspice model, verified against the datasheet before use. 2.0 mm tall, confirmed to clear the enclosure |
 | Port connector | **B05B-XASK-1-A(LF)(SN)** (JST XA, 5-pin, vertical, with boss) | Matches the appliance's XARR-05V panel housing, so the harness is straight-through (§5.2). Vertical entry confirmed against the enclosure. `-A` for the boss: this is the board's only permanent mechanical interface and takes every insertion force in a unit that vibrates, so the boss carries that into the board rather than the solder joints. Tin, not `-GU` gold — plating should match across a mating pair, and standard XA crimps are tin. **Through-hole**, so it needs a selective- or hand-solder step on an otherwise all-SMD board |
 
-| Level translator | **TXU0204** (`PW` TSSOP-14 provisional — confirm) | 4-bit fixed-direction, two channels each way — TI names UART as the application. Direction fixed in *silicon*, so there is no DIR pin to mis-strap; Schmitt-trigger inputs for a metre of harness; integrated pull-downs, which retire ADR 0001's own warning about floating unused inputs. Push-pull ±12 mA at 4.5 V against the ~4 kΩ of the auto-direction parts ADR 0001 rejected. Two channels unused. See the 2026-09-13 amendment to [ADR 0001](adr/0001-fixed-direction-level-translation.md) |
+| Level translator | **TXU0204PWR** (`PW` TSSOP-14 provisional — confirm) | 4-bit fixed-direction, two channels each way — TI names UART as the application. Direction fixed in *silicon*, so there is no DIR pin to mis-strap; Schmitt-trigger inputs for a metre of harness; integrated pull-downs, which retire ADR 0001's own warning about floating unused inputs. Push-pull ±12 mA at 4.5 V against the ~4 kΩ of the auto-direction parts ADR 0001 rejected. Two channels unused. See the 2026-09-13 amendment to [ADR 0001](adr/0001-fixed-direction-level-translation.md) |
 
-| eFuse | **TPS2553** (SOT-23-6 DBV) | ADR 0004's part. 75 mA–1.7 A adjustable limit, 2.5–6.5 V, 85 mΩ, active-high enable, **reverse blocking**, thermal shutdown, constant-current limiting rather than latch-off (the `-1` suffix latches; we do not want that). Unencrypted PSpice model exists, though ADR 0004's amendment means one is not required here. **R<sub>ILIM</sub> is deliberately unset** — it is gated on measuring the Haier rail, exactly as ADR 0004 requires |
-| Ideal-diode OR | **LM66200** (dual) | 1.6–5.5 V, 40 mΩ, 2.5 A, low I<sub>Q</sub>, **two ideal diodes in one package** — both OR branches in a single part instead of two LM66100s. Unencrypted PSpice model |
+| eFuse | **TPS2553DBVR** (SOT-23-6) — **not the `-1`** | ADR 0004's part. 75 mA–1.7 A adjustable limit, 2.5–6.5 V, 85 mΩ, active-high enable, **reverse blocking**, thermal shutdown, constant-current limiting rather than latch-off (the `-1` suffix latches; we do not want that). Unencrypted PSpice model exists, though ADR 0004's amendment means one is not required here. **R<sub>ILIM</sub> is deliberately unset** — it is gated on measuring the Haier rail, exactly as ADR 0004 requires |
+| Ideal-diode OR | **LM66200DRLR** (SOT-5X3-8, its only package) | 1.6–5.5 V, 40 mΩ, 2.5 A, low I<sub>Q</sub>, **two ideal diodes in one package** — both OR branches in a single part instead of two LM66100s. Unencrypted PSpice model |
 
 | ESD array | **TPD4E05U06QDQARQ1** (TI, AEC-Q101) | Quad, 0.5 pF, V<sub>RWM</sub> 5.5 V, min breakdown 6.5 V, ±12 kV, 2.5 A / 40 W surge. Two channels for TX and RX at the connector, per [layout-rules.md](layout-rules.md); two spare. The `-Q1` is taken for its temperature grade, not automotive compliance — this board lives in a warm appliance with no enclosure. **Caveat:** 5.5 V standoff against 5 V logic is 0.5 V of margin, so the Haier's open-circuit rail voltage must be confirmed (already on the bench list) |
 | USB-C receptacle | **USB4085-GF-A** (GCT) | USB 2.0, 16 contacts, through-hole, horizontal top-mount, four PCB retention/grounding posts, 10 000 mating cycles, 3.46 mm profile. Through-hole retention is what §7.1 asked for, and it shares the selective-solder step the JST already needs. **KiCad 10 ships both a reviewed footprint and a STEP model** for it, which is not true of any vertical receptacle. Vertical was considered: it would free ~9 mm of long edge we do not need, in exchange for the cable levering perpendicular to the board and hand-sourced library assets |
@@ -580,6 +580,20 @@ that result.
 - ~~Buck and eFuse MPNs~~ **Both pinned (§7.4):** TPS62162 and TPS2553.
   `buck-load-step` is blocked on the deck not yet regulating at 3.3 V, not on
   the part. `RILIM` is set per ADR 0007
+- **`TPS2553DBVR` availability.** The non-latching part was out of stock at
+  Digi-Key on 2026-09-19 and only the **`-1` latch-off variant** was available.
+  The `-1` is explicitly ruled out by §7.4 and ADR 0004: it latches off on
+  overcurrent instead of limiting, and with 470 µF of bulk the plug-in charge
+  time is the same order as the part's 8 ms fault deglitch, so it could latch at
+  every plug-in and would need a physical unplug to recover — inside an
+  appliance. Three ways out, in order: find the plain part at another
+  distributor; use **`TPS2552DBVR`**, same family and constant-current but
+  active-low enable; or fit the `-1` with the auto-retry circuit the datasheet
+  documents in its §10.2.2, which restores self-recovery with two passives. The
+  library's symbol and footprint serve any of these unchanged.
+- **`PCL1A471MCL1GS` land pattern**, the last unverified footprint. Needs the
+  Nichicon PCL series datasheet, which also settles the endurance question
+  above. See [lib/README.md](../lib/README.md)
 - **Which ERD carries which control** on the reference appliance. Firmware only,
   no hardware impact. Ten of the 64 ERDs are unnamed in GE's public definition
   set, and the appliance reads ERD `0x6003` from the module every 30 s for

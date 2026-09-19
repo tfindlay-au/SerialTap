@@ -128,10 +128,13 @@ than assumed, and it cost a rewrite: see
 
 **Gates to fabrication**
 
-1. **Project library.** Started 2026-09-19 and validating under `kicad-cli`.
-   Three symbols and two footprints still to author or source; see
-   [lib/README.md](lib/README.md) for the gap list and the datasheet pin tables
-   already extracted for them. Confirm the **TXU0204 package** before capture
+1. **Project library.** Complete for every pinned part as of 2026-09-19 and
+   validating under `kicad-cli`: 12 symbols, 10 footprints, a 3D model on every
+   footprint, nothing referencing outside the repo. Two open items in
+   [lib/README.md](lib/README.md): the **`PCL1A471` land pattern** is unverified,
+   and the **`TXU0204` package** needs confirming. **`TPS2553DBVR` sourcing is a
+   live problem** — only the `-1` latch-off variant had stock, and that variant
+   is ruled out; see SPDD §13
 2. **Remaining part detail.** Passives, the two 5.1 kΩ USB-C CC pulldowns,
    BOOT/RESET switches, power LED, packages for the TPS62162 and TXU0204, and a
    distributor stock check for every line. Selection is done; detail is not
