@@ -4,7 +4,9 @@ An open-hardware board that puts an appliance's 5 V serial service port on Home
 Assistant. ESP32-C3 plus bidirectional level translation, powered by the
 appliance itself — one 4-wire cable carries 5 V, GND, TX and RX.
 
-Reference target: Haier AS50QDFHRA (hOn over UART, 9600 8E1, ESPHome `haier`).
+Reference target: Haier AS50QDFHRA. **GE Appliances GEA3** over UART, 230400 8N1,
+confirmed two-way on 2026-09-19 — not hOn, not ESPHome `haier`. See
+[docs/gea3.md](docs/gea3.md).
 Intended to work with any appliance exposing 5 V and UART on a service port.
 
 **Read [CONTEXT.md](CONTEXT.md) for terminology and [docs/SPDD.md](docs/SPDD.md)
@@ -125,8 +127,16 @@ than assumed, and it cost a rewrite: see
    yet regulate at 3.3 V, so its results are marked untrusted. Blocked on the
    buck MPN anyway
 4. **Measure the Haier's 5 V rail** against the 300–370 mA figure — open-circuit
-   voltage, current limit, sag under a 250 mA pulsed load, and what it *does* in
-   current limit
-5. **Confirm the connector pin order** and what the fifth pin carries (Saleae
-   capture on all five). Determines the cable, not a respin
+   voltage (done: 5.0257 V), current limit, sag under a pulsed load, and what it
+   *does* in current limit. A TinyS3 now runs from the rail
+   ([docs/gea3.md](docs/gea3.md)); a DMM in series on that lead is the first
+   real number
+5. **Confirm the connector pin order.** Roles are confirmed by a working
+   two-way conversation (2026-09-19); the numbering direction is still
+   provisional. Determines the cable, not a respin
 6. Layout, then review gates 2 and 3
+
+**Protocol (resolved 2026-09-19, ADR pending):** the port speaks GEA3, which
+is public. Firmware becomes esphome-gea plus a climate entity writing the
+ERDs listed in [docs/gea3.md](docs/gea3.md). The SPDD and CONTEXT.md still
+describe the hOn assumption until the ADR lands.

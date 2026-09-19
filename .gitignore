@@ -17,3 +17,6 @@ __pycache__/
 
 # Reference photos of third-party hardware: kept locally, not carried in the repo
 /images/
+
+# Local ESPHome working copy with real credentials; the sanitised version is bench/esphome/as50qdfhra.yaml
+esphome.cfg

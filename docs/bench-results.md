@@ -295,3 +295,28 @@ and a limit set too low will brown the module into a reboot loop.
 The rail measurement needs the unit **powered on**; the continuity and pull-up
 checks need it **off**. Doing power first and continuity last avoids a second
 power cycle.
+
+---
+
+# Session 2 — 2026-09-19: two-way GEA3 confirmed
+
+**The protocol is GE Appliances GEA3.** The heartbeat above decodes completely
+against GE's public library, and an ESP32-S3 on the port, powered from pin 5,
+received 64 ERDs in answer to a subscribe-all. Full decode, wiring, config,
+ERD map and open items are in **[gea3.md](gea3.md)**. "Not hOn" is no longer
+two claims: the appliance does not speak hOn, or smartAir2, at all.
+
+Done this session, in order: heartbeat decoded (CRC seed `0x1021` over
+destination..payload, ERD read request for `0x6003` from `0xC0` to `0xBF`);
+smartAir2 and USB ruled out on the existing capture; TinyS3 + BSS138 shifter
+wired to pins 1/3/4/5; flashed with esphome-gea; plugged in; discovery log
+received over Wi-Fi.
+
+Not done: the series-current measurement (bench-plan Part 2, still the
+fabrication gate), the on-change publications, and the cold power-cycle test
+for the boot anomaly recorded in gea3.md. The pin numbering is still
+provisional; the roles are now confirmed by the fact that the conversation
+worked.
+
+**The critical path has moved back.** With the protocol known and public, the
+power gate is once again the thing in front of fabrication.
