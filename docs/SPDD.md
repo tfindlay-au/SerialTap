@@ -363,10 +363,14 @@ schematic symbols carry the MPNs and this table points at the reasoning.
 including the **two 5.1 kΩ CC pulldowns** the USB-C sink needs to be recognised
 and offered 5 V.
 
-**Two things to confirm from datasheets before ordering:** the PCL series
-endurance figure (sources disagree between 2 000 h and 20 000 h at 105 °C, and
-polymer life doubles per 20 °C rather than per 10 °C, so it matters), and stock
-for every line above — none of which has been checked against a distributor.
+**Endurance resolved (2026-09-20).** The Nichicon datasheet, now in
+[lib/datasheets](../lib/datasheets/), states **20 000 hours at 105 °C**, twice on
+the same page. The 2 000 h figure some sources carry is wrong. That datasheet also
+confirms this entry's 17 mΩ ESR and 3.8 A ripple, gives the case as 8 × 10 mm, and
+adds leakage of 940 µA at rated voltage.
+
+**Still to confirm before ordering:** stock for every line above. Only the eFuse
+has been checked, and it is a problem — see §13.
 
 **`lib/` is started (2026-09-19).** Symbols and footprints exist for every part
 above except three, 3D models for six, and datasheets for eight. It validates
@@ -591,9 +595,6 @@ that result.
   active-low enable; or fit the `-1` with the auto-retry circuit the datasheet
   documents in its §10.2.2, which restores self-recovery with two passives. The
   library's symbol and footprint serve any of these unchanged.
-- **`PCL1A471MCL1GS` land pattern**, the last unverified footprint. Needs the
-  Nichicon PCL series datasheet, which also settles the endurance question
-  above. See [lib/README.md](../lib/README.md)
 - **Which ERD carries which control** on the reference appliance. Firmware only,
   no hardware impact. Ten of the 64 ERDs are unnamed in GE's public definition
   set, and the appliance reads ERD `0x6003` from the module every 30 s for

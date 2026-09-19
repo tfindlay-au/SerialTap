@@ -38,7 +38,7 @@
 
 * --- 5 V rail storage ---------------------------------------------------------
 .param CBULK   = 470u   ; polymer / hybrid aluminium (SPDD 7.1)
-.param ESRBULK = 25m
+.param ESRBULK = 17m  ; PCL1A471MCL1GS datasheet, 100 kHz 20C (was 25m, assumed)
 .param CCER    = 22u    ; all 5 V ceramics, DC-bias derated (SPDD 7.1)
 .param ESRCER  = 5m
 .param RLED    = 5k     ; power LED branch, ~1 mA
@@ -77,7 +77,9 @@ Vapp   app 0 {VAPP}
 Xclapp app appo CLIM ILIM={IAPP} RON={RAPP}
 Vsense appo jst 0                       ; what the appliance actually delivers
 Rcable jst  fi  {RCABLE}
-Rfuse  fi   efi {RFUSE}
+Rfuse  fi   efi {max(RFUSE,1u)}   ; guard: LTspice rejects a 0 ohm resistor.
+*                                  RFUSE=0 (no PTC) becomes 1 uohm, which is
+*                                  0.25 uV at 250 mA - electrically nothing.
 Xefuse efi  efo CLIM ILIM={IEF} RON={RDSEF}
 Dor    efo  v5  IDEALD                  ; ideal-diode OR, JST branch (FR-6)
 

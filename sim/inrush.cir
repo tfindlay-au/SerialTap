@@ -28,7 +28,7 @@
 .param CINEF  = 0.1u    ; ceramic on the eFuse input
 
 .param CBULK   = 470u
-.param ESRBULK = 25m
+.param ESRBULK = 17m  ; PCL1A471MCL1GS datasheet, 100 kHz 20C (was 25m, assumed)
 .param CCER    = 22u
 .param ESRCER  = 5m
 .param RLED    = 5k

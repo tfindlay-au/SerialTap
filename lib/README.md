@@ -58,7 +58,7 @@ no reference points outside this directory. Validated 2026-09-19: 12 symbols and
 | **XGL4020-222MEC** inductor | SamacSys | **SamacSys** ✅ **matches Coilcraft** | vendor STEP |
 | **B05B-XASK-1-A(LF)(SN)** JST | KiCad generic 1x05 | KiCad, exact part, **boss hole present** | vendor STEP |
 | **USB4085-GF-A** USB-C | KiCad generic 16P | KiCad, exact part | KiCad STEP |
-| **PCL1A471MCL1GS** bulk | KiCad generic polarised | ⚠️ KiCad `CP_Elec_8x10` — **still unverified**, see below | KiCad |
+| **PCL1A471MCL1GS** bulk | KiCad generic polarised | KiCad `CP_Elec_8x10` — **decided, see below** | KiCad |
 
 Symbol names are the part, not a generic type, so an MPN cannot be silently
 inherited by a second part of the same class later. Each carries `MPN` and
@@ -116,23 +116,38 @@ hole for it, and its plain variant has 5 pads against this one's 6. It also has
 larger annular rings than the supplied alternative, which is what a through-hole
 connector taking insertion force wants. No alternative needed.
 
+## The bulk capacitor land pattern, decided
+
+**Nichicon publishes no recommended land pattern for this part.** The part spec
+sheet and the series datasheet both defer to the *Guidelines for Aluminum
+Electrolytic Capacitors*, and that document does not contain one either — it
+defers in turn to the catalogue. So neither candidate is vendor-specified; both
+are IPC derivations.
+
+| Candidate | Pad | Centres | Inner edge | Outer edge |
+|---|---|---|---|---|
+| **KiCad `CP_Elec_8x10`** (chosen) | 3.5 × 2.5 | ±3.25 | ±1.5 | ±5.0 |
+| SamacSys `CAPAE830X1040N` | 3.8 × 2.15 | ±3.4 | ±1.5 | ±5.3 |
+
+**They agree exactly on the inner pad edge at ±1.5 mm**, which is what sets where
+the terminal lands. They differ only in how far each pad extends outward and how
+wide it is. Either would solder.
+
+KiCad's is chosen for wider pads — 2.5 mm against 2.15 mm, so more solder area
+and more tolerance to placement rotation on a part 10 mm tall with a high centre
+of mass — and for a tighter courtyard on a 22 mm-wide board. It also comes from a
+library with a documented review process, where the alternative's origin proved
+unreliable: the same source was wrong on the LM66200 and right on the XGL4020.
+
+**Confirm two ways:** at DFM review, and against the real capacitor when it
+arrives, by checking the terminals sit inside the pads with fillet showing.
+
 ## Still open
 
-1. **`PCL1A471MCL1GS` land pattern — the last unverified footprint.** The two
-   candidates disagree and neither can be adjudicated without Nichicon's drawing.
+1. **JST XA series datasheet.** No direct URL found. The footprint is KiCad's for
+   the exact part, so nothing is blocked; this is for completeness.
 
-   | Candidate | Pad | Centres |
-   |---|---|---|
-   | KiCad `CP_Elec_8x10`, generic, currently linked | 3.5 × 2.5 | ±3.25 |
-   | SamacSys `CAPAE830X1040N`, part-specific | 3.8 × 2.15 | ±3.4 |
-
-   Part-specific normally wins, but SamacSys was wrong on the LM66200 and right
-   on the XGL4020, so it cannot be trusted by origin. **Needs the Nichicon PCL
-   series datasheet**, which also settles SPDD §7.4's endurance question.
-
-2. **JST XA series datasheet.** No direct URL found.
-
-3. **Package confirmation for `TXU0204`**: TSSOP-14 (`PW`) is in the library. The
+2. **Package confirmation for `TXU0204`**: TSSOP-14 (`PW`) is in the library. The
    alternatives are WQFN-14, UQFN-12 and X2QFN-12. TSSOP is the only leaded
    option and area is not scarce. Confirm before capture.
 

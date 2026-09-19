@@ -59,3 +59,13 @@ fi
 
 echo
 echo "Done. Decks .include these from sim/models/."
+
+# Nichicon publishes a SPICE model for the bulk capacitor, PCL1A471MCL1GS, at
+#   https://www.nichicon.com/en-us/part/pcl1a471mcl1gs/680/
+# It is deliberately NOT fetched. The decks model that capacitor as CBULKX, a
+# lumped C with series ESR, and the only parameter that matters at their
+# timescales is that ESR - now 17 mOhm from the datasheet rather than the 25 mOhm
+# previously assumed. A vendor model would add frequency-dependent ESR above
+# 100 kHz, which neither rail-sag (millisecond bursts) nor inrush (a single
+# constant-current ramp) can resolve. Fetch it if a deck ever asks a question at
+# switching frequency.

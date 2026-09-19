@@ -107,9 +107,12 @@ than assumed, and it cost a rewrite: see
 
 **Done**
 
-- `sim/rail-sag` and `sim/inrush` (2026-09-12). The appliance rail must supply
-  **300–370 mA**, not the 250 mA originally assumed; 470 µF is the right bulk
-  value and more capacitance would not rescue a weak rail. See
+- `sim/rail-sag` and `sim/inrush` (2026-09-12, **both re-run 2026-09-20**). The
+  appliance rail must supply **300–370 mA**, not the 250 mA originally assumed;
+  470 µF is the right bulk value and more capacitance would not rescue a weak
+  rail. Both decks were found **unrunnable in a clean checkout** and are now
+  fixed: `models/behavioral.lib` had been deleted by accident, and `rail-sag`
+  set a 0 Ω resistor that LTspice rejects outright. No conclusion reversed. See
   [sim/README.md](sim/README.md)
 - The service connector is a **5-pin JST XA**, not 4-pin (2026-09-12)
 - KiCad project set up and verified: 4-layer stackup, DRC rules from
@@ -130,11 +133,10 @@ than assumed, and it cost a rewrite: see
 
 1. **Project library.** Complete for every pinned part as of 2026-09-19 and
    validating under `kicad-cli`: 12 symbols, 10 footprints, a 3D model on every
-   footprint, nothing referencing outside the repo. Two open items in
-   [lib/README.md](lib/README.md): the **`PCL1A471` land pattern** is unverified,
-   and the **`TXU0204` package** needs confirming. **`TPS2553DBVR` sourcing is a
-   live problem** — only the `-1` latch-off variant had stock, and that variant
-   is ruled out; see SPDD §13
+   footprint, nothing referencing outside the repo. One open item in
+   [lib/README.md](lib/README.md): the **`TXU0204` package** needs confirming.
+   **`TPS2553DBVR` sourcing is a live problem** — only the `-1` latch-off variant
+   had stock, and that variant is ruled out; see SPDD §13
 2. **Remaining part detail.** Passives, the two 5.1 kΩ USB-C CC pulldowns,
    BOOT/RESET switches, power LED, packages for the TPS62162 and TXU0204, and a
    distributor stock check for every line. Selection is done; detail is not

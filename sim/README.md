@@ -130,9 +130,32 @@ from these decks:
 
 ## What the decks found
 
-Run 2026-09-12, against the design values in
-[SPDD §5.3](../docs/SPDD.md) — 470 µF bulk, ideal-diode OR, 0.95 Ω total series
-resistance from appliance to rail.
+Run 2026-09-12; **`rail-sag` and `inrush` re-run 2026-09-20** against the design
+values in [SPDD §5.3](../docs/SPDD.md) — 470 µF bulk, ideal-diode OR, 0.95 Ω
+total series resistance from appliance to rail.
+
+> **Why they were re-run, and two defects found doing it.** Both decks were
+> unrunnable in a clean checkout, so the tables below could not be reproduced.
+>
+> 1. `models/behavioral.lib` — which defines `CLIM`, `IDEALD`, `CBULKX` and
+>    `BUCKLOAD`, every block `rail-sag` and `inrush` are built from — was
+>    deleted by commit `786b8c3`, which moved `buck-load-step` onto vendor
+>    models. The two behavioural decks still included it. `.gitignore` carries
+>    an explicit `!/models/behavioral.lib` exception, so the deletion was
+>    plainly accidental. Restored from history.
+> 2. `rail-sag` set `RFUSE = 0.0` in commit `c5ce298` to record that no PTC is
+>    fitted. **LTspice rejects a zero-ohm resistor outright**, so the deck has
+>    been dead since 2026-09-13 and its committed results dated from *before*
+>    the PTC was dropped. The parameter still reads 0.0 as the design
+>    statement; the element is now `{max(RFUSE,1u)}`, and 1 µΩ is 0.25 µV at
+>    250 mA.
+>
+> `ESRBULK` was also corrected from an assumed 25 mΩ to the **17 mΩ** the
+> `PCL1A471MCL1GS` datasheet specifies at 100 kHz.
+>
+> **No conclusion reverses.** One cell of the table below moved, by 10 mA, and
+> it strengthens the finding on bulk capacitance rather than weakening it. The
+> 300–370 mA requirement is unchanged.
 
 ### The number: minimum appliance supply current
 
@@ -141,7 +164,7 @@ placeholder for the buck's minimum input, `VBUCKREQ` in the deck:
 
 | Radio duty | 220 µF | **470 µF** | 1000 µF |
 |---|---|---|---|
-| 20% — steady ESPHome traffic | 175 mA | **120 mA** | 110 mA |
+| 20% — steady ESPHome traffic | 175 mA | **110 mA** | 110 mA |
 | 50% — busy link | 200 mA | **175 mA** | 175 mA |
 | 91% — association / OTA | 250 mA | **250 mA** | 250 mA |
 
@@ -160,9 +183,12 @@ rather than dipping it marginally below a threshold. So the 300–370 mA
 requirement stands whichever family member is finally chosen.
 
 **This settles how much bulk is worth fitting.** Going 470 µF → 1000 µF buys
-10 mA at light duty and nothing at all under sustained transmit. Dropping to
-220 µF costs 55 mA. 470 µF (SPDD §5.3) is the right size, and "add more bulk"
-is *not* the answer if the Haier turns out marginal — more source current is.
+**nothing at any duty** — the two columns are now identical at every row.
+Dropping to 220 µF costs 65 mA. 470 µF (SPDD §5.3) is the right size, and "add
+more bulk" is *not* the answer if the Haier turns out marginal — more source
+current is. (Before the 2026-09-20 corrections the 1000 µF column showed a
+10 mA advantage at light duty; with the real capacitor's lower ESR that
+advantage disappears.)
 
 ### The eFuse limit
 
