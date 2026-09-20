@@ -174,6 +174,35 @@ unreliable: the same source was wrong on the LM66200 and right on the XGL4020.
 **Confirm two ways:** at DFM review, and against the real capacitor when it
 arrives, by checking the terminals sit inside the pads with fillet showing.
 
+## Generic symbols, added 2026-09-20 for schematic capture
+
+The ten pinned parts were not enough to draw the board: it also needs
+resistors, capacitors, an LED, tact switches, test points and power symbols.
+Eleven symbols were copied in from **KiCad 10's own libraries** on this
+machine, so the design still references nothing outside this repo.
+
+| Symbol | Source | Use |
+|---|---|---|
+| `R`, `C` | KiCad `Device` | every passive; `Footprint` left empty until the MPN is pinned |
+| `LED` | KiCad `Device` | D1, power indicator |
+| `SW_Push` | KiCad `Switch` | SW1 BOOT, SW2 RESET |
+| `TestPoint` | KiCad `Connector` | TP1–TP10 |
+| `PWR_FLAG` | KiCad `power` | tells ERC where `PORT_5V`, `USB_VBUS` and `V3V3` enter the board |
+| `GND` | KiCad `power` | unchanged |
+| `V5`, `V3V3`, `PORT_5V`, `USB_VBUS` | KiCad `power` `+5V`/`+3V3`, renamed | the rail names [docs/schematic-capture.md](../docs/schematic-capture.md) uses. A power symbol's net name is its `Value`, so renaming the symbol, its units and its value is the whole change |
+
+Passive symbols deliberately carry **no `Footprint`**. The package is a
+consequence of the part, and the parts are not pinned yet; an empty field is
+honest, a guessed 0603 is not.
+
+## One pin type departs from the datasheet
+
+`LM66200` **`VOUT_2` is `passive`, not `power_out`.** Pins 2 and 7 are the same
+internal node, so with both as `power_out` ERC sees two power outputs shorted
+together and errors. The rest of the pin types still come from the datasheet
+I/O column, as above. Recorded here so the departure is not mistaken for the
+import sloppiness that the 26 corrections fixed.
+
 ## Still open
 
 1. **JST XA series datasheet.** No direct URL found. The footprint is KiCad's for

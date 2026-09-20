@@ -12,10 +12,16 @@ board's point of view:
 | J1 pin | Net | Function |
 |---:|---|---|
 | 1 | `PORT_5V` | appliance 5 V input |
-| 2 | `GND` | common return |
-| 3 | `PORT_TX` | board output to appliance |
-| 4 | `PORT_RX` | appliance output to board |
-| 5 | `PORT_NC` | deliberately unconnected until the harness investigation assigns it |
+| 2 | `PORT_TX` | board output to appliance — the appliance's receiver |
+| 3 | `PORT_RX` | appliance output to board — the appliance's transmitter |
+| 4 | `PORT_NC` | deliberately unconnected until the harness investigation assigns it |
+| 5 | `GND` | common return |
+
+**Corrected 2026-09-20.** This table originally read 5 V, GND, TX, RX, spare at
+pins 1–5, from a connector that was being read from the wrong end. Old pin *n*
+is new pin *6 − n*. Direction is settled by the working TinyS3 rig, not
+inferred: TinyS3 TX drives pin 2, pin 3 drives TinyS3 RX
+([gea3.md](gea3.md)).
 
 J2 is USB-C. All VBUS pins join `USB_VBUS`; all GND pins and shield join
 `GND`; D+ and D− go through the USB ESD array to C3 GPIO19 and GPIO18.
@@ -79,9 +85,122 @@ line reaches its ESD channel before the UART series resistor or USB trace.
 
 ## Review invariants
 
-- J1 pin 5 has no copper connection other than its own pad.
+- J1 pin 4 has no copper connection other than its own pad.
 - No USB VBUS path can reach `PORT_5V` except through the LM66200 ideal-diode OR.
 - The ESD array is ahead of both UART series resistors.
 - `FB` is not floating; `VOS` senses at the output capacitor.
 - Every unused TXU input is tied off and every unused output is explicitly no-connect.
 - Every passive has an MPN before ERC/BOM review; values above are design values, not distributor substitutions.
+
+## Capture record — 2026-09-20
+
+Captured into [`pcb/serialtap-r1p0.kicad_sch`](../pcb/serialtap-r1p0.kicad_sch),
+KiCad 10 native format (`version 20260306`), one A3 sheet in seven labelled
+blocks: service port, USB-C, power path, level translation, ESP32-C3, test
+access, ERC power sources. **43 components, 57 nets.**
+
+`kicad-cli sch erc --severity-all` reports **0 violations**.
+
+The connectivity above was transcribed and then checked against the *extracted
+netlist*, not against the drawing — a drawing can look right and still be
+wrong. Every review invariant, as `kicad-cli sch export netlist` reports it:
+
+| Invariant | Netlist evidence |
+|---|---|
+| J1 pin 4 has no copper other than its own pad | `unconnected-(J1-Pin_4-Pad4)`, one node |
+| No USB VBUS path to `PORT_5V` except through the OR | `USB_VBUS` = J2 VBUS ×4, C3, U2.VIN2. `PORT_5V` = J1.1, U1.IN, U1.EN, C1. They meet only at U2's output |
+| ESD array ahead of both UART series resistors | `PORT_TX` = J1.3, **U5.D1+**, R1.1 — and `TX_BUF` = R1.2, U4.B1Y, TP4. Same shape for RX |
+| `FB` not floating; `VOS` senses at the output capacitor | U3.5 (`FB`) is in `GND`; U3.6 (`VOS`) is in `V3V3` with C6 |
+| Every unused translator pin handled | A2, B4 tied to `GND`; A4Y, B2Y carry explicit no-connects |
+| Every passive has an MPN | **Not met** — see "Still open" below |
+
+### Decisions taken at capture
+
+- **`RILIM` = 66.5 kΩ 1% (R5).** TI's Table 2 row for a 400 mA nominal limit;
+  with part and resistor tolerance the limit lands **351–449 mA**. That is
+  ~100 mA above the board's 250 mA worst-case 5 V draw, so a Wi-Fi TX burst
+  cannot nuisance-trip it, and below the ~590 mA inrush the rail demonstrably
+  sources for the OEM module it was built to feed
+  ([ADR 0007](adr/0007-rail-limit-inferred-not-measured.md)). The 88.7 kΩ /
+  300 mA alternative was rejected: its 262 mA minimum leaves only 12 mA over
+  the board's own estimated peak. Still an inferred value, to be confirmed at
+  bring-up.
+- **`FAULT`, `PG` and `ST` go to test pads** (TP8, TP9, TP10), not to GPIOs.
+  Zero BOM cost, no firmware coupling. `FAULT` and `PG` are open-drain and
+  carry pull-ups (R6 to `V5`, R7 to `V3V3`). The cost is that neither fault
+  state is visible to Home Assistant; routing them to GPIO6/GPIO7 later is a
+  respin, so this is the decision to revisit if remote fault reporting matters.
+- **Drawing style: rails and cross-block signals by symbol and label, local
+  topology by wire.** Power symbols (`PORT_5V`, `USB_VBUS`, `V5`, `V3V3`,
+  `GND`) carry the rails; labels carry signals between blocks; wires are drawn
+  where the topology is the point — the J1 → ESD → series resistor chain, the
+  buck's SW node through L1, the BOOT and RESET networks, each pull-up. This
+  keeps a 43-part board on one readable sheet. The netlist, not the drawing, is
+  what was checked.
+- **`LM66200` `VOUT_2` pin type changed to passive** in the project library.
+  `VOUT_1` and `VOUT_2` are the same internal node, and two `power_out` pins on
+  one net is an ERC conflict. The datasheet I/O column still says output; the
+  library note records why the symbol departs from it.
+- **Eleven generic symbols added to the project library** (R, C, LED, SW_Push,
+  TestPoint, PWR_FLAG, GND, V5, V3V3, PORT_5V, USB_VBUS), copied from KiCad 10's
+  own libraries so nothing references outside the repo. See
+  [lib/README.md](../lib/README.md).
+
+### Review gate 1 — kicad-happy, 2026-09-20
+
+Run on the schematic alone; no PCB exists yet, so the cross-domain, EMC,
+thermal and gerber analyses were **not run** and neither was the lifecycle
+audit. 28 findings: 2 errors, 2 warnings, 24 informational.
+
+| Finding | Verdict |
+|---|---|
+| `PP-001` U2.VIN1 has no DC path to a rail | **False positive.** `EFUSE_OUT` holds U1.OUT (`power_out`), U2.VIN1 and C2. The DC path runs through U1's pass FET; the rule walks the net graph only and cannot traverse an IC. A current-limited switch between two rails always trips it |
+| `SS-001` BOM under 50% MPN coverage (9/21) | **True, and expected.** The passives are the open gate below |
+| `DS-002` no `datasheets/` directory | **Path convention.** This project keeps vendor PDFs in `lib/datasheets/` beside the symbols that cite them |
+| `UC-002` no ESD/TVS on VBUS at J2 | **Genuine, and open.** See below |
+| `PR-004` no series resistors on USB D+/D− | **Expected.** The C3's USB Serial/JTAG PHY needs none; Espressif's own boards fit none |
+
+**The VBUS finding is worth a decision.** All four ESD channels are committed
+(`PORT_TX`, `PORT_RX`, USB D+, D−), so VBUS is unprotected. `PORT_5V` is
+covered by a different mechanism — the TPS2553 is rated 15 kV IEC 61000-4-2
+*with external capacitance*, which C1 provides. VBUS has no equivalent: it
+reaches the LM66200 directly, whose inputs are **6 V absolute maximum**
+(datasheet §6.1) against a hot-plug transient that can overshoot well past
+5.5 V. C3 (1 µF) damps it; nothing clamps it. A single-channel TVS on VBUS
+would close this. Not fitted, because it is a new part and this project pins
+parts deliberately rather than by reflex.
+
+### Amended 2026-09-20: J1 pin numbering corrected
+
+Captured first against the original table, then rewired when the connector was
+found to have been read from the wrong end. The board-side nets are unchanged
+— `PORT_TX` is still what the board drives — but they move pads: J1.2 now
+carries `PORT_TX` through R1, J1.3 carries `PORT_RX` through R2, J1.4 is the
+no-connect and J1.5 is ground. Confirmed in the netlist:
+
+```
+PORT_5V    J1.1 + C1.1 U1.1 U1.3
+PORT_TX    J1.2 + R1.1 U5.1          TX_BUF  R1.2 + U4.10 (B1Y, output)
+PORT_RX    J1.3 + R2.1 U5.2          RX_BUF  R2.2 + U4.8  (B3,  input)
+unconnected-(J1-Pin_4-Pad4)
+GND        J1.5 + ...
+```
+
+`TX_BUF` lands on the translator's B-side **output** and `RX_BUF` on its
+B-side **input**, so the direction through the fixed-direction buffer matches
+the rig that works.
+
+### Still open after capture
+
+1. **Passive MPNs.** The schematic now fixes the count: **25 components over 12
+   unique lines.** R1/R2 330 Ω 1%, R3/R4/R8 5.1 k, R5 66.5 k 1%, R6/R7 100 k,
+   R9/R10 10 k, C1/C7/C8/C9 0.1 µF, C2/C3/C11 1 µF, C5/C10 10 µF, C6 22 µF, D1
+   (LED), SW1/SW2 (tact). C4 is already pinned — it is the Nichicon bulk.
+   Footprints follow the MPNs, so both land together. This is the last gate
+   before layout.
+2. ~~**VBUS TVS**~~ **Accepted, not fitted** (2026-09-20). The USB port is a
+   one-off setup interface — the operational path is J1 — so the exposure is
+   closer to a debug header's than to a permanently cabled port. The risk is
+   real and recorded; the decision is to carry it.
+3. **Reference designators are functional, not positional.** Re-annotate in
+   KiCad if left-to-right ordering matters for the assembly drawing.

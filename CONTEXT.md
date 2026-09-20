@@ -65,7 +65,7 @@ The board's single level-translated UART channel, translated in both directions
 with fixed-direction buffers.
 
 Physically a **5-pin** JST XA connector (2.5 mm pitch), of which the design
-uses four: **5 V, GND, TX, RX**. It is simultaneously the data path to the
+uses four, in order **5 V, TX, RX, spare, GND**. It is simultaneously the data path to the
 target device and the board's primary power source. There is exactly one port:
 the board is a single-target adapter, not a multi-port gateway.
 
@@ -75,10 +75,14 @@ on the AS50QDFHRA, mated with a JST **XARR-05V** panel housing — XA series,
 header so the harness can be straight-through, which is the least error-prone
 cable to build and to get wrong.
 
-**What the fifth pin does is unknown.** It is captured along with the other
-four during the Wednesday probe. Until then it connects to nothing on the
-board — not the ESD array, not a GPIO — because strapping an unknown signal to
-a net that matters is a worse failure than losing a pin.
+**What pin 4 does is unknown.** It read as floating on the capture — no
+contact, or a genuine spare. Until that is settled it connects to nothing on
+the board — not the ESD array, not a GPIO — because strapping an unknown signal
+to a net that matters is a worse failure than losing a pin.
+
+**The numbering was corrected on 2026-09-20**, having previously been read from
+the wrong end of the connector: old pin *n* is new pin *6 − n*. Every document
+in this repo now uses the corrected numbers.
 
 ### Primary supply
 The 5 V arriving on the port's JST XA connector. The board is normally powered by
@@ -133,7 +137,7 @@ each appliance gets a documented harness.
 | Area | Decision |
 |---|---|
 | Module | ESP32-C3-MINI-1 (ADR 0002) |
-| Port | One, JST XA **5-pin**, four used: 5 V, GND, TX, RX |
+| Port | One, JST XA **5-pin**, four used: 5 V, TX, RX, (spare), GND |
 | Translation | Fixed-direction dual-supply buffers (ADR 0001) |
 | Supply sources | JST XA 5 V (primary) and USB-C, ideal-diode OR-ed |
 | Inrush / sag | Current-limited eFuse + ≥470 µF low-ESR bulk (ADR 0004) |
@@ -225,9 +229,10 @@ rule against editing them.
   gives up is written down there, along with the conditions that reinstate the
   test. The unexplained manual reset on first power-up from the rail is the one
   open item that could still change the design.
-- **Unverified Haier pinout.** Partly resolved. The *connector* is confirmed
-  (2026-09-12): a 5-pin JST XA, 2.5 mm pitch, mated with an XARR-05V panel
-  housing. The *pin order* is still assumed, and the fifth pin's function is
-  entirely unknown. The board uses a conventional fixed pinout, so this stays a
-  cable question rather than a respin question — but the harness cannot be built
-  until all five are captured.
+- **Unverified Haier pinout.** ~~Partly resolved.~~ **Resolved 2026-09-20,
+  except for one pin.** The *connector* was confirmed on 2026-09-12: a 5-pin
+  JST XA, 2.5 mm pitch, mated with an XARR-05V panel housing. The *pin order*
+  is now settled — 5 V, TX, RX, spare, GND — after the numbering was found to
+  have been read from the wrong end; direction comes from the working TinyS3
+  link rather than inference. **Pin 4's function remains unknown**, which holds
+  up nothing but the harness documentation.

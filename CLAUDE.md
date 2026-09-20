@@ -4,7 +4,10 @@ An open-hardware board that puts an appliance's 5 V serial service port on Home
 Assistant. ESP32-C3 plus bidirectional level translation, powered by the
 appliance itself — one 4-wire cable carries 5 V, GND, TX and RX.
 
-Reference target: Haier AS50QDFHRA. **GE Appliances GEA3** over UART, 230400 8N1,
+Reference target: Haier AS50QDFHRA. Service connector pin order is
+**1 = 5 V, 2 = TX, 3 = RX, 4 = spare, 5 = GND**, TX being the pin the board
+drives (corrected 2026-09-20 — earlier numbering ran the other way).
+**GE Appliances GEA3** over UART, 230400 8N1,
 confirmed two-way on 2026-09-19 — not hOn, not ESPHome `haier`. See
 [docs/gea3.md](docs/gea3.md).
 Intended to work with any appliance exposing 5 V and UART on a service port.
@@ -128,6 +131,20 @@ than assumed, and it cost a rewrite: see
   [ADR 0006](docs/adr/0006-gea3-not-hon.md), [docs/gea3.md](docs/gea3.md)
 - **The rail load test no longer gates fabrication** (2026-09-19). Its only
   design output was one resistor. [ADR 0007](docs/adr/0007-rail-limit-inferred-not-measured.md)
+- **The service connector was being read from the wrong end** (2026-09-20).
+  Corrected everywhere: the order is 5 V, TX, RX, spare, GND, and old pin *n*
+  is new pin *6 − n*. Nothing measured changed — the bench voltages and the
+  5.84/4.62 kΩ bias readings were taken against physical pins — but every
+  document that cited a pin number did. Direction is now settled by the working
+  TinyS3 link rather than inference: TinyS3 TX drives pin 2, pin 3 drives
+  TinyS3 RX. The schematic was rewired to match
+- **The schematic exists** (2026-09-20). Drawn by hand into
+  `pcb/serialtap-r1p0.kicad_sch` from
+  [docs/schematic-capture.md](docs/schematic-capture.md), which Codex left as
+  the wiring contract. ERC clean, netlist-checked against every invariant, and
+  `RILIM` now has a value: **66.5 kΩ 1%**, a 351–449 mA limit once tolerance is
+  counted — above the board's 250 mA peak, below the rail's OEM-implied
+  capability. `FAULT`, `PG` and `ST` go to test pads, not GPIOs
 - **Every pinned part is sourceable, and the eFuse blocker is retired**
   (2026-09-20). `TPS2553DBVR` — the plain non-latching part — is stocked at LCSC
   (44k) and Mouser (882); Digi-Key is out until 2026-10-26, which is what the
@@ -138,14 +155,24 @@ than assumed, and it cost a rewrite: see
 **Gates to fabrication**
 
 1. **Project library.** ~~Gate~~ **Closed.** Complete for every pinned part as
-   of 2026-09-19 and validating under `kicad-cli`: 12 symbols, 10 footprints, a
-   3D model on every footprint, nothing referencing outside the repo
-2. **Remaining part detail.** Passives, the two 5.1 kΩ USB-C CC pulldowns,
-   BOOT/RESET switches and power LED — none of which can be pinned sensibly
-   before the schematic says how many of each there are. The packages are
+   of 2026-09-19 and validating under `kicad-cli`: 10 footprints, a 3D model on
+   every footprint, nothing referencing outside the repo. Grown to 23 symbols on
+   2026-09-20 with the generics capture needed (R, C, LED, switch, test point,
+   power symbols), all copied in from KiCad 10 rather than referenced
+2. **Remaining part detail.** ~~Gate~~ **Now countable, and the last one before
+   layout.** The schematic fixes it at **25 components over 12 unique lines** —
+   ten resistors, ten ceramics, the LED and the two tact switches. Footprints
+   follow the MPNs, so both land together. Packages for the pinned parts are
    settled (TPS62162 `DSG`, TXU0204 `RUT`) and the **distributor stock check is
-   done for all ten pinned parts** (2026-09-20, [bom/](bom/))
-3. **Schematic capture**, then `kicad-happy` review gate 1
+   done for all ten** (2026-09-20, [bom/](bom/))
+3. **Schematic capture.** ~~Gate~~ **Closed 2026-09-20.** 43 components, 57
+   nets, one A3 sheet, KiCad 10 native. `kicad-cli sch erc --severity-all`: 0
+   violations, and every review invariant checked against the *extracted
+   netlist* rather than the drawing. `kicad-happy` review gate 1 run: 2 errors
+   and 2 warnings, triaged in
+   [docs/schematic-capture.md](docs/schematic-capture.md) — one is real (no TVS
+   on USB VBUS, which reaches the LM66200's 6 V absolute maximum unclamped) and
+   one is the passives above
 4. **`sim/buck-load-step`** — corrected 2026-09-20 with fixed-output TPS62162
    `FB` tied to AGND. It passes the 40 → 335 mA load step with ≥285 mV margin.
 5. Layout, then review gates 2 and 3
@@ -159,5 +186,8 @@ than assumed, and it cost a rewrite: see
   could still change the design
 - RX pull-up measurement **complete**: 5.84/5.80 kΩ to GND and 4.62 kΩ to 5 V;
   both UART series resistors are now 330 Ω, 1%
-- Connector pin-order direction. Roles are confirmed by a working conversation;
-  the numbering is not. Determines the cable, not a respin
+- ~~Connector pin-order direction~~ **Settled 2026-09-20.** The connector had
+  been read from the wrong end: the order is **5 V, TX, RX, spare, GND**, and
+  direction comes from the working TinyS3 link, not inference. Every document
+  in the repo now uses the corrected numbers. What **pin 4** carries is still
+  unknown, and still blocks only the harness

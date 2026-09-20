@@ -165,47 +165,53 @@ of work changes:
 
 The hardware is not wrong. It is, for the moment, unproven to be *useful*.
 
-## Observed pin behaviour — provisional
+## Observed pin behaviour
 
-Saleae channel *n* was clipped to connector pin *n+1*; connector pin 1 was used
-as the ground reference.
+> **Numbering corrected 2026-09-20.** This session read the connector from the
+> wrong end. Every number in this document is now the corrected one; old number
+> *n* is new number *6 − n*. Nothing measured changed — the voltages,
+> resistances and behaviours were taken against physical pins and stand as
+> recorded. Only the labels were wrong.
+
+Saleae channel *n* was clipped to connector pin *5 − n*; connector pin 5 was
+used as the ground reference.
 
 | Pin | Ch | Behaviour | Reading |
 |---|---|---|---|
-| 1 | — | ground reference | — |
-| 2 | 1 | floating | no contact, or a genuine no-connect |
+| 1 | 4 | **supply** — dead steady | 5.0257 V, 5.1 mV pk-pk |
+| 2 | 3 | idle high, zero transitions in 180 s | 5.0114 V |
 | 3 | 2 | **active** — full-swing traffic | −0.17 to 5.17 V |
-| 4 | 3 | idle high, zero transitions in 180 s | 5.0114 V |
-| 5 | 4 | **supply** — dead steady | 5.0257 V, 5.1 mV pk-pk |
+| 4 | 1 | floating | no contact, or a genuine no-connect |
+| 5 | — | ground reference | — |
 
-**Which end is pin 1 is unverified.** If the connector numbers from the other
-end the whole table reverses. The shape — one ground, one spare, two signals,
-one supply — matches SPDD §5.2's expectation, but the spare appears at position
-2 rather than position 5, which may simply be the numbering running the other
-way.
+The shape — one supply, two signals, one spare, one ground — matches SPDD
+§5.2's expectation, and now so does the order.
 
-Settling this is [bench-plan 1.1](bench-plan.md): continuity from each
-connector pin to the `GEATX` / `GEARX` test points on the OEM board's
-underside, **with the unit powered off**. It was not done. Per the fabrication
-gates it determines the cable, not a respin.
+**Direction is settled by a working link, not by inference** (2026-09-20). On
+the TinyS3 rig in [gea3.md](gea3.md): pin 2 → HV2 → LV2 → TinyS3 **TX**, and
+pin 3 → HV1 → LV1 → TinyS3 **RX**. Pin 2 is therefore the appliance's receiver
+— which is why the bias network below sits on it — and pin 3 is its
+transmitter. [bench-plan 1.1](bench-plan.md)'s continuity check to the OEM
+board's `GEATX` / `GEARX` test points was never run and would now only
+re-confirm this.
 
 ## DMM readings at the connector
 
 Taken with the unit switched off, at the end of the session.
 
-**Ground is pin 1 of the JST XA**, confirmed by continuity. This is the one
-piece of the pin map that is now measured rather than assumed, and it agrees
-with how the Saleae was clipped (channel *n* to pin *n+1*), so the channel
-mapping in the table above holds at least at that end.
+**Ground is pin 5 of the JST XA**, confirmed by continuity. This is the one
+piece of the pin map that was measured rather than assumed at the time, and it
+agrees with how the Saleae was clipped (channel *n* to pin *5 − n*), so the
+channel mapping in the table above holds at least at that end.
 
-**RX pin 4 was measured on the 20 kΩ range:**
+**RX pin 2 was measured on the 20 kΩ range:**
 
 | Meter probes | Reading |
 |---|---:|
-| black pin 1 (GND) → red pin 4 (RX) | 5.84 kΩ |
-| black pin 4 (RX) → red pin 1 (GND) | 5.80 kΩ |
-| black pin 4 (RX) → red pin 5 (5 V) | 4.62 kΩ |
-| black pin 5 (5 V) → red pin 4 (RX) | 4.62 kΩ |
+| black pin 5 (GND) → red pin 2 (RX) | 5.84 kΩ |
+| black pin 2 (RX) → red pin 5 (GND) | 5.80 kΩ |
+| black pin 2 (RX) → red pin 1 (5 V) | 4.62 kΩ |
+| black pin 1 (5 V) → red pin 2 (RX) | 4.62 kΩ |
 
 The near-symmetry with probe polarity makes a passive bias network much more
 likely than an ESD-junction reading. The two measured resistances imply an
@@ -269,7 +275,7 @@ and a limit set too low will brown the module into a reboot loop.
 | Behaviour in current limit (2.3) | the one result that could still force a design change |
 | Sag under pulsed load (2.4) | confirms `RAPP` dynamically |
 | RX pull-up (2.5) | **Complete:** measured on the powered-down unit; sets both UART series resistors to 330 Ω, 1% |
-| Pin order confirmation (1.1) | the harness and cable |
+| ~~Pin order confirmation (1.1)~~ | **Settled 2026-09-20** without it: the numbering was read from the wrong end, and the TinyS3 rig fixes direction |
 | Mechanical (Part 3) | mounting holes, connector placement |
 
 The rail measurement needs the unit **powered on**; the continuity and pull-up
@@ -281,7 +287,7 @@ power cycle.
 # Session 2 — 2026-09-19: two-way GEA3 confirmed
 
 **The protocol is GE Appliances GEA3.** The heartbeat above decodes completely
-against GE's public library, and an ESP32-S3 on the port, powered from pin 5,
+against GE's public library, and an ESP32-S3 on the port, powered from pin 1,
 received 64 ERDs in answer to a subscribe-all. Full decode, wiring, config,
 ERD map and open items are in **[gea3.md](gea3.md)**. "Not hOn" is no longer
 two claims: the appliance does not speak hOn, or smartAir2, at all.
@@ -289,7 +295,7 @@ two claims: the appliance does not speak hOn, or smartAir2, at all.
 Done this session, in order: heartbeat decoded (CRC seed `0x1021` over
 destination..payload, ERD read request for `0x6003` from `0xC0` to `0xBF`);
 smartAir2 and USB ruled out on the existing capture; TinyS3 + BSS138 shifter
-wired to pins 1/3/4/5; flashed with esphome-gea; plugged in; discovery log
+wired to pins 1/2/3/5 (corrected numbering); flashed with esphome-gea; plugged in; discovery log
 received over Wi-Fi.
 
 Not done: the series-current measurement (bench-plan Part 2, still the

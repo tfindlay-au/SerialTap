@@ -38,7 +38,7 @@ SerialTap:
    5 V ([haier-oem-board.md](../haier-oem-board.md)). SerialTap's C3 peaks
    lower, and its eFuse makes it gentler at plug-in than the board it replaces.
 2. **Direct observation, 2026-09-19.** A TinyS3 has run from the rail, with
-   Wi-Fi associated and transmitting, powered from pin 5 with no USB
+   Wi-Fi associated and transmitting, powered from pin 1 with no USB
    ([gea3.md](../gea3.md)). Whatever regulator that board carries, it is not a
    gentler load than SerialTap: same job, larger SoC. If it is a linear
    regulator, its draw from the 5 V rail is roughly 40% higher than
@@ -96,7 +96,7 @@ resetting or faulting when SerialTap is plugged in.
    genuinely change the design, because it concerns enable and reset timing on
    a rising rail.
 3. **Pull-up measurement on the RX line**, bench-plan 2.5, with the unit off.
-   **Complete:** RX pin 4 measured 5.84/5.80 kΩ to GND and 4.62 kΩ to 5 V,
+   **Complete:** RX pin 2 measured 5.84/5.80 kΩ to GND and 4.62 kΩ to 5 V,
    setting both series resistors to 330 Ω, 1% (see bench-results.md).
 
 And when convenient, sag under a load step (bench-plan 2.4) **with the ESP32 as

@@ -119,8 +119,16 @@ buses are out of reach for this board without a revision.
 ### 5.2 Port and pinout
 
 One JST XA **5-pin** connector (2.5 mm pitch), four of which are used, in fixed
-pin order **5 V, GND, TX, RX**, silkscreened from the board's point of view —
-TX is the pin the board drives.
+pin order **1 = 5 V, 2 = TX, 3 = RX, 4 = spare, 5 = GND**, silkscreened from
+the board's point of view — TX is the pin the board drives, which is the
+appliance's receiver.
+
+**This order is corrected as of 2026-09-20.** Earlier revisions of this
+document, the bench notes and `gea3.md` numbered the connector from the wrong
+end and read 5 V, GND, TX, RX at pins 1–4. Nothing measured changed; the
+labels did. Direction is not inferred: on the working TinyS3 rig the shifter
+carries TinyS3 TX into pin 2 and pin 3 into TinyS3 RX
+([gea3.md](gea3.md)).
 
 The pin count follows the reference target: the AS50QDFHRA service connector
 was confirmed on 2026-09-12 to be a 5-pin XA, mated with a JST XARR-05V panel
@@ -139,10 +147,10 @@ the appliance, and the gender/mating relationship against XARR-05V should be
 read off the JST XA datasheet rather than a distributor summary before an MPN
 is committed.
 
-**The fifth pin's function is unknown**, so nothing on the board connects to it
-yet — not the ESD array, not a GPIO. It is captured with the other four during
-the Wednesday probe. Committing it to anything before that risks strapping an
-unknown signal, possibly not a 5 V-logic one, to a net that matters.
+**Pin 4's function is unknown** — it read as floating, either no contact or a
+genuine spare — so nothing on the board connects to it: not the ESD array, not
+a GPIO. Committing it to anything before it is known risks strapping an unknown
+signal, possibly not a 5 V-logic one, to a net that matters.
 
 There is no crossover jumper, and the C3's GPIO matrix cannot substitute for
 one: remapping UART pins would drive a fixed-direction buffer backwards.
@@ -617,9 +625,12 @@ that result.
 - **Why the board needed a manual reset** on its first power-up from the
   appliance rail (2026-09-19). The one open item that could still change the
   design, because it concerns enable and reset timing on a rising rail
-- AS50QDFHRA service connector **pin order**, and what the fifth pin carries
-  (blocks the harness). The connector and mating part are now known: 5-pin JST
-  XA, 2.5 mm pitch, XARR-05V panel housing (confirmed 2026-09-12)
+- ~~AS50QDFHRA service connector **pin order**~~ **Settled 2026-09-20**: the
+  connector had been read from the wrong end. Corrected order is 5 V, TX, RX,
+  spare, GND, with direction fixed by the working TinyS3 link (§5.2). What
+  **pin 4** carries is still unknown, and still blocks nothing but the harness.
+  Connector and mating part known since 2026-09-12: 5-pin JST XA, 2.5 mm pitch,
+  XARR-05V panel housing
 - Whether a board-mounted JST XA or a wire-to-board pigtail suits the install
 - ~~PCB antenna or external?~~ **Settled: PCB antenna (ESP32-C3-MINI-1).** The
   OEM board provides a U.FL footprint but it was never populated — that unit ran

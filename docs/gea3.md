@@ -89,13 +89,19 @@ logger moved to `USB_SERIAL_JTAG` so it does not claim those pins.
 
 ### Wiring used
 
-| Service port pin (provisional numbering, see bench-results) | Measured as | Went to |
+| Service port pin | Measured as | Went to |
 |---|---|---|
-| 1 | ground | TinyS3 GND, and from there to the shifter GND (both shifter GND pins are one net) |
-| 2 | no contact | — |
+| 1 | 5.0257 V supply | TinyS3 5V pin, and from there to shifter HV |
+| 2 | idle high, silent = appliance RX | shifter HV2 ← LV2 ← TinyS3 GPIO43 (TX) |
 | 3 | carries the heartbeat = appliance TX | shifter HV1 → LV1 → TinyS3 GPIO44 (RX) |
-| 4 | idle high, silent = appliance RX | shifter HV2 ← LV2 ← TinyS3 GPIO43 (TX) |
-| 5 | 5.0257 V supply | TinyS3 5V pin, and from there to shifter HV |
+| 4 | no contact | — |
+| 5 | ground | TinyS3 GND, and from there to the shifter GND (both shifter GND pins are one net) |
+
+**Numbering corrected 2026-09-20.** This session read the connector from the
+wrong end; the physical wiring above is what was built and what worked, only
+the pin numbers were reversed. Old number *n* is new number *6 − n*. This table
+is also the evidence that settles UART direction: the TinyS3's TX drives pin 2,
+so pin 2 is the appliance's receiver, and pin 3 is its transmitter.
 
 TinyS3 3V3 → shifter LV. The TinyS3 5V pin shares a net with USB VBUS, so
 appliance power and USB are never connected at the same time.

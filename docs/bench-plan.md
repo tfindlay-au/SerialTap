@@ -17,7 +17,17 @@ evidence.
 
 Answers the harness. Does **not** answer anything in Part 2.
 
-### 1.1 Pin mapping — do this first, and with a meter
+### 1.1 Pin mapping — ~~do this first~~ settled 2026-09-20
+
+**No longer required.** The numbering was being read from the wrong end of the
+connector. Corrected, and naming the signals from the **appliance's** side as
+this document does, the order is 5 V, appliance RX, appliance TX, spare,
+ground — which is what SPDD §5.2 calls 5 V, TX, RX, spare, GND from the
+**board's** side, TX being the pin the board drives. Direction is fixed by the
+working TinyS3 link (pin 2 ← TinyS3 TX, pin 3 → TinyS3 RX), not by inference. The continuity check below would now
+only re-confirm it, and is kept for anyone repeating the work on another unit.
+
+#### The check, as originally written
 
 The OEM board exposes **gold test points marked `GEATX` and `GEARX`** on its
 underside ([haier-oem-board.md](haier-oem-board.md)). With the unit powered
@@ -48,9 +58,9 @@ setpoint — so the bus is not merely idling.
 | **11 bits/frame** → ~1.146 ms (8E1: start + 8 + parity + stop) | framing is not 8E1; ESPHome's `haier` config changes |
 | **Idle high (mark)** | an inverted or open-drain bus; ADR 0001's assumptions need revisiting |
 | **Logic high ≈ 5 V** | if it is 3.3 V, the entire level-translation design is unnecessary |
-| Pin 5 static, or a supply | if it carries traffic, it is not a spare and SPDD §5.2 needs revisiting |
+| Pin 4 static, or a supply | if it carries traffic, it is not a spare and SPDD §5.2 needs revisiting |
 
-### 1.4 What pin 5 is
+### 1.4 What pin 4 is
 
 Currently connected to nothing on SerialTap, deliberately. Determine whether it
 is: a second supply, a ground, a static level, or an active signal. Until then
@@ -340,7 +350,7 @@ capacitance helping it — which `rail-sag` does not model.
 With the unit **powered down**, measure resistance from the appliance's RX pin
 (the line SerialTap drives) to its 5 V rail and to ground.
 
-The result is recorded in [bench-results.md](bench-results.md): RX pin 4 reads
+The result is recorded in [bench-results.md](bench-results.md): RX pin 2 reads
 5.84/5.80 kΩ to GND and 4.62 kΩ to 5 V, independent of probe polarity. Use
 **330 Ω, 1%** for both UART series resistors. This is now a design input, not a
 100–330 Ω guess.
@@ -365,7 +375,7 @@ For the replacement board to actually drop in:
 
 | Measurement | Unblocks |
 |---|---|
-| Pin mapping + pin 5 | the harness; `docs/harness/` |
+| ~~Pin mapping~~ **done**; what pin 4 carries | the harness; `docs/harness/` |
 | Baud, framing, idle level | the ESPHome config; confirms ADR 0001's premises |
 | Logic high voltage | confirms level translation is needed at all |
 | Open-circuit rail voltage | ESD array margin (TPD4E05U06's 5.5 V standoff) |

@@ -23,3 +23,10 @@ esphome.cfg
 
 # Vendor CAD downloads staged for import into lib/; not part of the design
 import/
+
+# kicad-happy analysis output: regenerable, and the manifest is not worth the churn
+/analysis/
+
+# kicad-cli ERC and DRC reports: regenerated on demand
+*-erc.rpt
+*-drc.rpt
