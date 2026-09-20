@@ -357,9 +357,29 @@ The result is recorded in [bench-results.md](bench-results.md): RX pin 2 reads
 
 ---
 
-## Part 3 — Mechanical (calipers, and photographs with a ruler in frame)
+## Part 3 — Mechanical — **done 2026-09-20**
 
-For the replacement board to actually drop in:
+Measured with calipers by the author:
+
+- **22 × 54 mm is confirmed.** The outline already in the KiCad file and in
+  SPDD §8 is right, not assumed.
+- **There are no mounting holes**, and nothing intrudes into the board volume —
+  no standoffs, ribs or clips.
+- **Connector position is unconstrained.** Nothing dictates where along the
+  edges the JST and USB-C sit, so the floorplan in
+  [layout-rules.md](layout-rules.md) is free to place them on its own logic.
+
+Two consequences worth carrying into layout:
+
+1. The pre-release checklist item about mounting-hole keepouts is **not
+   applicable** — there are none to keep clear of.
+2. **With no mounting holes, the connectors are the only mechanical anchorage.**
+   That raises the value of the JST `-A` variant's locating boss (SPDD §7.4),
+   which was chosen to carry insertion force into the board rather than the
+   solder joints — it is now carrying *all* of it. Worth a deliberate look at
+   how the board is retained in the appliance before fabrication.
+
+The original list, for anyone repeating this on another unit:
 
 - **Mounting hole positions**, from a datum corner, and their diameter
 - **Board outline** confirmation against the 22 × 54 mm already in the KiCad file

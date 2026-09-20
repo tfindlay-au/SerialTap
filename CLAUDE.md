@@ -186,6 +186,12 @@ than assumed, and it cost a rewrite: see
    `FB` tied to AGND. It passes the 40 → 335 mA load step with ≥285 mV margin.
 5. Layout, then review gates 2 and 3
 
+**Mechanical, measured 2026-09-20:** 22 × 54 mm confirmed with calipers, **no
+mounting holes**, no intrusions, and connector placement unconstrained. That
+closes bench-plan Part 3 and frees the floorplan — but it also means the
+connectors carry all mechanical load, so how the board is retained is an open
+question for layout.
+
 **Not gates, but cheap and still owed** ([ADR 0007](docs/adr/0007-rail-limit-inferred-not-measured.md))
 
 - A meter in series with the TinyS3's 5 V lead. First measured current in the

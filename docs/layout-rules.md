@@ -66,6 +66,33 @@ Zones run along the 54 mm axis:
   unprotected side of the ESD devices must be as short as possible; the 3.3 V
   side takes the long run to the module, where it is harmless.
 
+## Area budget — measured from the footprints, 2026-09-20
+
+The board is **1188 mm²** (22 × 54). The courtyards of all 33 components total
+**774 mm², or 65%** of that. Tight but routable on four layers; the usual pain
+threshold is 70–80%.
+
+It is less crowded than "33 components" sounds, because four parts are 71% of
+the area and the other 29 share what is left:
+
+| Part | Courtyard | mm² |
+|---|---|---:|
+| U6 ESP32-C3-MINI-1 | 13.6 × 17.0 | 231 |
+| J1 JST XA 5-pin | 16.0 × 7.4 | 118 |
+| J2 USB-C | 10.6 × 10.2 | 107 |
+| C4 bulk 470 µF | 10.5 × 8.8 | 92 |
+| **those four** | | **548** |
+| the other 29 (5 ICs, inductor, 2 switches, 20 passives, LED) | | **226** |
+
+So placement is really "fit four large objects to the floorplan, then fill".
+The module's 231 mm² already includes its antenna end, which is where the
+keepout lives — the keepout does not cost additional area, it constrains what
+may sit *near* it.
+
+**One library gap this exposed:** the `LM66200` footprint has **no courtyard**
+on `F.CrtYd`. Every other footprint has one. KiCad's courtyard-overlap DRC
+check therefore cannot protect U2 during placement — fix before laying out.
+
 ## Per-circuit rules
 
 ### Buck converter
@@ -183,7 +210,8 @@ eFuse limit, so current capacity is never the binding constraint here.
 - Pin-1 and polarity markers on silkscreen, still visible after assembly.
 - Designators readable and unambiguous; none hidden under parts.
 - Keep components ≥3 mm from the board edge where possible.
-- Mounting holes with keepout; no copper or parts encroaching.
+- ~~Mounting holes with keepout~~ **N/A — there are none** (measured
+  2026-09-20). The connectors are the board's only mechanical anchorage.
 - Test points: 1 mm exposed copper, labelled on silkscreen, reachable with a
   probe without removing the board.
 
