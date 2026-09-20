@@ -189,7 +189,7 @@ connector pin to the `GEATX` / `GEARX` test points on the OEM board's
 underside, **with the unit powered off**. It was not done. Per the fabrication
 gates it determines the cable, not a respin.
 
-## DMM readings at the connector — partial
+## DMM readings at the connector
 
 Taken with the unit switched off, at the end of the session.
 
@@ -198,44 +198,24 @@ piece of the pin map that is now measured rather than assumed, and it agrees
 with how the Saleae was clipped (channel *n* to pin *n+1*), so the channel
 mapping in the table above holds at least at that end.
 
-**Pins 3 and 4 read approximately 1.387, drifting between 1.382 and 1.392**,
-never settling.
+**RX pin 4 was measured on the 20 kΩ range:**
 
-### What is ambiguous about that, and must be re-checked first
+| Meter probes | Reading |
+|---|---:|
+| black pin 1 (GND) → red pin 4 (RX) | 5.84 kΩ |
+| black pin 4 (RX) → red pin 1 (GND) | 5.80 kΩ |
+| black pin 4 (RX) → red pin 5 (5 V) | 4.62 kΩ |
+| black pin 5 (5 V) → red pin 4 (RX) | 4.62 kΩ |
 
-Two things were not captured at the time and cannot be recovered from the
-number:
+The near-symmetry with probe polarity makes a passive bias network much more
+likely than an ESD-junction reading. The two measured resistances imply an
+approximate Thevenin resistance of 2.6 kΩ at the appliance RX input, with a
+roughly 2.8 V open-circuit bias point on a 5 V rail.
 
-1. **The units.** A four-digit "1.38x" on an auto-ranging meter is most likely
-   **kΩ**, but MΩ is not excluded.
-2. **What was measured against what.** Whether this was pin 3 to ground and
-   pin 4 to ground, or pin 3 to pin 4, was not recorded.
-
-Until both are pinned down this reading cannot be used for anything. Re-take it
-as the first item of the next session.
-
-### What it might mean
-
-*This section is interpretation, not measurement.*
-
-If it is **~1.4 kΩ from each signal pin to ground**, it sits squarely in the
-range that matters for [bench-plan 2.5](bench-plan.md): the
-[ADR 0001 amendment](adr/0001-fixed-direction-level-translation.md) worked the
-R<sub>s</sub> problem against an assumed 1 kΩ pull-up and found that SPDD §5.6's
-"100–330 Ω" range spans pass and fail. A real ~1.4 kΩ would let that resistor be
-chosen rather than guessed — which is the whole point of test 2.5.
-
-The instability is not necessarily a fault. A DMM measuring into an IC pin is
-not measuring a resistor: it is driving a small test current into ESD
-structures, input capacitance and whatever pull-up network is present, and the
-reading reflects all of that. A ±0.4% wobble around 1.387 is mild. It is worth
-noting, not worth worrying about yet.
-
-**What would settle it:** with the unit off and the bulk capacitance given time
-to discharge, measure each signal pin separately **to ground and to the 5 V
-pin**, and in **both probe polarities** — a junction reads differently each way
-and a resistor does not. That distinguishes a real pull-up from an ESD diode,
-which is the difference between sizing R<sub>s</sub> and mis-sizing it.
+**Design decision:** use **330 Ω, 1%** series resistors on both translated UART
+lines. This is conservative for installation faults and keeps the translator's
+output current well below its rated drive while remaining small compared with
+the measured appliance network. The value is no longer a 100–330 Ω guess.
 
 ## The test to run next
 
@@ -285,10 +265,10 @@ and a limit set too low will brown the module into a reboot loop.
 
 | | Why it matters |
 |---|---|
-| **Part 2 entirely — the V–I curve** | the fabrication gate — `RILIM`, `RAPP`, SPDD §12.1 step 2. **Now deferred behind the protocol question**; see above |
+| **Part 2.2–2.3 — the V–I curve** | optional bring-up characterisation; `RILIM` is now set from inference under ADR 0007 |
 | Behaviour in current limit (2.3) | the one result that could still force a design change |
 | Sag under pulsed load (2.4) | confirms `RAPP` dynamically |
-| RX pull-up (2.5) | sizes R<sub>s</sub>, currently a 100–330 Ω guess. **Partially attempted** — see the DMM readings above |
+| RX pull-up (2.5) | **Complete:** measured on the powered-down unit; sets both UART series resistors to 330 Ω, 1% |
 | Pin order confirmation (1.1) | the harness and cable |
 | Mechanical (Part 3) | mounting holes, connector placement |
 

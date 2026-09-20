@@ -116,7 +116,7 @@ ordered. Route it properly anyway — it costs nothing:
 Order along the path, nearest connector first:
 
 ```
-JST pin --> TVS array --> series R (value set by pull-up measurement) --> translator B-side
+JST pin --> TVS array --> 330 Ω series R --> translator B-side
 ```
 
 - TVS ground via directly into L2, short and wide. The ESD return path matters

@@ -69,21 +69,21 @@ choice in four ways:
 Two of its four channels go unused. That is the price, and the integrated
 pull-downs make it a cheap one.
 
-### The drive calculation this ADR asked for and never did
+### Measured line bias and series-resistor decision
 
 TXU0204 at a 4.5 V supply: **VOH 3.7 V at −12 mA, VOL 0.8 V at +12 mA.** Real
 push-pull, against the ~4 kΩ of the TXB parts rejected above.
 
 Driving *low* into an appliance that pulls up, through our series resistor:
 
-| Appliance pull-up | Rs = 220 Ω | Rs = 100 Ω |
-|---|---|---|
-| 1 kΩ to 5 V | line reaches 1.1 V | line reaches 0.72 V |
+| Appliance pull-up | Rs = 330 Ω |
+|---|---:|
+| Measured AS50QDFHRA RX bias network | 5.84 kΩ to GND; 4.62 kΩ to 5 V |
 
-A 5 V **CMOS** input (VIL ≈ 1.5 V) accepts both; a **TTL-threshold** input
-(VIL = 0.8 V) accepts only the 100 Ω case. So SPDD §5.6's "100–330 Ω" range
-spans pass and fail, and which end is safe depends on the appliance's pull-up.
-**Measure that pull-up** before sizing Rs — it is on the bench list.
+A 330 Ω series resistor is now selected for both lines. It is small compared
+with the measured bias network and keeps the translator's fault current
+conservative. The measurement was taken with the appliance de-energised and
+the result is recorded in [bench-results.md](../bench-results.md).
 
 ### Optocouplers: considered, rejected
 

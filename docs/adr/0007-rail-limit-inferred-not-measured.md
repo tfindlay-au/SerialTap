@@ -96,8 +96,8 @@ resetting or faulting when SerialTap is plugged in.
    genuinely change the design, because it concerns enable and reset timing on
    a rising rail.
 3. **Pull-up measurement on the RX line**, bench-plan 2.5, with the unit off.
-   It sizes R<sub>s</sub>, currently a 100–330 Ω guess, and the 2026-09-16
-   reading of roughly 1.387 of unrecorded units was never pinned down.
+   **Complete:** RX pin 4 measured 5.84/5.80 kΩ to GND and 4.62 kΩ to 5 V,
+   setting both series resistors to 330 Ω, 1% (see bench-results.md).
 
 And when convenient, sag under a load step (bench-plan 2.4) **with the ESP32 as
 its own load** rather than with resistors: Wi-Fi transmitting continuously,

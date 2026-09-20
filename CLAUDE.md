@@ -157,7 +157,7 @@ than assumed, and it cost a rewrite: see
 - Cold power-cycle the appliance twice. The board needed a manual reset on its
   first power-up from the rail and that is unexplained. The one open item that
   could still change the design
-- RX pull-up measurement, unit off. Sizes R<sub>s</sub>, currently a 100–330 Ω
-  guess
+- RX pull-up measurement **complete**: 5.84/5.80 kΩ to GND and 4.62 kΩ to 5 V;
+  both UART series resistors are now 330 Ω, 1%
 - Connector pin-order direction. Roles are confirmed by a working conversation;
   the numbering is not. Determines the cable, not a respin

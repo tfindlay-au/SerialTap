@@ -191,8 +191,9 @@ would carry the same USB pair as the USB-C connector and add nothing.
 
 ### 5.6 Protection
 
-- Series resistors (value set from the powered-down pull-up measurement) on TX
-  and RX. They limit fault current if a line meets 5 V or GND during install.
+- **330 Ω, 1% series resistors** on TX and RX, selected from the powered-down
+  appliance RX bias measurement. They limit fault current if a line meets 5 V
+  or GND during install.
 - The single four-channel ESD array protects the two JST UART signals and USB
   D+/D−. The interfaces are not used concurrently, but this assignment protects
   either interface from an accidental cable connection without another device.

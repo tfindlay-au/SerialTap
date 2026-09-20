@@ -70,8 +70,8 @@ it stays unconnected.
 > inference; read ADR 0007 for the reasoning, the three lines of evidence behind
 > it, the rigour it gives up, and the conditions that would reinstate the test.
 >
-> **Still required, and all cheap:** 2.1 (done), 2.5 the RX pull-up, a meter in
-> series with the 5 V lead for the first measured current, and a cold
+> **Still required, and all cheap:** a meter in series with the 5 V lead for the
+> first measured current, and a cold
 > power-cycle test for the unexplained manual reset of 2026-09-19. Section 2.4,
 > sag under a pulsed load, should be done with the **ESP32 as its own load**
 > rather than with resistors.
@@ -335,16 +335,15 @@ A Saleae analog channel is ideal; a scope does fine.
 Confirms `RAPP` dynamically and shows whether the rail has its own bulk
 capacitance helping it — which `rail-sag` does not model.
 
-### 2.5 Pull-up on the RX line — sizes a resistor we cannot otherwise choose
+### 2.5 Pull-up on the RX line — sizes the UART series resistors
 
 With the unit **powered down**, measure resistance from the appliance's RX pin
 (the line SerialTap drives) to its 5 V rail and to ground.
 
-The [ADR 0001 amendment](adr/0001-fixed-direction-level-translation.md) showed
-that SPDD §5.6's "100–330 Ω" series-resistor range **spans pass and fail**: into
-a 1 kΩ pull-up, 220 Ω leaves the line at 1.1 V and 100 Ω at 0.72 V — which a
-TTL-threshold input accepts only in the second case. Without this measurement,
-R<sub>s</sub> is a guess.
+The result is recorded in [bench-results.md](bench-results.md): RX pin 4 reads
+5.84/5.80 kΩ to GND and 4.62 kΩ to 5 V, independent of probe polarity. Use
+**330 Ω, 1%** for both UART series resistors. This is now a design input, not a
+100–330 Ω guess.
 
 ---
 
@@ -373,5 +372,5 @@ For the replacement board to actually drop in:
 | Current limit | Optional bring-up characterisation; validates or revises the inferred `RILIM` under ADR 0007 |
 | Source impedance `RAPP` | replaces the guess in `rail-sag.cir`; re-run the deck |
 | Behaviour in limit | how conservatively `RILIM` must be set |
-| RX pull-up | sizes R<sub>s</sub>, currently a 100–330 Ω range |
+| RX pull-up | **Complete:** sets both UART series resistors to 330 Ω, 1% |
 | Mechanical | mounting holes and connector placement in layout |
