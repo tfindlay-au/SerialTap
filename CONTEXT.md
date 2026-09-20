@@ -138,14 +138,14 @@ each appliance gets a documented harness.
 | Supply sources | JST XA 5 V (primary) and USB-C, ideal-diode OR-ed |
 | Inrush / sag | Current-limited eFuse + ≥470 µF low-ESR bulk (ADR 0004) |
 | 3.3 V rail | Synchronous buck, not an LDO (ADR 0003) |
-| Port protection | Series resistors on TX/RX, ESD array, resettable fuse on 5 V |
+| Port protection | Series resistors on TX/RX; one quad ESD array protects both UART lines and USB D+/D−; TPS2553 protects the port 5 V input |
 | Programming | USB-C only; BOOT (GPIO9) and RESET (EN) tact switches |
 | Source of truth | KiCad 10 schematic → netlist → PCB (ADR 0005) |
 | Parts | Every component pinned by MPN; no automatic part picking |
 | Library | Project-local `lib/`, `${KIPRJMOD}`-relative, nothing global |
 | Mechanical | Bare board, mounting holes, no enclosure |
 | Stackup | 4-layer: L1 sig+parts / L2 GND / L3 rails / L4 GND |
-| Outline | ~40 × 25 mm; connectors one short edge, antenna the other |
+| Outline | 22 × 54 mm; JST on one short edge, USB-C on the adjacent long edge, antenna at the far short edge |
 | Fab class | PCBWay 5/5 mil, 0.25 mm drill; impedance not controlled |
 | Indicators | Power LED only; no status or activity LEDs |
 | Test points | Pads on 5 V, 3V3, GND, and both sides of each translator channel |

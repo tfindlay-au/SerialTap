@@ -1,6 +1,5 @@
 Circuit: * SerialTap - buck-load-step
 
-WARNING: Less than two connections to node FB.  This node is used by R:1:TEST1.
 Direct Newton iteration for .op point succeeded.
 .step cout=4.7e-06
 .step cout=1e-05
@@ -15,36 +14,36 @@ Measurement: vo_ss
 
 Measurement: vo_und
   step	MIN(v(vout))	FROM	TO
-     1	3.28567	0.0006	0.0007
-     2	3.29049	0.0006	0.0007
-     3	3.29267	0.0006	0.0007
+     1	3.28457	0.0006	0.0007
+     2	3.29046	0.0006	0.0007
+     3	3.29264	0.0006	0.0007
 
 Measurement: vo_ovr
   step	MAX(v(vout))	FROM	TO
-     1	3.31073	0.0008	0.0009
-     2	3.30915	0.0008	0.0009
-     3	3.30739	0.0008	0.0009
+     1	3.31066	0.0008	0.0009
+     2	3.3099	0.0008	0.0009
+     3	3.30738	0.0008	0.0009
 
 Measurement: margin
   step	vo_und- 3
-     1	0.28567
-     2	0.290493
-     3	0.292671
+     1	0.284574
+     2	0.290457
+     3	0.292645
 
 
-Date: Sun Sep 20 00:12:51 2026
-Total elapsed time: 510.157 seconds.
+Date: Sun Sep 20 10:41:33 2026
+Total elapsed time: 638.122 seconds.
 
 tnom = 27
 temp = 27
 method = modified trap
-totiter = 2914892
-traniter = 2914876
-tranpoints = 818549
-accept = 593720
-rejected = 224829
-matrix size = 490
-fillins = 311
+totiter = 2913475
+traniter = 2913459
+tranpoints = 818339
+accept = 593575
+rejected = 224764
+matrix size = 489
+fillins = 315
 solver = Normal
-Matrix Compiler1:    1631 opcodes  6.9/[3.5]/5.2
+Matrix Compiler1:    1652 opcodes  8.9/4.0/[3.6]
 Matrix Compiler2: off

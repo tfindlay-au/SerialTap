@@ -370,7 +370,7 @@ For the replacement board to actually drop in:
 | Baud, framing, idle level | the ESPHome config; confirms ADR 0001's premises |
 | Logic high voltage | confirms level translation is needed at all |
 | Open-circuit rail voltage | ESD array margin (TPD4E05U06's 5.5 V standoff) |
-| **Current limit** | **`RILIM` for the eFuse; SPDD §12.1 step 2; the fabrication gate** |
+| Current limit | Optional bring-up characterisation; validates or revises the inferred `RILIM` under ADR 0007 |
 | Source impedance `RAPP` | replaces the guess in `rail-sag.cir`; re-run the deck |
 | Behaviour in limit | how conservatively `RILIM` must be set |
 | RX pull-up | sizes R<sub>s</sub>, currently a 100–330 Ω range |

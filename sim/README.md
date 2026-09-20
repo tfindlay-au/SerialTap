@@ -39,7 +39,7 @@ is 40 → 335 mA, which is what `buck-load-step` applies.
 
 `buck-load-step` is the one deck a behavioural block cannot answer — overshoot,
 undershoot and settling belong to the control loop, the inductor and the output
-capacitor together. It runs on TI's own model for the **TPS6282x** family.
+capacitor together. It runs on TI's own model for the **TPS62162**.
 
 `models/fetch-models.sh` downloads TI's *unencrypted* PSpice transient model
 (literature number SLVMCV3) and converts it. Four things are worth knowing:
@@ -72,36 +72,37 @@ capacitor together. It runs on TI's own model for the **TPS6282x** family.
   you might want to look at the waveform afterwards; the default throws the
   `.raw` away once the measurements are parsed out.
 
-### What it found
+### Corrected result
 
-Run 2026-09-13, on TI's TPS62162 model and Coilcraft's XGL4020-222 `_sat`
-model — no behavioural stand-ins anywhere in the power stage.
+Run 2026-09-20, on the TPS62162 model and Coilcraft's XGL4020-222 `_sat`
+model, with no behavioural stand-ins in the power stage. The fixed-output
+part's `FB` pin is tied to AGND, as required by the datasheet. This supersedes
+the 2026-09-13 run, which left FB floating.
 
 | COUT | regulated | undershoot on 40 → 335 mA | overshoot | margin to 3.0 V |
 |---|---|---|---|---|
-| 4.7 µF | 3.2994 V | 3.2857 V | 3.3107 V | **+286 mV** |
-| 10 µF | 3.2994 V | 3.2905 V | 3.3091 V | +291 mV |
-| 22 µF | 3.2994 V | 3.2927 V | 3.3074 V | +293 mV |
+| 4.7 µF | 3.2994 V | 3.2846 V | 3.3107 V | **+285 mV** |
+| 10 µF | 3.2994 V | 3.2905 V | 3.3099 V | +290 mV |
+| 22 µF | 3.2994 V | 3.2926 V | 3.3074 V | +293 mV |
 
-**Passes with roughly 290 mV in hand, at every capacitor value tried.**
-Undershoot is 14 mV at worst — which is better than a 22 µF output capacitor on
+The corrected run passes with roughly 290 mV in hand at every capacitor value
+tried.
+Undershoot is 15 mV at worst — which is better than a 22 µF output capacitor on
 a 295 mA step has any right to be, and implies the loop reacts within a switching
 cycle or two. DCS-Control is genuinely that fast, but the model is TI's
 behavioural one, so treat the absolute figure with suspicion. The conclusion
 survives the doubt: the margin would have to be wrong by a factor of twenty
 before this fails.
 
-**It also settles the output capacitor.** Going 22 µF → 4.7 µF costs 7 mV of
+Going 22 µF → 4.7 µF costs 8 mV of
 undershoot, so DC-bias derating cannot hurt us here: a 22 µF 0603 part that
 derates to a third of its nameplate at 3.3 V still leaves the rail nowhere near
 brownout. Size the output capacitor for ripple and stability, not for the load
 step.
 
-**The passives in that deck are placeholders.** TPS62827 is the 4 A member of
-the family and is oversized for this board; the family member, the inductor and
-the output capacitors are still unpinned. The values are scaled from TI's own
-testbench for this model (1.8 V at 4 A, L = 470 nH, COUT = 100 µF). Re-running
-after the real parts are chosen is one command.
+**The capacitor models in that deck are placeholders.** The converter is the
+selected TPS62162 and the inductor is the selected XGL4020-222MEC. Re-run after
+pinning the real input/output capacitor MPNs.
 
 ## Model fidelity
 
@@ -175,7 +176,7 @@ individual transmit burst; it cannot manufacture average current.
 **And the answer barely depends on the buck.** `VBUCKREQ` is a reporting
 threshold, not a modelling one, so the same results can be re-judged against a
 different minimum input voltage without re-running. Dropping it from 4.0 V to
-3.5 V — roughly dropout for a TPS6282x at this current, and well under any
+3.5 V — roughly dropout for the TPS62162 at this current, and well under any
 candidate's UVLO — moves exactly one corner of the table (220 µF at 20% duty,
 175 → 130 mA) and leaves every other figure unchanged. That is because the
 failure mode is average-current starvation, which collapses the rail entirely
@@ -241,5 +242,5 @@ figure firms up once the eFuse MPN — and with it `TOL` — is chosen.
 | `RAPP` | 0.5 Ω | Appliance source impedance. Measurement, item 3 above. |
 | `RCABLE` | 0.25 Ω | ~1 m of 26 AWG out and back. Depends on the harness finally built. |
 | `VBUCKREQ` | 4.0 V | Placeholder for the buck's minimum input. `margin` is `v5min - VBUCKREQ`, so results can be re-judged without re-running. |
-| `RFUSE` | 0.20 Ω | PTC hold resistance. Set to 0 if the eFuse makes the fuse redundant (ADR 0004). |
+| `RFUSE` | 0 Ω | No PTC is fitted; TPS2553 supplies the selected input protection. The deck represents 0 Ω as 1 µΩ because LTspice rejects an ideal zero-ohm resistor. |
 | `TON` / duty | 2 ms, 20–91% | Transmit burst shape. Worst case is asserted, not measured. Worth a current probe during bring-up. |

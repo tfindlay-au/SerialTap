@@ -116,11 +116,14 @@ ordered. Route it properly anyway — it costs nothing:
 Order along the path, nearest connector first:
 
 ```
-JST pin --> TVS array --> series R (100-330 Ω) --> translator B-side
+JST pin --> TVS array --> series R (value set by pull-up measurement) --> translator B-side
 ```
 
 - TVS ground via directly into L2, short and wide. The ESD return path matters
   more than the clamp.
+- The TPD4E05U06's other two channels protect USB D+/D− at USB-C. Both ports
+  are normally mutually exclusive, but both connector-facing data paths are
+  protected against accidental connection.
 - 100 nF on **both** VCCA and VCCB of each translator, within 2 mm.
 - Tie off unused translator inputs. Never leave them floating.
 

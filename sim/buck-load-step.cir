@@ -27,9 +27,8 @@
 .param VIN  = 5.0       ; nominal. rail-sag covers what happens when the
 +                       ; appliance cannot hold this up
 .param VOUT = 3.3       ; FIXED - TPS62162 sets it internally. There is no
-+                       ; feedback divider and no feedforward cap, which is
-+                       ; half the reason this part was chosen: it deletes the
-+                       ; sense trace that layout-rules.md has to special-case.
++                       ; feedback divider or feedforward cap. VOS remains a
++                       ; control-loop sense net and must be routed to COUT.
 
 * --- power stage ----------------------------------------------------------------
 * Inductor: Coilcraft XGL4020-222MEC, 2.2 uH. Modelled with Coilcraft's own
@@ -59,13 +58,13 @@
 
 * ===========================================================================
 * TPS62162_TRANS pins: VIN EN AGND PGND ETPAD PG FB VOS SW
-* VOS is the output sense pin and goes to the output; FB is unused on the
-* fixed-voltage members and is tied off inside the model.
+* VOS is the output sense pin and goes to the output. FB is tied to AGND on
+* fixed-voltage members, as required by the datasheet.
 * ===========================================================================
 Vin   vin 0 {VIN}
 Ven   en  0 {VIN}
 Cin   vin 0 {CIN} Rser=5m
-X1    vin en 0 0 0 pg fb vout sw TPS62162_TRANS
+X1    vin en 0 0 0 pg 0  vout sw TPS62162_TRANS
 XL1   sw   vout XGL4020-222_sat
 Cout  vout 0 {COUT} Rser={ESR}
 Rpg   vout pg 100k

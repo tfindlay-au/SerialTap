@@ -63,9 +63,9 @@ consistently misread as a spirit level.
 **Signal path**
 
 ```
-  JST XA        series R   ESD     fixed-direction        ESP32-C3-MINI-1
-  TX ----------[ Rs ]-----[ ]----[ B->A translator ]----> RX  (UART1)
-  RX ----------[ Rs ]-----[ ]<---[ A->B translator ]----- TX  (UART1)
+  JST XA          ESD    series R  fixed-direction        ESP32-C3-MINI-1
+  TX ------------[ ]-----[ Rs ]---[ B->A translator ]----> RX  (UART1)
+  RX ------------[ ]-----[ Rs ]<--[ A->B translator ]----- TX  (UART1)
                                   VCCB=5V  VCCA=3V3
 
                                    USB-C  D+/D- <-------> GPIO18/19
@@ -76,8 +76,8 @@ consistently misread as a spirit level.
 **Power path**
 
 ```
-  JST XA 5V --[fuse]--[ eFuse ]--[ideal diode]--+
-               (current-limited, bounds inrush) |
+  JST XA 5V ---------[ eFuse ]--[ideal diode]--+
+                    (current-limited, bounds inrush) |
                                                 +-- 5V rail --+-- [470uF+]
   USB-C VBUS ---------------------[ideal diode]-+              |
                                                                +-- [PWR LED]
@@ -92,13 +92,13 @@ consistently misread as a spirit level.
                                                         3V3 rail --> C3, VCCA
 ```
 
-**Signal path.** Target ↔ series resistors ↔ ESD array ↔ fixed-direction
+**Signal path.** Target ↔ ESD array ↔ series resistors ↔ fixed-direction
 translators ↔ C3 UART1. Console and debug ride the C3's built-in USB
 Serial/JTAG on GPIO18/19, out to USB-C, so the port's UART is never shared with
 logging.
 
 **Power path.** The JST 5 V and USB-C VBUS are each ideal-diode OR-ed onto a
-common 5 V rail; a slew-controlled load switch limits inrush; a synchronous buck
+common 5 V rail; a current-limited eFuse limits inrush; a synchronous buck
 produces 3.3 V.
 
 ## 5. Detailed design
@@ -191,11 +191,13 @@ would carry the same USB pair as the USB-C connector and add nothing.
 
 ### 5.6 Protection
 
-- Series resistors (100–330 Ω) on TX and RX. Free at 9600 baud; limits fault
-  current if a line meets 5 V or GND during install.
-- ESD diode array on the 5 V-side signals.
-- Resettable fuse on the 5 V input.
-- Reverse current on both supply inputs is already blocked by the ideal diodes.
+- Series resistors (value set from the powered-down pull-up measurement) on TX
+  and RX. They limit fault current if a line meets 5 V or GND during install.
+- The single four-channel ESD array protects the two JST UART signals and USB
+  D+/D−. The interfaces are not used concurrently, but this assignment protects
+  either interface from an accidental cable connection without another device.
+- Port 5 V current limiting and reverse blocking are provided by TPS2553;
+  source isolation is completed by the LM66200 ideal-diode OR.
 
 ### 5.7 Indicators and test access
 
@@ -237,13 +239,11 @@ adding more would not rescue a weak rail; and the eFuse limit must sit strictly
 below the appliance's own limit, which puts the appliance requirement at
 **300–370 mA**, not the 250 mA of §5.4.
 
-`buck-load-step` is **not** written. Its question is entirely about the
-converter's control loop, which the behavioural blocks in `sim/models/` cannot
-answer, so it needs the buck's vendor SPICE model (§7.2) rather than faking it.
-The buck is now pinned — **TPS62162**, chosen partly for having an unencrypted
-model — so the deck is blocked on itself, not on a part: it runs but does not
-yet regulate at 3.3 V, and its results are marked untrusted until it does.
-Fabrication stays gated until it runs.
+`buck-load-step` uses the TPS62162 vendor model, because its question is about
+the converter control loop and cannot be answered by a behavioural block. The
+corrected 2026-09-20 deck ties the fixed-output part's `FB` pin to AGND and
+passes the 40 → 335 mA load step with at least 285 mV margin to 3.0 V. Results
+are in [sim/README.md](../sim/README.md).
 
 Simulation lives **outside** the KiCad flow. KiCad 10's built-in ngspice can
 simulate a schematic, but the questions here are about a power path that spans
@@ -343,16 +343,16 @@ schematic symbols carry the MPNs and this table points at the reasoning.
 
 | Function | MPN | Why this one |
 |---|---|---|
-| 3.3 V buck | **TPS62162DSGT** (WSON-8, 2×2 mm; `T` = 250-piece reel) | Fixed 3.3 V, so no feedback divider and no sense trace for layout to special-case. 1 A against a 335 mA peak. The only candidate with both a fixed output *and* an unencrypted SPICE model — TPS6282533 has no published model, TPS62901's is 74% Cadence-encrypted. Costs ~2 efficiency points against the TPS6282x, worth ~5 mA of appliance current, which is noise against a 300–370 mA requirement ([ADR 0003](adr/0003-buck-not-ldo.md), §5.8) |
+| 3.3 V buck | **TPS62162DSGT** (WSON-8, 2×2 mm; `T` = 250-piece reel) | Fixed 3.3 V, so no feedback divider. `FB` is tied to AGND and `VOS` senses at the output capacitor, per the datasheet; the latter remains a control-loop-sensitive layout net. 1 A against a 335 mA peak. The only candidate with both a fixed output *and* an unencrypted SPICE model — TPS6282533 has no published model, TPS62901's is 74% Cadence-encrypted. Costs ~2 efficiency points against the TPS6282x, worth ~5 mA of appliance current, which is noise against a 300–370 mA requirement ([ADR 0003](adr/0003-buck-not-ldo.md), §5.8) |
 | Buck inductor | **XGL4020-222MEC** (Coilcraft) | 2.2 µH, 19.5 mΩ DCR against the XFL3012's 97 mΩ — buys back ~0.8 of the ~2 points conceded above. Isat 2.7 A sits clear of the IC's ~1.6–2 A current limit, so the IC protects before the inductor saturates. Coilcraft publishes a `_sat` LTspice model, verified against the datasheet before use. 2.0 mm tall, confirmed to clear the enclosure |
 | Port connector | **B05B-XASK-1-A(LF)(SN)** (JST XA, 5-pin, vertical, with boss) | Matches the appliance's XARR-05V panel housing, so the harness is straight-through (§5.2). Vertical entry confirmed against the enclosure. `-A` for the boss: this is the board's only permanent mechanical interface and takes every insertion force in a unit that vibrates, so the boss carries that into the board rather than the solder joints. Tin, not `-GU` gold — plating should match across a mating pair, and standard XA crimps are tin. **Through-hole**, so it needs a selective- or hand-solder step on an otherwise all-SMD board |
 
 | Level translator | **TXU0204RUTR** (`RUT` UQFN-12, 2.0 × 1.7 mm) | 4-bit fixed-direction, two channels each way — TI names UART as the application. Direction fixed in *silicon*, so there is no DIR pin to mis-strap; Schmitt-trigger inputs for a metre of harness; integrated pull-downs, which retire ADR 0001's own warning about floating unused inputs. Push-pull ±12 mA at 4.5 V against the ~4 kΩ of the auto-direction parts ADR 0001 rejected. Two channels unused. See the 2026-09-13 amendment to [ADR 0001](adr/0001-fixed-direction-level-translation.md) |
 
-| eFuse | **TPS2553DBVR** (SOT-23-6) — **not the `-1`** | ADR 0004's part. 75 mA–1.7 A adjustable limit, 2.5–6.5 V, 85 mΩ, active-high enable, **reverse blocking**, thermal shutdown, constant-current limiting rather than latch-off (the `-1` suffix latches; we do not want that). Unencrypted PSpice model exists, though ADR 0004's amendment means one is not required here. **R<sub>ILIM</sub> is deliberately unset** — it is gated on measuring the Haier rail, exactly as ADR 0004 requires |
+| eFuse | **TPS2553DBVR** (SOT-23-6) — **not the `-1`** | ADR 0004's part. 75 mA–1.7 A adjustable limit, 2.5–6.5 V, 85 mΩ, active-high enable, **reverse blocking**, thermal shutdown, constant-current limiting rather than latch-off (the `-1` suffix latches; we do not want that). Unencrypted PSpice model exists, though ADR 0004's amendment means one is not required here. `R<sub>ILIM</sub>` is selected from the inferred rail envelope under ADR 0007, then checked at bring-up. |
 | Ideal-diode OR | **LM66200DRLR** (SOT-5X3-8, its only package) | 1.6–5.5 V, 40 mΩ, 2.5 A, low I<sub>Q</sub>, **two ideal diodes in one package** — both OR branches in a single part instead of two LM66100s. Unencrypted PSpice model |
 
-| ESD array | **TPD4E05U06QDQARQ1** (TI, AEC-Q101) | Quad, 0.5 pF, V<sub>RWM</sub> 5.5 V, min breakdown 6.5 V, ±12 kV, 2.5 A / 40 W surge. Two channels for TX and RX at the connector, per [layout-rules.md](layout-rules.md); two spare. The `-Q1` is taken for its temperature grade, not automotive compliance — this board lives in a warm appliance with no enclosure. **Caveat:** 5.5 V standoff against 5 V logic is 0.5 V of margin, so the Haier's open-circuit rail voltage must be confirmed (already on the bench list) |
+| ESD array | **TPD4E05U06QDQARQ1** (TI, AEC-Q101) | Quad, 0.5 pF, V<sub>RWM</sub> 5.5 V, min breakdown 6.5 V, ±12 kV, 2.5 A / 40 W surge. Channels protect JST TX/RX and USB D+/D−; the ports are mutually exclusive in normal use, but both remain protected against an accidental cable connection. The `-Q1` is taken for its temperature grade, not automotive compliance — this board lives in a warm appliance with no enclosure. **Caveat:** 5.5 V standoff against 5 V logic is 0.5 V of margin, so the Haier's open-circuit rail voltage must be confirmed (already on the bench list) |
 | USB-C receptacle | **USB4085-GF-A** (GCT) | USB 2.0, 16 contacts, through-hole, horizontal top-mount, four PCB retention/grounding posts, 10 000 mating cycles, 3.46 mm profile. Through-hole retention is what §7.1 asked for, and it shares the selective-solder step the JST already needs. **KiCad 10 ships both a reviewed footprint and a STEP model** for it, which is not true of any vertical receptacle. Vertical was considered: it would free ~9 mm of long edge we do not need, in exchange for the cable levering perpendicular to the board and hand-sourced library assets |
 
 | Bulk capacitor | **PCL1A471MCL1GS** (Nichicon) | 470 µF, 10 V ±20%, conductive polymer aluminium **solid** — no liquid electrolyte, so nothing to dry out, which is the entire reason for this class of part here. 8 × 10 mm SMD, ESR 17 mΩ, ripple 3.8 A, −55 to +105 °C. Double the voltage margin on a 5 V rail; the ±20% worst case of 376 µF is still comfortable, since `rail-sag` showed even 220 µF costs only 55 mA at light duty. ESR and ripple ratings are enormously in excess of what is asked of them, and deliberately not paid for |
@@ -497,7 +497,7 @@ does better.
 | FR-4 | §5.5 C3 ROM USB Serial/JTAG + esptool |
 | FR-5 | §5.5 BOOT and RESET switches |
 | FR-6 | §5.3 ideal-diode OR on both sources |
-| FR-7 | §5.6 series R, ESD array, resettable fuse |
+| FR-7 | §5.6 series R, ESD array, TPS2553 current limit and reverse blocking |
 | FR-8 | §9 ESPHome OTA |
 
 ## 12. Validation
@@ -517,7 +517,8 @@ checklist, or the physical measurements below.
 1. **Simulate the power path** (§5.8). `rail-sag` yields the minimum source
    current the design tolerates; `inrush` sets the eFuse limit resistor;
    `buck-load-step` confirms no brownout on a 30 → 250 mA step.
-   *Done for the first two; `buck-load-step` awaits the buck MPN.*
+   *Complete. `buck-load-step` was re-run 2026-09-20 with fixed-output `FB`
+   tied to AGND; it passes with ≥285 mV margin to 3.0 V.*
 2. **Measure the Haier's 5 V rail** — open-circuit voltage, current limit, and
    sag under a 250 mA pulsed load — and confirm it exceeds the number from
    step 1. This is the single largest unknown in the design.
@@ -585,8 +586,8 @@ that result.
   TinyS3 with Wi-Fi live (2026-09-19). Still unmeasured, and the cost of that is
   recorded in ADR 0007
 - ~~Buck and eFuse MPNs~~ **Both pinned (§7.4):** TPS62162 and TPS2553.
-  `buck-load-step` is blocked on the deck not yet regulating at 3.3 V, not on
-  the part. `RILIM` is set per ADR 0007
+  The corrected buck deck passes; `RILIM` is set per ADR 0007 and checked at
+  bring-up.
 - ~~**`TPS2553DBVR` availability.**~~ **Resolved 2026-09-20 by the first of the
   three escape routes: another distributor.** The plain non-latching part is
   stocked at **LCSC (C55266, 44,248)** and **Mouser (882)**. Digi-Key remains out

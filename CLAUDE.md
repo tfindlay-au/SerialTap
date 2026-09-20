@@ -146,9 +146,8 @@ than assumed, and it cost a rewrite: see
    settled (TPS62162 `DSG`, TXU0204 `RUT`) and the **distributor stock check is
    done for all ten pinned parts** (2026-09-20, [bom/](bom/))
 3. **Schematic capture**, then `kicad-happy` review gate 1
-4. **`sim/buck-load-step`** — the deck runs on TI's converted model but does not
-   yet regulate at 3.3 V, so its results are marked untrusted. Not blocked on a
-   part: the buck is pinned
+4. **`sim/buck-load-step`** — corrected 2026-09-20 with fixed-output TPS62162
+   `FB` tied to AGND. It passes the 40 → 335 mA load step with ≥285 mV margin.
 5. Layout, then review gates 2 and 3
 
 **Not gates, but cheap and still owed** ([ADR 0007](docs/adr/0007-rail-limit-inferred-not-measured.md))
