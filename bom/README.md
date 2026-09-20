@@ -1,13 +1,17 @@
 # Sourcing and cost — checked 2026-09-20
 
-Scope: the **ten pinned parts** of SPDD §7.4. Passives, the two 5.1 kΩ CC
-pulldowns, BOOT/RESET switches and the power LED are still unpinned (gate 2)
-and are not in [bom.csv](bom.csv).
+Scope: **every line on the board**. The ten parts of SPDD §7.4 were checked on
+2026-09-20; the passives were pinned and checked later the same day, once the
+schematic fixed how many of each there are.
 
-`bom.csv` is the sourcing capture. Its `Reference` column is `U?`/`J?`/`C?`
-because the schematic is still empty — **capture has not happened yet**
-(gate 3). Once it has, these MPNs and distributor PNs become symbol properties,
-and the CSV gets regenerated from the schematic rather than hand-kept.
+`bom.csv` is now **regenerated from the schematic**, so its `Reference` column
+carries real designators instead of the old `U?`/`J?`/`C?` placeholders, and the
+MPNs live in the symbol properties. The curated columns — distributor PNs,
+stock, chosen distributor, notes — are merged forward by MPN, not regenerated.
+
+**Every line now carries an MPN** — 22 lines, 33 components, **US$13.82/board**
+at these prices. The switch line was settled on 2026-09-20 once the C&K
+datasheet arrived by hand; it also forced R9 from 10 kΩ to 2.2 kΩ (SPDD §7.4).
 
 ## How this was checked
 
@@ -28,6 +32,40 @@ DigiKey has no credentials at all. Setting `DIGIKEY_CLIENT_ID` and
 `DIGIKEY_CLIENT_SECRET` alongside a working Mouser key would make this whole
 check a script rather than a one-off scrape — worth doing before the next
 stock re-check, since stock data goes stale fast.
+
+## The passives, pinned 2026-09-20
+
+Searched by MPN against the jlcsearch API, because free-text search on that API
+returns nothing — which suits this project anyway: the part is chosen first and
+then checked for stock, never picked *because* it was in stock.
+
+| Line | Refs | MPN | LCSC stock | US$ ea |
+|---|---|---|---:|---:|
+| 330 Ω 1% 0603 | R1, R2 | RK73H1JTTD3300F | 3,017 | 0.0051 |
+| 5.1 kΩ 1% 0603 | R3, R4, R8 | RK73H1JTTD5101F | 13,741 | 0.0076 |
+| 10 kΩ 1% 0603 | R9, R10 | RK73H1JTTD1002F | **1,192** | 0.0038 |
+| 66.5 kΩ 1% 0603 | R5 | RK73H1JTTD6652F | 2,192 | 0.0154 |
+| 100 kΩ 1% 0603 | R6, R7 | RK73H1JTTD1003F | 11,115 | 0.0043 |
+| 100 nF 50 V X7R 0603 | C1, C7, C8, C9 | CL10B104KB8NNNC | 268,519 | 0.0115 |
+| 1 µF 25 V X7R 0603 | C2, C3, C11 | CL10B105KA8NNNC | 178,930 | 0.0218 |
+| 10 µF 25 V X7R 1206 | C5, C10 | CL31B106KAHNNNE | 30,509 | 0.2660 |
+| 22 µF 25 V X7R 1210 | C6 | CL32B226KAJNNNE | 30,185 | 0.3599 |
+| LED green 0603 | D1 | LTST-C191KGKT | 193,281 | 0.0217 |
+| 2.2 kΩ 1% 0603 | R9 | RK73H1JTTD2201F | 1,033 | 0.0045 |
+| Tact switch | SW1, SW2 | KMR211NGLFS | 8,125 | 0.6362 |
+
+**The thinnest lines are the 2.2 kΩ at 1,033 and the 10 kΩ at 1,192** — about 100 boards' worth, and the
+only passive under 2,000. Several other 10 kΩ 0603 1% parts showed absurdly low
+stock in this index (Yageo RC0603FR-0710KL at 22, Panasonic ERJ-3EKF1002V at 2),
+which is much more likely to be a partial index than the real LCSC position.
+**Treat passive stock figures here as indicative only** — Mouser's API still
+rejects its key, so there was no second source to cross-check against, and
+DigiKey has no credentials at all.
+
+**Datasheets are in [lib/datasheets](../lib/datasheets/)** for every pinned
+passive. Samsung's own site and C&K's both refuse automated fetches; the Samsung
+sheets came from a Future Electronics / Octopart mirror, and **the C&K one could
+not be fetched at all**, which is why SW1/SW2 is still open.
 
 ## Every line is obtainable — but no single distributor can fill the board
 
@@ -129,8 +167,12 @@ Caveats, because these are estimates and not a quote:
 - The Coilcraft inductor at DigiKey is a **Marketplace** listing: +US$10 flat
   shipping on its own. LCSC (5,408 in stock, cheaper) or Coilcraft direct avoids
   that — one reason it lands on LCSC above
-- **Passives are not counted.** Rough allowance once pinned: ~US$2–4/board at
-  DigiKey prototype pricing, well under US$1 at LCSC
+- **Passives now counted** (2026-09-20): **US$1.09/board** at LCSC indicative
+  pricing for the 21 pinned passive components (ten resistors, ten ceramics
+  and the LED; the bulk capacitor is counted separately at US$2.13), of which the two 10 µF 1206 and
+  the one 22 µF 1210 are US$0.89 — the ceramics dominate, and they dominate
+  because they are 25 V X7R rather than the cheapest part that meets the value.
+  The board total is **~US$12.55**, excluding the still-open switch line
 
 The module and the bulk cap together are 45% of the board's parts cost. Nothing
 here is worth optimising — [CLAUDE.md](../CLAUDE.md) principle 1 — it is

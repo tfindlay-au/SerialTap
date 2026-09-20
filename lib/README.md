@@ -195,6 +195,42 @@ Passive symbols deliberately carry **no `Footprint`**. The package is a
 consequence of the part, and the parts are not pinned yet; an empty field is
 honest, a guessed 0603 is not.
 
+## Passive footprints, added 2026-09-20
+
+Five footprints and the test pad, copied from KiCad 10 with their 3D models, and
+rewritten to `${KIPRJMOD}`-relative paths like everything else here:
+`R_0603_1608Metric`, `C_0603_1608Metric`, `C_1206_3216Metric`,
+`C_1210_3225Metric`, `LED_0603_1608Metric`, `TestPoint_Pad_D1.5mm`.
+
+**These were not adjudicated against a vendor land pattern, and did not need to
+be.** Chip passives are dimensionally standardised — EIA 0603 is 1.6 × 0.8 mm
+whoever makes it — so KiCad's IPC-7351 derivations apply to any part in the
+size. That is the opposite of the situation with the `TXU0204` and `LM66200`,
+where the land is package-specific and two sources disagreed. KOA publishes no
+recommended land in the RK73H datasheet at all; Samsung's sheets give body
+dimensions, which is what was checked instead:
+
+| Part | Datasheet body | Footprint |
+|---|---|---|
+| CL10B104KB8NNNC, CL10B105KA8NNNC | 1.6 × 0.8 mm (0603) | `C_0603_1608Metric` |
+| CL31B106KAHNNNE | 3.2 × 1.6 mm, 1.6 mm thick (1206) | `C_1206_3216Metric` |
+| CL32B226KAJNNNE | 3.2 × 2.5 mm, **2.5 mm thick** (1210) | `C_1210_3225Metric` |
+
+The 22 µF is the tallest passive on the board at 2.5 mm — still well under the
+bulk capacitor's 10 mm, so it does not touch the height budget.
+
+**The switch footprint *was* adjudicated**, because a switch land pattern is
+part-specific. C&K's recommended layout for the `NG` (no ground pin) variant
+gives four pads, overall 5 mm across with a 3.2 mm inner gap and 2.6 mm overall
+height with a 0.6 mm gap — so **0.9 × 1.0 mm pads at ±2.05, ±0.8 mm**. KiCad's
+`SW_Push_1P1T_NO_CK_KMR2` is exactly that, and its sibling
+`SW_Push_1P1T-SH_NO_CK_KMR2xxG` is the five-pad `G` variant, which this part is
+not. The datasheet is in [datasheets/CK-KMR2.pdf](datasheets/CK-KMR2.pdf);
+C&K and Littelfuse both block automated fetches, so it was downloaded by hand.
+
+Datasheets for all of them are in [datasheets/](datasheets/). The test pad
+carries no 3D model, being bare copper.
+
 ## One pin type departs from the datasheet
 
 `LM66200` **`VOUT_2` is `passive`, not `power_out`.** Pins 2 and 7 are the same

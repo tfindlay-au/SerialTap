@@ -131,6 +131,14 @@ than assumed, and it cost a rewrite: see
   [ADR 0006](docs/adr/0006-gea3-not-hon.md), [docs/gea3.md](docs/gea3.md)
 - **The rail load test no longer gates fabrication** (2026-09-19). Its only
   design output was one resistor. [ADR 0007](docs/adr/0007-rail-limit-inferred-not-measured.md)
+- **The passives and switches are pinned** (2026-09-20). Chosen as two consistent families
+  rather than line by line, and every choice datasheet-backed: X7R at ≥25 V
+  throughout because the TPS62162's stability table assumes DC-bias variation
+  stays inside ±20%, and 1% resistors throughout because the eFuse's `RILIM`
+  requires it. Capture also lost the bulk capacitor's own symbol — C4 was
+  drawn with the generic `C`, costing its MPN, footprint and polarity marking.
+  Fixed, and test pads are now excluded from the BOM rather than appearing as
+  ten phantom purchases
 - **The service connector was being read from the wrong end** (2026-09-20).
   Corrected everywhere: the order is 5 V, TX, RX, spare, GND, and old pin *n*
   is new pin *6 − n*. Nothing measured changed — the bench voltages and the
@@ -159,12 +167,13 @@ than assumed, and it cost a rewrite: see
    every footprint, nothing referencing outside the repo. Grown to 23 symbols on
    2026-09-20 with the generics capture needed (R, C, LED, switch, test point,
    power symbols), all copied in from KiCad 10 rather than referenced
-2. **Remaining part detail.** ~~Gate~~ **Now countable, and the last one before
-   layout.** The schematic fixes it at **25 components over 12 unique lines** —
-   ten resistors, ten ceramics, the LED and the two tact switches. Footprints
-   follow the MPNs, so both land together. Packages for the pinned parts are
-   settled (TPS62162 `DSG`, TXU0204 `RUT`) and the **distributor stock check is
-   done for all ten** (2026-09-20, [bom/](bom/))
+2. **Remaining part detail.** ~~Gate~~ **Closed 2026-09-20.** **All 22 BOM
+   lines carry an MPN, a footprint and a datasheet.** One KOA RK73H series for
+   every resistor value, one Samsung CL series in X7R ≥25 V for every ceramic,
+   a Lite-On LED chosen for temperature grade over brightness, and C&K
+   `KMR211NGLFS` switches. Board cost ~US$13.82 ([bom/](bom/)). The switch
+   datasheet moved R9 from 10 kΩ to 2.2 kΩ — C&K specify a 1 mA minimum contact
+   current and a 10 kΩ pull-up would have switched 0.33 mA (SPDD §7.4)
 3. **Schematic capture.** ~~Gate~~ **Closed 2026-09-20.** 43 components, 57
    nets, one A3 sheet, KiCad 10 native. `kicad-cli sch erc --severity-all`: 0
    violations, and every review invariant checked against the *extracted

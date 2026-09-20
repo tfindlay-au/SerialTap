@@ -192,12 +192,15 @@ the rig that works.
 
 ### Still open after capture
 
-1. **Passive MPNs.** The schematic now fixes the count: **25 components over 12
-   unique lines.** R1/R2 330 Ω 1%, R3/R4/R8 5.1 k, R5 66.5 k 1%, R6/R7 100 k,
-   R9/R10 10 k, C1/C7/C8/C9 0.1 µF, C2/C3/C11 1 µF, C5/C10 10 µF, C6 22 µF, D1
-   (LED), SW1/SW2 (tact). C4 is already pinned — it is the Nichicon bulk.
-   Footprints follow the MPNs, so both land together. This is the last gate
-   before layout.
+1. ~~**Passive MPNs.**~~ **Done 2026-09-20**, except SW1/SW2 — see
+   [bom/README.md](../bom/README.md) and SPDD §7.4. Two capture defects surfaced
+   while pinning them, both fixed: **C4 had been drawn with the generic `C`
+   symbol** instead of its own `PCL1A471MCL1GS` symbol, which cost it an MPN, a
+   footprint and — on a polarised polymer capacitor — its polarity marking; and
+   **the ten test pads were appearing as a BOM line**, now excluded from the BOM
+   while staying on the board as copper. Pinning the switches then changed a
+   third thing: **R9 is 2.2 kΩ, not 10 kΩ**, so SW1's contacts carry 1.5 mA
+   against C&K's 1 mA minimum (SPDD §7.4). R10 stays 10 kΩ.
 2. ~~**VBUS TVS**~~ **Accepted, not fitted** (2026-09-20). The USB port is a
    one-off setup interface — the operational path is J1 — so the exposure is
    closer to a debug header's than to a permanently cabled port. The risk is

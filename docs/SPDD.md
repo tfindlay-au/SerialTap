@@ -368,9 +368,35 @@ schematic symbols carry the MPNs and this table points at the reasoning.
 
 | Module | **ESP32-C3-MINI-1-H4X** (Espressif) | 4 MB flash — ample for an ESPHome image plus OTA partitions, with no filesystem to speak of. **H = 105 °C** ambient rather than the N variant's 85 °C, for a bare board in an HVAC unit. **X = chip revision v1.1, and it is not optional: every non-X variant is NRND.** Plain `-1`, *not* `-1U` — the U denotes a U.FL connector and no antenna at all, whereas `-1` carries the PCB trace antenna this design settled on ([haier-oem-board.md](haier-oem-board.md)). Keeping the PCB antenna is what makes the antenna keepout layout priority #1; `-1U` has no keepout, but needs an external antenna and a pigtail inside the chassis |
 
-**Not yet pinned:** BOOT/RESET switches, power LED, and all passives —
-including the **two 5.1 kΩ CC pulldowns** the USB-C sink needs to be recognised
-and offered 5 V.
+**Passives pinned 2026-09-20**, once the schematic fixed how many of each there
+are. Two families, chosen for consistency rather than per-line optimisation:
+
+| Function | MPN | Why this one |
+|---|---|---|
+| All five resistor values — 330 Ω ×2, 5.1 kΩ ×3, 10 kΩ ×2, 66.5 kΩ, 100 kΩ ×2 | **KOA Speer RK73H 1J** series, 0603, ±1% | One series across every value: ±100 ppm/°C, −55…+155 °C, AEC-Q200. The 66.5 kΩ `RILIM` **has** to be 1% — the TPS2553 datasheet says so, it is not a preference — and running the same grade everywhere costs cents and removes a class of mistake. Size code `1J` = 0603 and tolerance code `F` = ±1% are confirmed from the ordering table in the datasheet |
+| 100 nF ×4, 1 µF ×3, 10 µF ×2, 22 µF | **Samsung CL** series, **X7R only, ≥25 V** | X7R throughout, never X5R: TPS62162's LC stability table assumes variation stays within ±20% *including DC bias*, and 25 V parts on a 5 V rail keep the derating small enough to stay there. The 22 µF output value and its dielectric are the datasheet's own recommendation |
+| Power LED | **LTST-C191KGKT** (Lite-On, 574 nm) | Vf 1.9–2.4 V puts ~0.6 mA through the 5.1 kΩ — dim on purpose (§5.7). Chosen over the 5× brighter emerald-green `LTST-C191TGKT` for temperature grade: −55…+85 °C against −20…+80 °C, consistent with the H-grade module and the `-Q1` ESD array |
+| BOOT/RESET switches | **C&K KMR211NGLFS** | −40…+85 °C, 200 000 operations, 1.2 N. `NG` is the ordering key's **no ground pin** option, which is what picks the four-pad land pattern over the five-pad one. C&K's recommended layout — 0.9 × 1.0 mm pads at ±2.05, ±0.8 mm — matches KiCad's footprint exactly |
+
+**The switch datasheet changed a resistor.** C&K specify a **minimum contact
+current of 1 mA** for the standard silver contacts; the ULC option exists
+precisely because 1 mA is a lot for a logic-level button, and it is not stocked
+anywhere this project can check. With a 10 kΩ pull-up, SW1 would have switched
+0.33 mA — a third of the vendor's minimum, in the dry-circuit region where
+contact films do not get broken down.
+
+- **R9 (BOOT) is therefore 2.2 kΩ, not 10 kΩ.** That puts 1.5 mA through SW1,
+  50% above the minimum. GPIO9 is a strapping pin read once at reset, so the
+  only cost is 1.5 mA while the button is physically held.
+- **R10 (EN) stays 10 kΩ.** SW2 discharges C11's 1 µF through its contacts on
+  every press, which is a far larger wetting pulse than any steady current would
+  be, so the low steady current does not matter there. Shortening the EN time
+  constant would also have been the wrong move while the manual-reset-on-first-
+  power-up anomaly (§13) is unexplained. *The wetting-pulse argument is
+  engineering judgement, not a vendor statement.*
+
+The **two 5.1 kΩ CC pulldowns** the USB-C sink needs are R3 and R4, sharing a
+line with the LED series resistor R8.
 
 **Endurance resolved (2026-09-20).** The Nichicon datasheet, now in
 [lib/datasheets](../lib/datasheets/), states **20 000 hours at 105 °C**, twice on

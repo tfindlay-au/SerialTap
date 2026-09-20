@@ -2188,6 +2188,205 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "serialtap:PCL1A471MCL1GS"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "C"
+				(at 0.635 2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "PCL1A471MCL1GS"
+				(at 0.635 -2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" "serialtap:CP_Elec_8x10"
+				(at 0.9652 -3.81 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Polarized capacitor"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "MPN" "PCL1A471MCL1GS"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Manufacturer" "Nichicon"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "cap capacitor"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "CP_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "PCL1A471MCL1GS_0_1"
+				(rectangle
+					(start -2.286 0.508)
+					(end 2.286 1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.778 2.286) (xy -0.762 2.286)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 2.794) (xy -1.27 1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start 2.286 -0.508)
+					(end -2.286 -1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+			)
+			(symbol "PCL1A471MCL1GS_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 2.794)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 2.794)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "serialtap:PORT_5V"
 			(power global)
 			(pin_numbers
@@ -8069,7 +8268,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:C_0603_1608Metric"
 			(at 304.8 59.69 0)
 			(hide yes)
 			(show_name no)
@@ -8081,7 +8280,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://product.samsungsem.com/mlcc/CL10B105KA8NNN.do"
 			(at 304.8 59.69 0)
 			(hide yes)
 			(show_name no)
@@ -8093,7 +8292,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Capacitor, 1 uF ceramic - EN reset timing"
+		(property "Description" "Capacitor, 1 uF 25V X7R 0603 - EN reset timing"
+			(at 304.8 59.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "CL10B105KA8NNNC"
+			(at 304.8 59.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "Samsung Electro-Mechanics"
 			(at 304.8 59.69 0)
 			(hide yes)
 			(show_name no)
@@ -9025,7 +9248,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:R_0603_1608Metric"
 			(at 172.72 27.94 0)
 			(hide yes)
 			(show_name no)
@@ -9037,7 +9260,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.koaspeer.com/pdfs/RK73H.pdf"
 			(at 172.72 27.94 0)
 			(hide yes)
 			(show_name no)
@@ -9049,7 +9272,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Resistor, 100 kohm - FAULT open-drain pull-up"
+		(property "Description" "Resistor, 100 kohm 1% 0603 - FAULT pull-up"
+			(at 172.72 27.94 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "RK73H1JTTD1003F"
+			(at 172.72 27.94 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "KOA Speer"
 			(at 172.72 27.94 0)
 			(hide yes)
 			(show_name no)
@@ -9410,7 +9657,7 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
@@ -9438,7 +9685,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:TestPoint_Pad_D1.5mm"
 			(at 344.17 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -9462,7 +9709,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Test pad, C3_TX"
+		(property "Description" "Test pad, C3_TX - bare copper, not a purchased part"
 			(at 344.17 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -9599,7 +9846,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:C_0603_1608Metric"
 			(at 152.4 68.58 0)
 			(hide yes)
 			(show_name no)
@@ -9611,7 +9858,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://product.samsungsem.com/mlcc/CL10B105KA8NNN.do"
 			(at 152.4 68.58 0)
 			(hide yes)
 			(show_name no)
@@ -9623,7 +9870,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Capacitor, 1 uF ceramic - LM66200 VIN2 input"
+		(property "Description" "Capacitor, 1 uF 25V X7R 0603 - LM66200 VIN2 input"
+			(at 152.4 68.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "CL10B105KA8NNNC"
+			(at 152.4 68.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "Samsung Electro-Mechanics"
 			(at 152.4 68.58 0)
 			(hide yes)
 			(show_name no)
@@ -10145,7 +10416,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:C_0603_1608Metric"
 			(at 139.7 177.8 0)
 			(hide yes)
 			(show_name no)
@@ -10157,7 +10428,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://product.samsungsem.com/mlcc/CL10B104KB8NNN.do"
 			(at 139.7 177.8 0)
 			(hide yes)
 			(show_name no)
@@ -10169,7 +10440,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Capacitor, 0.1 uF ceramic - TXU0204 VCCA bypass"
+		(property "Description" "Capacitor, 100 nF 50V X7R 0603 - TXU0204 VCCA bypass"
+			(at 139.7 177.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "CL10B104KB8NNNC"
+			(at 139.7 177.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "Samsung Electro-Mechanics"
 			(at 139.7 177.8 0)
 			(hide yes)
 			(show_name no)
@@ -10284,7 +10579,7 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
@@ -10312,7 +10607,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:TestPoint_Pad_D1.5mm"
 			(at 332.74 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -10336,7 +10631,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Test pad, RX_BUF"
+		(property "Description" "Test pad, RX_BUF - bare copper, not a purchased part"
 			(at 332.74 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -10382,7 +10677,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Value" "10k"
+		(property "Value" "2.2k"
 			(at 388.366 88.265 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10393,7 +10688,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:R_0603_1608Metric"
 			(at 386.08 86.36 0)
 			(hide yes)
 			(show_name no)
@@ -10405,7 +10700,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.koaspeer.com/pdfs/RK73H.pdf"
 			(at 386.08 86.36 0)
 			(hide yes)
 			(show_name no)
@@ -10417,7 +10712,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Resistor, 10 kohm - BOOT (GPIO9) pull-up"
+		(property "Description" "Resistor, 2.2 kohm 1% 0603 - BOOT pull-up, sized for 1.5 mA through SW1 (C&K minimum contact current is 1 mA)"
+			(at 386.08 86.36 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "RK73H1JTTD2201F"
+			(at 386.08 86.36 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "KOA Speer"
 			(at 386.08 86.36 0)
 			(hide yes)
 			(show_name no)
@@ -11048,7 +11367,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:LED_0603_1608Metric"
 			(at 198.12 76.2 0)
 			(hide yes)
 			(show_name no)
@@ -11060,7 +11379,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://optoelectronics.liteon.com/upload/download/ds22-2000-228/ltst-c191kgkt.pdf"
 			(at 198.12 76.2 0)
 			(hide yes)
 			(show_name no)
@@ -11072,7 +11391,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "LED, green - power indicator"
+		(property "Description" "LED, yellow-green 574 nm 0603, Vf 1.9-2.4 V - power indicator at ~0.6 mA"
+			(at 198.12 76.2 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "LTST-C191KGKT"
+			(at 198.12 76.2 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "Lite-On"
 			(at 198.12 76.2 0)
 			(hide yes)
 			(show_name no)
@@ -11786,7 +12129,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:C_0603_1608Metric"
 			(at 121.92 68.58 0)
 			(hide yes)
 			(show_name no)
@@ -11798,7 +12141,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://product.samsungsem.com/mlcc/CL10B104KB8NNN.do"
 			(at 121.92 68.58 0)
 			(hide yes)
 			(show_name no)
@@ -11810,7 +12153,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Capacitor, 0.1 uF ceramic - TPS2553 input bypass, at the IC"
+		(property "Description" "Capacitor, 100 nF 50V X7R 0603 - TPS2553 input bypass, at the IC"
+			(at 121.92 68.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "CL10B104KB8NNNC"
+			(at 121.92 68.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "Samsung Electro-Mechanics"
 			(at 121.92 68.58 0)
 			(hide yes)
 			(show_name no)
@@ -11950,7 +12317,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:C_1206_3216Metric"
 			(at 327.66 121.92 0)
 			(hide yes)
 			(show_name no)
@@ -11962,7 +12329,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://product.samsungsem.com/mlcc/CL31B106KAHNNN.do"
 			(at 327.66 121.92 0)
 			(hide yes)
 			(show_name no)
@@ -11974,7 +12341,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Capacitor, 10 uF ceramic - module bulk"
+		(property "Description" "Capacitor, 10 uF 25V X7R 1206 - module bulk"
+			(at 327.66 121.92 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "CL31B106KAHNNNE"
+			(at 327.66 121.92 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "Samsung Electro-Mechanics"
 			(at 327.66 121.92 0)
 			(hide yes)
 			(show_name no)
@@ -12171,7 +12562,7 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
@@ -12199,7 +12590,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:TestPoint_Pad_D1.5mm"
 			(at 378.46 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -12223,7 +12614,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Test pad, PG"
+		(property "Description" "Test pad, PG - bare copper, not a purchased part"
 			(at 378.46 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -12608,7 +12999,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:R_0603_1608Metric"
 			(at 50.8 45.72 0)
 			(hide yes)
 			(show_name no)
@@ -12620,7 +13011,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.koaspeer.com/pdfs/RK73H.pdf"
 			(at 50.8 45.72 0)
 			(hide yes)
 			(show_name no)
@@ -12632,7 +13023,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Resistor, 330 ohm 1% - UART series, set from measured RX bias"
+		(property "Description" "Resistor, 330 ohm 1% 0603 - UART series, set from the measured RX bias"
+			(at 50.8 45.72 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "RK73H1JTTD3300F"
+			(at 50.8 45.72 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "KOA Speer"
 			(at 50.8 45.72 0)
 			(hide yes)
 			(show_name no)
@@ -12690,7 +13105,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:C_1210_3225Metric"
 			(at 251.46 102.87 0)
 			(hide yes)
 			(show_name no)
@@ -12702,7 +13117,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://product.samsungsem.com/mlcc/CL32B226KAJNNN.do"
 			(at 251.46 102.87 0)
 			(hide yes)
 			(show_name no)
@@ -12714,7 +13129,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Capacitor, 22 uF ceramic - TPS62162 output, VOS sense point"
+		(property "Description" "Capacitor, 22 uF 25V X7R 1210 - TPS62162 output, VOS senses here"
+			(at 251.46 102.87 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "CL32B226KAJNNNE"
+			(at 251.46 102.87 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "Samsung Electro-Mechanics"
 			(at 251.46 102.87 0)
 			(hide yes)
 			(show_name no)
@@ -12856,7 +13295,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:R_0603_1608Metric"
 			(at 198.12 66.04 0)
 			(hide yes)
 			(show_name no)
@@ -12868,7 +13307,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.koaspeer.com/pdfs/RK73H.pdf"
 			(at 198.12 66.04 0)
 			(hide yes)
 			(show_name no)
@@ -12880,7 +13319,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Resistor, 5.1 kohm - power LED series, ~0.6 mA"
+		(property "Description" "Resistor, 5.1 kohm 1% 0603 - power LED series, ~0.6 mA"
+			(at 198.12 66.04 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "RK73H1JTTD5101F"
+			(at 198.12 66.04 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "KOA Speer"
 			(at 198.12 66.04 0)
 			(hide yes)
 			(show_name no)
@@ -12940,7 +13403,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:R_0603_1608Metric"
 			(at 284.48 43.18 0)
 			(hide yes)
 			(show_name no)
@@ -12952,7 +13415,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.koaspeer.com/pdfs/RK73H.pdf"
 			(at 284.48 43.18 0)
 			(hide yes)
 			(show_name no)
@@ -12964,7 +13427,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Resistor, 10 kohm - EN pull-up"
+		(property "Description" "Resistor, 10 kohm 1% 0603 - EN pull-up"
+			(at 284.48 43.18 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "RK73H1JTTD1002F"
+			(at 284.48 43.18 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "KOA Speer"
 			(at 284.48 43.18 0)
 			(hide yes)
 			(show_name no)
@@ -13025,7 +13512,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:SW_Push_1P1T_NO_CK_KMR2"
 			(at 378.46 101.6 0)
 			(hide yes)
 			(show_name no)
@@ -13037,7 +13524,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.ckswitches.com/media/1479/kmr2.pdf"
 			(at 378.46 101.6 0)
 			(hide yes)
 			(show_name no)
@@ -13049,7 +13536,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Tact switch - BOOT"
+		(property "Description" "Tact switch KMR2, 1.2 N, -40..+85 C - BOOT"
+			(at 378.46 101.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "KMR211NGLFS"
+			(at 378.46 101.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "C&K (Littelfuse)"
 			(at 378.46 101.6 0)
 			(hide yes)
 			(show_name no)
@@ -13357,7 +13868,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:R_0603_1608Metric"
 			(at 180.34 44.45 0)
 			(hide yes)
 			(show_name no)
@@ -13369,7 +13880,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.koaspeer.com/pdfs/RK73H.pdf"
 			(at 180.34 44.45 0)
 			(hide yes)
 			(show_name no)
@@ -13381,7 +13892,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Resistor, 66.5 kohm 1% - RILIM, 400 mA nominal limit (351-449 mA over tolerance)"
+		(property "Description" "Resistor, 66.5 kohm 1% 0603 - RILIM, 400 mA nominal (351-449 mA over tolerance)"
+			(at 180.34 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "RK73H1JTTD6652F"
+			(at 180.34 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "KOA Speer"
 			(at 180.34 44.45 0)
 			(hide yes)
 			(show_name no)
@@ -13988,7 +14523,7 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
@@ -14016,7 +14551,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:TestPoint_Pad_D1.5mm"
 			(at 321.31 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -14040,7 +14575,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Test pad, TX_BUF"
+		(property "Description" "Test pad, TX_BUF - bare copper, not a purchased part"
 			(at 321.31 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -14147,7 +14682,7 @@
 		)
 	)
 	(symbol
-		(lib_id "serialtap:C")
+		(lib_id "serialtap:PCL1A471MCL1GS")
 		(at 167.64 68.58 0)
 		(unit 1)
 		(body_style 1)
@@ -14158,7 +14693,7 @@
 		(dnp no)
 		(uuid "8e71c5c9-07ea-4ff7-842c-eee66f10067b")
 		(property "Reference" "C4"
-			(at 167.64 65.532 0)
+			(at 167.64 63.5 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -14167,8 +14702,8 @@
 				)
 			)
 		)
-		(property "Value" "470u"
-			(at 167.64 71.628 0)
+		(property "Value" "PCL1A471MCL1GS"
+			(at 167.64 71.882 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -14177,7 +14712,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:CP_Elec_8x10"
 			(at 167.64 68.58 0)
 			(hide yes)
 			(show_name no)
@@ -14201,7 +14736,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Bulk capacitor, 470 uF polymer - 5 V rail"
+		(property "Description" "Bulk capacitor, 470 uF 10V polymer - 5 V rail"
+			(at 167.64 68.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "PCL1A471MCL1GS"
+			(at 167.64 68.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "Nichicon"
 			(at 167.64 68.58 0)
 			(hide yes)
 			(show_name no)
@@ -14261,7 +14820,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:R_0603_1608Metric"
 			(at 86.36 146.05 0)
 			(hide yes)
 			(show_name no)
@@ -14273,7 +14832,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.koaspeer.com/pdfs/RK73H.pdf"
 			(at 86.36 146.05 0)
 			(hide yes)
 			(show_name no)
@@ -14285,7 +14844,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Resistor, 5.1 kohm - USB-C CC1 pulldown (Rd)"
+		(property "Description" "Resistor, 5.1 kohm 1% 0603 - USB-C CC1 pulldown (Rd)"
+			(at 86.36 146.05 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "RK73H1JTTD5101F"
+			(at 86.36 146.05 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "KOA Speer"
 			(at 86.36 146.05 0)
 			(hide yes)
 			(show_name no)
@@ -14426,7 +15009,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:C_0603_1608Metric"
 			(at 137.16 68.58 0)
 			(hide yes)
 			(show_name no)
@@ -14438,7 +15021,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://product.samsungsem.com/mlcc/CL10B105KA8NNN.do"
 			(at 137.16 68.58 0)
 			(hide yes)
 			(show_name no)
@@ -14450,7 +15033,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Capacitor, 1 uF ceramic - LM66200 VIN1 input"
+		(property "Description" "Capacitor, 1 uF 25V X7R 0603 - LM66200 VIN1 input"
+			(at 137.16 68.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "CL10B105KA8NNNC"
+			(at 137.16 68.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "Samsung Electro-Mechanics"
 			(at 137.16 68.58 0)
 			(hide yes)
 			(show_name no)
@@ -14647,7 +15254,7 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
@@ -14675,7 +15282,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:TestPoint_Pad_D1.5mm"
 			(at 287.02 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -14699,7 +15306,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Test pad, V5"
+		(property "Description" "Test pad, V5 - bare copper, not a purchased part"
 			(at 287.02 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -14863,7 +15470,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:SW_Push_1P1T_NO_CK_KMR2"
 			(at 294.64 60.96 0)
 			(hide yes)
 			(show_name no)
@@ -14875,7 +15482,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.ckswitches.com/media/1479/kmr2.pdf"
 			(at 294.64 60.96 0)
 			(hide yes)
 			(show_name no)
@@ -14887,7 +15494,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Tact switch - RESET"
+		(property "Description" "Tact switch KMR2, 1.2 N, -40..+85 C - RESET"
+			(at 294.64 60.96 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "KMR211NGLFS"
+			(at 294.64 60.96 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "C&K (Littelfuse)"
 			(at 294.64 60.96 0)
 			(hide yes)
 			(show_name no)
@@ -15027,7 +15658,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:C_0603_1608Metric"
 			(at 228.6 177.8 0)
 			(hide yes)
 			(show_name no)
@@ -15039,7 +15670,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://product.samsungsem.com/mlcc/CL10B104KB8NNN.do"
 			(at 228.6 177.8 0)
 			(hide yes)
 			(show_name no)
@@ -15051,7 +15682,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Capacitor, 0.1 uF ceramic - TXU0204 VCCB bypass"
+		(property "Description" "Capacitor, 100 nF 50V X7R 0603 - TXU0204 VCCB bypass"
+			(at 228.6 177.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "CL10B104KB8NNNC"
+			(at 228.6 177.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "Samsung Electro-Mechanics"
 			(at 228.6 177.8 0)
 			(hide yes)
 			(show_name no)
@@ -15111,7 +15766,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:R_0603_1608Metric"
 			(at 182.88 100.33 0)
 			(hide yes)
 			(show_name no)
@@ -15123,7 +15778,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.koaspeer.com/pdfs/RK73H.pdf"
 			(at 182.88 100.33 0)
 			(hide yes)
 			(show_name no)
@@ -15135,7 +15790,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Resistor, 100 kohm - PG open-drain pull-up"
+		(property "Description" "Resistor, 100 kohm 1% 0603 - PG pull-up"
+			(at 182.88 100.33 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "RK73H1JTTD1003F"
+			(at 182.88 100.33 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "KOA Speer"
 			(at 182.88 100.33 0)
 			(hide yes)
 			(show_name no)
@@ -16262,7 +16941,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:C_1206_3216Metric"
 			(at 182.88 68.58 0)
 			(hide yes)
 			(show_name no)
@@ -16274,7 +16953,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://product.samsungsem.com/mlcc/CL31B106KAHNNN.do"
 			(at 182.88 68.58 0)
 			(hide yes)
 			(show_name no)
@@ -16286,7 +16965,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Capacitor, 10 uF ceramic - TPS62162 input"
+		(property "Description" "Capacitor, 10 uF 25V X7R 1206 - TPS62162 input"
+			(at 182.88 68.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "CL31B106KAHNNNE"
+			(at 182.88 68.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "Samsung Electro-Mechanics"
 			(at 182.88 68.58 0)
 			(hide yes)
 			(show_name no)
@@ -16401,7 +17104,7 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
@@ -16429,7 +17132,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:TestPoint_Pad_D1.5mm"
 			(at 389.89 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -16453,7 +17156,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Test pad, ST"
+		(property "Description" "Test pad, ST - bare copper, not a purchased part"
 			(at 389.89 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -16590,7 +17293,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:R_0603_1608Metric"
 			(at 54.61 33.02 0)
 			(hide yes)
 			(show_name no)
@@ -16602,7 +17305,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.koaspeer.com/pdfs/RK73H.pdf"
 			(at 54.61 33.02 0)
 			(hide yes)
 			(show_name no)
@@ -16614,7 +17317,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Resistor, 330 ohm 1% - UART series, set from measured RX bias"
+		(property "Description" "Resistor, 330 ohm 1% 0603 - UART series, set from the measured RX bias"
+			(at 54.61 33.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "RK73H1JTTD3300F"
+			(at 54.61 33.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "KOA Speer"
 			(at 54.61 33.02 0)
 			(hide yes)
 			(show_name no)
@@ -16918,7 +17645,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:C_0603_1608Metric"
 			(at 314.96 121.92 0)
 			(hide yes)
 			(show_name no)
@@ -16930,7 +17657,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://product.samsungsem.com/mlcc/CL10B104KB8NNN.do"
 			(at 314.96 121.92 0)
 			(hide yes)
 			(show_name no)
@@ -16942,7 +17669,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Capacitor, 0.1 uF ceramic - module bypass"
+		(property "Description" "Capacitor, 100 nF 50V X7R 0603 - module bypass"
+			(at 314.96 121.92 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "CL10B104KB8NNNC"
+			(at 314.96 121.92 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "Samsung Electro-Mechanics"
 			(at 314.96 121.92 0)
 			(hide yes)
 			(show_name no)
@@ -17139,7 +17890,7 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
@@ -17167,7 +17918,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:TestPoint_Pad_D1.5mm"
 			(at 309.88 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -17191,7 +17942,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Test pad, GND"
+		(property "Description" "Test pad, GND - bare copper, not a purchased part"
 			(at 309.88 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -17303,7 +18054,7 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
@@ -17331,7 +18082,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:TestPoint_Pad_D1.5mm"
 			(at 367.03 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -17355,7 +18106,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Test pad, FAULT_N"
+		(property "Description" "Test pad, FAULT_N - bare copper, not a purchased part"
 			(at 367.03 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -17549,7 +18300,7 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
@@ -17577,7 +18328,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:TestPoint_Pad_D1.5mm"
 			(at 298.45 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -17601,7 +18352,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Test pad, V3V3"
+		(property "Description" "Test pad, V3V3 - bare copper, not a purchased part"
 			(at 298.45 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -17631,7 +18382,7 @@
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
@@ -17659,7 +18410,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:TestPoint_Pad_D1.5mm"
 			(at 355.6 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -17683,7 +18434,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Test pad, C3_RX"
+		(property "Description" "Test pad, C3_RX - bare copper, not a purchased part"
 			(at 355.6 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -17740,7 +18491,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "serialtap:R_0603_1608Metric"
 			(at 76.2 148.59 0)
 			(hide yes)
 			(show_name no)
@@ -17752,7 +18503,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.koaspeer.com/pdfs/RK73H.pdf"
 			(at 76.2 148.59 0)
 			(hide yes)
 			(show_name no)
@@ -17764,7 +18515,31 @@
 				(justify left bottom)
 			)
 		)
-		(property "Description" "Resistor, 5.1 kohm - USB-C CC2 pulldown (Rd)"
+		(property "Description" "Resistor, 5.1 kohm 1% 0603 - USB-C CC2 pulldown (Rd)"
+			(at 76.2 148.59 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "MPN" "RK73H1JTTD5101F"
+			(at 76.2 148.59 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Manufacturer" "KOA Speer"
 			(at 76.2 148.59 0)
 			(hide yes)
 			(show_name no)
