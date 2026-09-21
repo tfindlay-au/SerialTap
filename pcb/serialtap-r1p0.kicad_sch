@@ -8087,7 +8087,7 @@
 		)
 		(uuid "752796a9-7e10-4f37-89c9-78e3d05efe4e")
 	)
-	(label "PORT_RX"
+	(label "USB_DM"
 		(at 20.32 76.2 180)
 		(effects
 			(font
@@ -8127,7 +8127,7 @@
 		)
 		(uuid "92415f34-e330-4524-8bc2-e886aad6ecce")
 	)
-	(label "PORT_TX"
+	(label "USB_DP"
 		(at 20.32 71.12 180)
 		(effects
 			(font
@@ -8157,7 +8157,7 @@
 		)
 		(uuid "a6d11549-2aa1-4f92-8cf7-8cf33d326cc5")
 	)
-	(label "USB_DP"
+	(label "PORT_TX"
 		(at 63.5 71.12 0)
 		(effects
 			(font
@@ -8187,7 +8187,7 @@
 		)
 		(uuid "e09d64c2-af76-47bd-858e-85db799ff1cc")
 	)
-	(label "USB_DM"
+	(label "PORT_RX"
 		(at 63.5 76.2 0)
 		(effects
 			(font

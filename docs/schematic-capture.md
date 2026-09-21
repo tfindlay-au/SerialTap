@@ -109,7 +109,7 @@ wrong. Every review invariant, as `kicad-cli sch export netlist` reports it:
 |---|---|
 | J1 pin 4 has no copper other than its own pad | `unconnected-(J1-Pin_4-Pad4)`, one node |
 | No USB VBUS path to `PORT_5V` except through the OR | `USB_VBUS` = J2 VBUS ×4, C3, U2.VIN2. `PORT_5V` = J1.1, U1.IN, U1.EN, C1. They meet only at U2's output |
-| ESD array ahead of both UART series resistors | `PORT_TX` = J1.3, **U5.D1+**, R1.1 — and `TX_BUF` = R1.2, U4.B1Y, TP4. Same shape for RX |
+| ESD array ahead of both UART series resistors | `PORT_TX` = J1.2, **U5.D2+**, R1.1 — and `TX_BUF` = R1.2, U4.B1Y, TP4. Same shape for RX |
 | `FB` not floating; `VOS` senses at the output capacitor | U3.5 (`FB`) is in `GND`; U3.6 (`VOS`) is in `V3V3` with C6 |
 | Every unused translator pin handled | A2, B4 tied to `GND`; A4Y, B2Y carry explicit no-connects |
 | Every passive has an MPN | **Not met** — see "Still open" below |
@@ -180,8 +180,8 @@ no-connect and J1.5 is ground. Confirmed in the netlist:
 
 ```
 PORT_5V    J1.1 + C1.1 U1.1 U1.3
-PORT_TX    J1.2 + R1.1 U5.1          TX_BUF  R1.2 + U4.10 (B1Y, output)
-PORT_RX    J1.3 + R2.1 U5.2          RX_BUF  R2.2 + U4.8  (B3,  input)
+PORT_TX    J1.2 + R1.1 U5.4          TX_BUF  R1.2 + U4.10 (B1Y, output)
+PORT_RX    J1.3 + R2.1 U5.5          RX_BUF  R2.2 + U4.8  (B3,  input)
 unconnected-(J1-Pin_4-Pad4)
 GND        J1.5 + ...
 ```
@@ -190,9 +190,19 @@ GND        J1.5 + ...
 B-side **input**, so the direction through the fixed-direction buffer matches
 the rig that works.
 
+### Amended 2026-09-21: TVS channels swapped for layout
+
+`U5`'s four channels are identical, so which pair carries UART and which
+carries USB is a layout choice, not an electrical one. With the array placed
+under the USB-C pin row and the D± pair arriving from the module on the left,
+the pair has to enter the **top** two pads or its descent crosses the UART
+exits on L1. The labels were therefore swapped: **pins 1/2 (`D1±`) now carry
+`USB_DP`/`USB_DM`, pins 4/5 (`D2±`) carry `PORT_TX`/`PORT_RX`.** The netlist
+tables above are updated to match; ERC remains at 0 violations. No BOM change.
+
 ### Still open after capture
 
-1. ~~**Passive MPNs.**~~ **Done 2026-09-20**, except SW1/SW2 — see
+1. ~~**Passive MPNs.**~~ **Done 2026-09-20**, switches included — see
    [bom/README.md](../bom/README.md) and SPDD §7.4. Two capture defects surfaced
    while pinning them, both fixed: **C4 had been drawn with the generic `C`
    symbol** instead of its own `PCL1A471MCL1GS` symbol, which cost it an MPN, a

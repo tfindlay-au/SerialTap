@@ -310,7 +310,7 @@
 	(embedded_fonts no)
 	(model "${KIPRJMOD}/../lib/3dmodels/B05B-XASK-1-A.stp"
 		(offset
-			(xyz 0 0 0)
+			(xyz 10 0 0)
 		)
 		(scale
 			(xyz 1 1 1)
