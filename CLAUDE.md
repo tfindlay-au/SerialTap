@@ -181,16 +181,21 @@ than assumed, and it cost a rewrite: see
    and 2 warnings, triaged in
    [docs/schematic-capture.md](docs/schematic-capture.md) — one is real (no TVS
    on USB VBUS, which reaches the LM66200's 6 V absolute maximum unclamped) and
-   one is the passives above
+   one is the passives above. The VBUS TVS is **decided: not fitted**
+   (2026-09-20) — USB is a one-off flashing interface, like a pogo header
 4. **`sim/buck-load-step`** — corrected 2026-09-20 with fixed-output TPS62162
    `FB` tied to AGND. It passes the 40 → 335 mA load step with ≥285 mV margin.
-5. Layout, then review gates 2 and 3
+5. **Layout.** Placed and routed 2026-09-22 (`a80c933`): DRC shows
+   silkscreen findings only, with 0 unconnected and 0 schematic-parity issues.
+   The departures from the layout rules are recorded in
+   [layout-rules.md](docs/layout-rules.md#recorded-exceptions--r1p0-as-routed-2026-09-22).
+   Still to do: silkscreen tidy, fiducials, the pre-release checklist, then
+   review gates 2 and 3
 
 **Mechanical, measured 2026-09-20:** 22 × 54 mm confirmed with calipers, **no
 mounting holes**, no intrusions, and connector placement unconstrained. That
-closes bench-plan Part 3 and frees the floorplan — but it also means the
-connectors carry all mechanical load, so how the board is retained is an open
-question for layout.
+closes bench-plan Part 3 and frees the floorplan. Retention is **not** an open
+question (2026-09-22): the board keeps the OEM outline and sits in its slot.
 
 **Not gates, but cheap and still owed** ([ADR 0007](docs/adr/0007-rail-limit-inferred-not-measured.md))
 

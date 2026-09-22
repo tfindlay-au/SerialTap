@@ -7,6 +7,7 @@
 fp-info-cache
 *.bak
 *~
+~*.lck
 
 # Python
 __pycache__/

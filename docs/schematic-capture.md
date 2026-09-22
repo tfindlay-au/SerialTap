@@ -157,7 +157,7 @@ audit. 28 findings: 2 errors, 2 warnings, 24 informational.
 | `PP-001` U2.VIN1 has no DC path to a rail | **False positive.** `EFUSE_OUT` holds U1.OUT (`power_out`), U2.VIN1 and C2. The DC path runs through U1's pass FET; the rule walks the net graph only and cannot traverse an IC. A current-limited switch between two rails always trips it |
 | `SS-001` BOM under 50% MPN coverage (9/21) | **True, and expected.** The passives are the open gate below |
 | `DS-002` no `datasheets/` directory | **Path convention.** This project keeps vendor PDFs in `lib/datasheets/` beside the symbols that cite them |
-| `UC-002` no ESD/TVS on VBUS at J2 | **Genuine, and open.** See below |
+| `UC-002` no ESD/TVS on VBUS at J2 | **Genuine, and accepted — not fitted** (decided 2026-09-20; see below and open item 2) |
 | `PR-004` no series resistors on USB D+/D− | **Expected.** The C3's USB Serial/JTAG PHY needs none; Espressif's own boards fit none |
 
 **The VBUS finding is worth a decision.** All four ESD channels are committed
@@ -169,6 +169,10 @@ reaches the LM66200 directly, whose inputs are **6 V absolute maximum**
 5.5 V. C3 (1 µF) damps it; nothing clamps it. A single-channel TVS on VBUS
 would close this. Not fitted, because it is a new part and this project pins
 parts deliberately rather than by reflex.
+
+**Decided 2026-09-20, not to be reopened:** USB is used once, to flash the
+board at setup — closer to a Tag-Connect pogo header than to a cabled port. The
+risk is carried knowingly; see open item 2 below.
 
 ### Amended 2026-09-20: J1 pin numbering corrected
 

@@ -186,7 +186,16 @@ gap) are defined there too.
 | Min annular ring | 0.125 mm |
 | Copper to board edge | 0.3 mm (0.5 mm preferred for planes) |
 | Silkscreen to pad | 0.15 mm; no silk over pads |
+| Silkscreen text | **0.8 mm high, 0.15 mm stroke minimum** |
 | Solder mask dam | 0.1 mm min |
+
+**Silkscreen values checked against PCBWay, 2026-09-22.** PCBWay's
+capabilities page gives a minimum legend height of 0.8 mm and a minimum
+character width (stroke) of 0.15 mm; their engineering FAQ asks for 0.2 mm
+silk-to-pad and accepts 0.1 mm where space is tight, and says silk left on a
+pad is clipped off at fabrication. The board's DRC stroke minimum was 0.12 mm —
+**looser than the fab**, so it was raised to 0.15 mm. Height already matched.
+There is no slack to gain by matching PCBWay: their numbers are the floor.
 
 Default widths for non-critical nets:
 
@@ -211,9 +220,50 @@ eFuse limit, so current capacity is never the binding constraint here.
 - Designators readable and unambiguous; none hidden under parts.
 - Keep components ≥3 mm from the board edge where possible.
 - ~~Mounting holes with keepout~~ **N/A — there are none** (measured
-  2026-09-20). The connectors are the board's only mechanical anchorage.
+  2026-09-20). Retention is **not an open question** (decided 2026-09-22): the
+  board keeps the OEM board's 22 × 54 mm outline and sits in the same slot.
 - Test points: 1 mm exposed copper, labelled on silkscreen, reachable with a
   probe without removing the board.
+
+## Recorded exceptions — r1p0 as routed, 2026-09-22
+
+Where the routed board departs from a rule above, the departure is recorded
+here, with the reason, rather than left for a reviewer to rediscover.
+
+1. **The ESD array is not at the JST.** U5 (TPD4E05U06) sits 12.2 mm from
+   J1 and 5.5 mm from J2, footprint centre to centre (measured from the board
+   file 2026-09-22; the `a80c933` note's 9 mm / 3 mm is the gap between
+   parts). One four-channel array serves both connectors, so it cannot sit at
+   both. The order *connector → TVS → 330 Ω → translator* still holds on the
+   UART lines. **Accepted 2026-09-22.**
+2. **The UART from J1 runs on L3, with L1 hops.** Permitted by the stackup
+   (*L3: escape routing*). L3 is adjacent to L2, so the port lines keep an
+   unbroken ground reference; the cost is that they carve a channel through
+   the L3 V5 pour, not the ground plane.
+3. **One TVS stub runs on L3.** The U5 channel assignment (USB on pins 1/2,
+   UART on pins 4/5, swapped in the schematic in `a80c933`) is the only order
+   that routes the USB pair to the array without a crossing; the remaining
+   stub drops to L3.
+4. **CC2 passes under the USB-C body.** Three segments, all on L1, no vias
+   (checked 2026-09-22). The USB4085 shell is metal and grounded, so
+   soldermask is the only insulation between it and the trace. CC2 is a
+   static pull-down strap, not a signal, and USB is used only for setup
+   flashing. Confirm at gate 2 that the trace clears the shell's contact
+   points.
+5. **L4 carries the ten test pads.** They are bare copper with no BOM line —
+   nothing is assembled on L4, so *single-sided assembly* holds — but each pad
+   is a void in the L4 ground pour. L2 remains the unbroken plane the rules
+   require, and L4 is the second return path, so this is accepted.
+6. **Fiducials sit in the right-hand two-thirds only.** FID1 (151.6, 101.3)
+   and FID2 (152.9, 120.5) either side of J1, FID3 (132.6, 111.1) mid-board:
+   an asymmetric triangle ~20 × 19 mm. The only free L1 space at the left end
+   is directly beside the antenna, and antenna keepout outranks fiducial
+   spread. They are `serialtap:Fiducial_1mm_Mask2mm` (KiCad stock, copied
+   in), board-only, and excluded from the BOM and the placement file.
+7. **Two library footprints were trimmed to fit.** Silkscreen only, pads and
+   keepouts untouched: three outline segments off `ESP32-C3-MINI-1` and four
+   off `USB_C_Receptacle_GCT_USB4085`, to clear silk DRC. Made on the board,
+   then written back to `lib/` so the library and the board agree.
 
 ## Pre-release review checklist
 
@@ -223,11 +273,12 @@ eFuse limit, so current capacity is never the binding constraint here.
 - [ ] Switch node area minimised, not poured
 - [ ] Feedback trace clear of SW node and inductor
 - [ ] USB pair: no vias, no plane gap beneath, matched within 5 mm
-- [ ] TVS sits ahead of series resistors, at the connector
+- [ ] TVS sits ahead of series resistors, at the connector (distance to J1 excepted — *Recorded exceptions* 1)
 - [ ] Both VCCA and VCCB decoupled on every translator
 - [ ] No floating translator inputs
 - [ ] All test points present, labelled, accessible
-- [ ] 3 fiducials placed asymmetrically
+- [x] 3 fiducials placed asymmetrically (2026-09-22 — see *Recorded exceptions* 6)
+- [ ] Silkscreen: 0.8 mm / 0.15 mm text, clear of pads and board edge
 - [ ] DRC clean at 5/5 mil, 0.25 mm (`kicad-cli pcb drc`)
 - [ ] `kicad-happy` PCB review clean: thermal vias, plane voids, trace width,
       impedance, DFM score

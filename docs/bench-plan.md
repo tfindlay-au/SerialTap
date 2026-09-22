@@ -378,6 +378,8 @@ Two consequences worth carrying into layout:
    which was chosen to carry insertion force into the board rather than the
    solder joints — it is now carrying *all* of it. Worth a deliberate look at
    how the board is retained in the appliance before fabrication.
+   **Closed 2026-09-22:** the board keeps the OEM outline and sits in the
+   same slot, so the enclosure retains it.
 
 The original list, for anyone repeating this on another unit:
 
