@@ -237,13 +237,17 @@ here, with the reason, rather than left for a reviewer to rediscover.
    both. The order *connector → TVS → 330 Ω → translator* still holds on the
    UART lines. **Accepted 2026-09-22.**
 2. **The UART from J1 runs on L3, with L1 hops.** Permitted by the stackup
-   (*L3: escape routing*). L3 is adjacent to L2, so the port lines keep an
-   unbroken ground reference; the cost is that they carve a channel through
-   the L3 V5 pour, not the ground plane.
-3. **One TVS stub runs on L3.** The U5 channel assignment (USB on pins 1/2,
-   UART on pins 4/5, swapped in the schematic in `a80c933`) is the only order
-   that routes the USB pair to the array without a crossing; the remaining
-   stub drops to L3.
+   (*L3: escape routing*). On this stackup L3 sits 0.21 mm above L4 and
+   1.065 mm below L2, so its return reference is **L4**, not L2 (corrected
+   2026-09-22 — first recorded the wrong way round). The lines carve a
+   channel through the L3 V5 pour, not a ground plane.
+3. **USB D− reaches J2 on L3, through one via.** The U5 channel assignment
+   (USB on pins 1/2, UART on pins 4/5, swapped in the schematic in
+   `a80c933`) lets the pair reach the array without a crossing. From there D+
+   runs to J2 on L1, but D− drops through a via at (138.6, 110.75) and reaches
+   B7 on L3 (corrected 2026-09-22 — first recorded as "a TVS stub on L3"; both
+   TVS stubs are on L1, 2.0 mm on D− and 1.5 mm on D+). See the USB check
+   below the checklist.
 4. **CC2 passes under the USB-C body.** Three segments, all on L1, no vias
    (checked 2026-09-22). The USB4085 shell is metal and grounded, so
    soldermask is the only insulation between it and the trace. CC2 is a
@@ -284,3 +288,35 @@ here, with the reason, rather than left for a reviewer to rediscover.
       impedance, DFM score
 - [ ] `kicad-happy` `pcbway` pre-order checklist passed
 - [ ] Gerbers rendered and visually inspected before upload
+
+### USB pair as routed — measured 2026-09-22
+
+Measured from the board file with KiCad's Python API, not read off the
+drawing. Path: U6 → U5 (ESD, on 2.0 / 1.5 mm stubs) → J2. The main run is L1,
+0.20 mm wide at a 0.20 mm gap, ~30 mm long and tightly coupled.
+
+| Plug orientation | D+ | D− | Mismatch |
+|---|---|---|---|
+| A-side (A6/A7) | 36.84 mm | 40.18 mm + via | 3.34 mm (≈4.7 mm counting the via's 1.33 mm barrel) |
+| B-side (B6/B7) | 38.44 mm | 38.59 mm + via | 0.15 mm (≈1.5 mm with via) |
+
+Against the checklist:
+
+- **Matched within 5 mm: passes**, narrowly, in the worst orientation.
+- **No vias: fails.** One, on D−, at (138.6, 110.75).
+- **No plane gap beneath: fails in two places.** D+'s vertical leg at
+  x = 137.75 runs along the edge of the thermal reliefs of J2's two front
+  shell tabs, losing L2 for roughly 3 mm. And from U5 to J2 the pair splits:
+  D+ runs under the bottom pin row on L1, D− over the top row on L3, both
+  across the pins' antipads and ~2.6 mm apart.
+- **≥0.6 mm from other signals: fails.** The closest aggressors are VBUS pad
+  A9 (0.14 mm), a CC1 trace (0.20 mm) and the BOOT pad (0.45 mm). All three
+  are DC or static nets.
+- **~90 Ω geometry: not met.** An estimate, not a measurement: 0.20/0.20 mm
+  on the provisional 0.21 mm prepreg works out to roughly 105–110 Ω by the
+  IPC-2141 microstrip formula. The rule's 0.13 mm gap was not used.
+
+**What it means electrically:** little. This is USB 1.1 Full Speed. Its
+4–20 ns edges make a 40 mm line electrically short, and a 4.7 mm skew is
+~30 ps against an 83 ns bit. The failures are against the rule as written,
+not against a working link.
