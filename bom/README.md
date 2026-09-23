@@ -148,7 +148,10 @@ Ten pinned parts, per board, cheapest in-stock source, USD:
 | LM66200DRLR | 0.42 |
 | TPS2553DBVR | 0.30 |
 | B05B-XASK-1-A | 0.26 |
-| **Total** | **≈ US$11.46** |
+| **Subtotal, these ten** | **≈ US$11.46** |
+
+The passives and switches bring the **whole board to ≈ US$13.82** (see the
+top of this file); US$11.46 is the actives alone.
 
 For 5 boards + 2 spares (7 pieces): **≈ US$80** in pinned parts — roughly
 US$22 DigiKey, US$44 LCSC, US$15 Mouser.

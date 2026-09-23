@@ -26,28 +26,14 @@ fills in around them.
 | L3 | 5 V and 3V3 pours, plus escape routing |
 | L4 | **Ground.** Second return path and shield under the buck. No components. |
 
-Dielectric thicknesses are **not** symmetric on a standard 1.6 mm 4-layer —
-typically a thin prepreg L1–L2 and a thick core L2–L3. Obtain PCBWay's published
-stackup before computing any trace geometry; the L1–L2 height sets the USB pair
-dimensions.
-
-**Encoded as of 2026-09-12** in `pcb/serialtap-r1p0/serialtap-r1p0.kicad_pcb`:
-four copper layers named per the table above, on a **provisional** asymmetric
-stackup of 0.2104 mm prepreg / 1.065 mm core / 0.2104 mm prepreg, 35 µm outer
-and 17.5 µm inner copper. Those dielectric figures are the usual nominal values
-for a 1.6 mm four-layer board, **not** PCBWay's published stackup — they are
-placed so KiCad has a physically sensible board to work with, and the rule above
-still stands: get the real numbers before computing the USB geometry.
-
-**Replaced with PCBWay's published stackup, 2026-09-24.** From PCBWay's
-[multi-layer laminated structure](https://www.pcbway.com/multi-layer-laminated-structure.html)
-page, standard 4-layer 1.6 mm, 70 % inner residual copper (L2 is a near-solid
-plane, so the high-residual variant fits): 0.5 oz outer base plated to 1 oz
-(35 µm), **7628 RC46 % prepreg 0.1855 mm after lamination, Dk 4.74**, 1 oz
-(35 µm) inner copper, **1.03 mm core, Dk 4.6**, symmetric. Finished
-thickness 1.61 mm ±10 %. Loss tangent is not published; 0.02 is kept.
-Encoded in the board file and confirmed as read back by the analyzer.
-**Order with 1 oz inner copper** — the stackup assumes it.
+**Encoded in `pcb/serialtap-r1p0.kicad_pcb`: PCBWay's published standard
+4-layer 1.6 mm build** ([multi-layer laminated structure](https://www.pcbway.com/multi-layer-laminated-structure.html),
+70 % residual-copper variant, which suits a near-solid L2): 35 µm outer
+(0.5 oz plated to 1 oz), **7628 RC46 % prepreg 0.1855 mm, Dk 4.74**, 35 µm
+(1 oz) inner, **1.03 mm core, Dk 4.6**, symmetric; 1.61 mm finished, ±10 %.
+Loss tangent is unpublished; 0.02 is assumed. **Order with 1 oz inner
+copper** — the stackup assumes it. (Until 2026-09-24 the board carried a
+provisional 0.2104 mm / 1.065 mm / 17.5 µm-inner stackup.)
 
 ## Floorplan
 
@@ -58,16 +44,15 @@ Zones run along the 54 mm axis:
   |<--------------------------- 54 mm --------------------------->|
   +----------------------------------------------------------------+
   | ANTENNA  |  C3-MINI-1  | translators  |   power    |    JST     |  22
-  | overhang |   module     | + TVS + Rs   | OR/eFuse   |  5-pin XA  |  mm
+  | keepout  |   module     | + TVS + Rs   | OR/eFuse   |  5-pin XA  |  mm
   | no copper|              |              | bulk, buck |            |
   +-------------------------------------------[ USB-C ]-------------+
                                                long edge
 ```
 
-- Antenna at one short edge, outline relieved so it overhangs. **Superseded
-  2026-09-22:** the board keeps the OEM rectangle, so the antenna sits 0.25 mm
-  inside the edge with a copper-free keepout on all four layers instead —
-  checked 2026-09-23 under the pre-release checklist.
+- Antenna at one short edge, 0.25 mm inside the OEM rectangle over a
+  copper-free keepout on all four layers. (The first plan relieved the outline
+  so the antenna overhung; keeping the OEM outline, 2026-09-22, ruled it out.)
 - **JST on the far short edge; USB-C on a long edge beside it.** They do not
   both fit across 22 mm: a 5-position XA header is ~14.6 mm and a USB-C
   receptacle ~8.9 mm, which needs ~26 mm with edge clearance between them.
@@ -103,12 +88,9 @@ The module's 231 mm² already includes its antenna end, which is where the
 keepout lives — the keepout does not cost additional area, it constrains what
 may sit *near* it.
 
-**One library gap this exposed:** the `LM66200` footprint has **no courtyard**
-on `F.CrtYd`. Every other footprint has one. KiCad's courtyard-overlap DRC
-check therefore cannot protect U2 during placement — fix before laying out.
-**Fixed** — every footprint on the board has a courtyard (checked 2026-09-23),
-and the `missing_courtyard` DRC check, which had been set to *ignore*, is now
-an *error* so a future footprint cannot slip in without one.
+Every footprint has a courtyard (the `LM66200` one was missing at this
+budget and has since been fixed), and DRC treats a missing courtyard as an
+error, not *ignore* as it first did (2026-09-23).
 
 ## Per-circuit rules
 
@@ -136,9 +118,8 @@ The critical net is not the switch node — it is the **input loop**:
 - **No copper on any layer** — L1, L2, L3, L4 — in the C3-MINI-1's antenna
   keepout. This includes ground pours. Follow Espressif's module datasheet
   keepout dimensions exactly.
-- Module at the board edge with the antenna region overhanging the outline.
-  **Superseded 2026-09-22** by the OEM outline: the antenna end sits 0.25 mm
-  inside the edge, over the all-layer keepout (see *Floorplan*).
+- Module at the board edge, antenna end 0.25 mm inside the outline over the
+  all-layer keepout (see *Floorplan*).
 - Nothing routed on L3 beneath the antenna either.
 - Ring the keepout boundary with ground stitching vias.
 - Installation note for the harness docs: keep ≥15 mm clear of metal.
@@ -190,7 +171,7 @@ JST pin --> TVS array --> 330 Ω series R --> translator B-side
 
 ## Design rules (PCBWay 5/5 mil, 0.2 mm drill)
 
-These are encoded in `pcb/serialtap-r1p0/serialtap-r1p0.kicad_pro` and enforced
+These are encoded in `pcb/serialtap-r1p0.kicad_pro` and enforced
 by `kicad-cli pcb drc` — verified 2026-09-12 by feeding DRC a deliberately
 undersized track and confirming it was rejected against the 0.127 mm minimum.
 Net classes `Default` (0.20 mm), `Power` (0.50 mm) and `USB` (0.20 mm / 0.13 mm
@@ -208,18 +189,12 @@ gap) are defined there too.
 | Silkscreen text | **0.8 mm high, 0.15 mm stroke minimum** |
 | Solder mask dam | 0.1 mm min |
 
-**Drill and annular ring changed 2026-09-24.** The rules had been 0.25 mm
-drill with a 0.125 mm minimum annular ring, and every via was 0.25 / 0.5 mm.
-PCBWay's capabilities page says "For pads with vias in the middle, Min width
-for Annular Ring is 0.15mm(6mil)", so all 110 vias and U3's two thermal vias
-were 0.025 mm short — and DRC could not catch it, because the rule itself
-was 0.125 mm. Fixed by keeping the 0.5 mm pads and drilling 0.2 mm, which
-moves no copper: the alternative, 0.55 mm pads on the 0.25 mm drill, left
-U5's pin-3 GND via 0.004 mm too wide for its corridor between D− and
-PORT_TX. PCBWay charges extra only below 0.2 mm, and 1.6 mm ÷ 0.2 mm is 8:1,
-their standard aspect-ratio limit. The rules are now 0.2 mm minimum drill,
-0.2 / 0.5 mm default via, 0.15 mm minimum annular ring — so DRC enforces the
-fab's number from here on.
+**Drill moved from 0.25 to 0.2 mm, 2026-09-24.** PCBWay's via minimum
+annular ring is 0.15 mm; the old 0.25 / 0.5 mm vias gave 0.125 mm, and DRC
+missed it because its own rule was 0.125 mm. Drilling 0.2 mm on the same
+pads moves no copper (0.55 mm pads would not fit beside U5). PCBWay charges
+extra only below 0.2 mm; 1.6 ÷ 0.2 = 8:1 is their standard aspect-ratio
+limit.
 
 **Silkscreen values checked against PCBWay, 2026-09-22.** PCBWay's
 capabilities page gives a minimum legend height of 0.8 mm and a minimum
@@ -250,11 +225,13 @@ eFuse limit, so current capacity is never the binding constraint here.
   (buck input ceramics, translator decoupling).
 - Pin-1 and polarity markers on silkscreen, still visible after assembly.
 - Designators readable and unambiguous; none hidden under parts.
-- Keep components ≥3 mm from the board edge where possible.
+- Keep components ≥3 mm from the board edge where possible. r1p0 cannot —
+  the OEM outline is full — so the panel is tab-routed with tabs placed away
+  from the parts at the edge (*Review gate 3*).
 - ~~Mounting holes with keepout~~ **N/A — there are none** (measured
   2026-09-20). Retention is **not an open question** (decided 2026-09-22): the
   board keeps the OEM board's 22 × 54 mm outline and sits in the same slot.
-- Test points: 1 mm exposed copper, labelled on silkscreen, reachable with a
+- Test points: 1.5 mm exposed copper pads, labelled on silkscreen, reachable with a
   probe without removing the board.
 
 ## Recorded exceptions — r1p0 as routed, 2026-09-22
@@ -269,28 +246,24 @@ here, with the reason, rather than left for a reviewer to rediscover.
    both. The order *connector → TVS → 330 Ω → translator* still holds on the
    UART lines. **Accepted 2026-09-22.**
 2. **The UART from J1 runs on L3, with L1 hops.** Permitted by the stackup
-   (*L3: escape routing*). On this stackup L3 sits 0.21 mm above L4 and
-   1.065 mm below L2, so its return reference is **L4**, not L2 (corrected
-   2026-09-22 — first recorded the wrong way round). The lines carve a
+   (*L3: escape routing*). On this stackup L3 sits 0.19 mm above L4 and
+   1.03 mm below L2, so its return reference is **L4**, not L2. The lines carve a
    channel through the L3 V5 pour, not a ground plane.
 3. **USB D− reaches J2 on L3, through one via.** The U5 channel assignment
    (USB on pins 1/2, UART on pins 4/5, swapped in the schematic in
-   `a80c933`) lets the pair reach the array without a crossing. From there D+
-   runs to J2 on L1, but D− drops through a via at (138.6, 110.75) and reaches
-   B7 on L3 (corrected 2026-09-22 — first recorded as "a TVS stub on L3"; both
-   TVS stubs are on L1, 2.0 mm on D− and 1.5 mm on D+). See the USB check
-   below the checklist. The via is where D− has to cross D+: J2's pin order
-   is the reverse of U6's, so the crossing is a matter of topology and cannot
-   be designed out on L1 (2026-09-23). The only via-free route would move the
-   layer change into J2's own A6–B6 link and cost ground reference and
-   spacing. At USB Full Speed the via has no electrical effect.
-   **Accepted 2026-09-23.**
+   `a80c933`) lets the pair reach the array without a crossing; both TVS stubs
+   are on L1 (2.0 mm on D−, 1.5 mm on D+). From there D+ runs to J2 on L1,
+   but D− drops through a via at (138.6, 110.75) and reaches B7 on L3. The
+   via is where D− has to cross D+: J2's pin order is the reverse of U6's, so
+   the crossing is topological and cannot be designed out on L1. At USB Full
+   Speed it has no electrical effect. **Accepted 2026-09-23** — see the USB
+   check below the checklist.
 4. **CC2 passes under the USB-C body.** Three segments, all on L1, no vias
    (checked 2026-09-22). The USB4085 shell is metal and grounded, so
    soldermask is the only insulation between it and the trace. CC2 is a
    static pull-down strap, not a signal, and USB is used only for setup
-   flashing. Confirm at gate 2 that the trace clears the shell's contact
-   points.
+   flashing. The shell's four soldered tabs are its only contacts with
+   copper, and CC2 stays ≥1.45 mm from all of them (measured 2026-09-24).
 5. **L4 carries the ten test pads.** They are bare copper with no BOM line —
    nothing is assembled on L4, so *single-sided assembly* holds — but each pad
    is a void in the L4 ground pour. L2 remains the unbroken plane the rules
@@ -323,7 +296,7 @@ and `kicad-cli`), not read off the render. Notes follow the list.
 - [x] All test points present, labelled, accessible
 - [x] 3 fiducials placed asymmetrically (2026-09-22 — see *Recorded exceptions* 6)
 - [x] Silkscreen: 0.8 mm / 0.15 mm text, clear of pads and board edge
-- [x] DRC clean at 5/5 mil, 0.25 mm (`kicad-cli pcb drc`)
+- [x] DRC clean at 5/5 mil, 0.2 mm (`kicad-cli pcb drc`)
 - [x] `kicad-happy` PCB review clean: thermal vias, plane voids, trace width,
       impedance, DFM score (gate 2, 2026-09-24 — no blockers; triage below)
 - [x] `kicad-happy` `pcbway` pre-order checklist passed (gate 3, 2026-09-24 — see below)
@@ -386,51 +359,29 @@ drawing. Path: U6 → U5 (ESD, on 2.0 / 1.5 mm stubs) → J2. The main run is L1
 Against the checklist:
 
 - **Matched within 5 mm: passes**, narrowly, in the worst orientation.
-- **No vias: fails.** One, on D−, at (138.6, 110.75).
-- **No plane gap beneath: fails in one place** (was two — see the
-  2026-09-23 note below). From U5 to J2 the pair splits: D+ runs under the
-  bottom pin row on L1, D− over the top row on L3, both across the pins'
-  antipads and ~2.6 mm apart.
-- **≥0.6 mm from other signals: fails.** The closest aggressors are VBUS pad
-  A9 (0.14 mm), a CC1 trace (0.20 mm) and the BOOT pad (0.45 mm). All three
-  are DC or static nets.
-- **~90 Ω geometry: not met.** An estimate, not a measurement: 0.20/0.20 mm
-  on the provisional 0.21 mm prepreg works out to roughly 105–110 Ω by the
-  IPC-2141 microstrip formula. The rule's 0.13 mm gap was not used.
+- **No vias: excepted** — one, on D−, at (138.6, 110.75); *Recorded
+  exceptions* 3.
+- **No plane gap beneath: fails in one place.** From U5 to J2 the pair
+  splits — D+ under the bottom pin row on L1, D− over the top row on L3 —
+  across the pins' antipads and ~2.6 mm apart.
+- **≥0.6 mm from other signals: fails.** Closest are VBUS pad A9 (0.14 mm), a
+  CC1 trace (0.20 mm) and the BOOT pad (0.45 mm) — all DC or static nets.
+- **~90 Ω geometry: not met.** Estimated ~101 Ω on the PCBWay stackup (*Review
+  gate 2*), inside USB's ±15 %. The rule's 0.13 mm gap was not used.
 
-**What it means electrically:** little. This is USB 1.1 Full Speed. Its
-4–20 ns edges make a 40 mm line electrically short, and a 4.7 mm skew is
-~30 ps against an 83 ns bit. The failures are against the rule as written,
-not against a working link.
+**What it means electrically:** little. At USB 1.1 Full Speed, 4–20 ns edges
+make a 40 mm line electrically short, and a 4.7 mm skew is ~30 ps against an
+83 ns bit. The failures are against the rule as written, not a working link.
 
-**Vertical legs moved clear of the shell tabs, 2026-09-23.** D+'s vertical leg
-ran at x = 137.75 along the thermal reliefs of J2's two front shell tabs and
-lost L2 for 3.15 mm of a 5.05 mm span (63 of 129 samples at 0.05 mm). Both legs
-moved 0.95 mm west, to x = 136.80 (D+) and 136.40 (D−), keeping the 0.20 mm
-gap. The GND stitching via at (136.5, 106.0) sat on the new path and moved to
-(135.5, 106.0); it carries no track, only L2–L4. Re-measured with the same
-scripts: every sample along both legs now has L2 beneath it, lengths are
-unchanged (the top run shortens by what the bottom run gains), and DRC stays at
-0 violations, 0 unconnected, 0 parity.
-
-**Fix (b) as proposed does not work.** Checked 2026-09-23. The proposal was to
-land D− on A7 on L1, beside D+. The problem is topology, not spacing. Heading
-away from U6, the pair carries D+ on its left. J2 wants D− on the left, from
-whichever side and direction the pair reaches either pin row: the receptacle
-reverses U6's order. U5 is also a branch off the pair, and one line has to
-pass the other to reach it. So a pair that stays together as far as J2 needs
-one crossing. On one signal layer, a crossing is a via, and the via at
-(138.6, 110.75) is that crossing.
-
-**The only via-free route splits the pair at the connector.** D+ alone goes
-through the 0.55 mm corridor between the shell tab at (138.45, 107.53) and A12, and along
-the channel between the pin rows to B6. D− lands on A7 from below, and U5's
-D+ is fed on a stub from A6. Measured on the board as it stands: this route
-has no L2 under D+ for 1.60 of 6.20 mm, against 0.95 of 5.70 mm today. It runs
-0.175–0.225 mm from GND, VBUS, SBU1 and CC2 pads. U5 would sit on a ~3.6 mm
-stub. And in A-side orientation, D+ would still reach A6 through the A6–B6
-link on L3. The layer change would move into J2's own pin barrels, not go
-away. **Not made:** the via is kept, and accepted as *Recorded exceptions* 3.
+**Changes, 2026-09-23.** D+'s vertical leg ran along the thermal reliefs of
+J2's front shell tabs and lost L2 for 3.15 mm; both legs moved 0.95 mm west
+(D+ x = 136.80, D− 136.40), and the GND stitching via in their way moved from
+(136.5, 106.0) to (135.5, 106.0). Lengths unchanged, L2 now under both legs.
+Removing the D− via was examined and rejected: with the pair kept together,
+J2's reversed pin order forces one crossing, and the only via-free route
+splits the pair at the connector — worse ground reference (no L2 for 1.60 mm
+against 0.95 mm), 0.18–0.23 mm to neighbouring pads, a ~3.6 mm stub to U5,
+and a layer change that merely moves into J2's A6–B6 link.
 
 ## Review gate 2 — kicad-happy after layout, 2026-09-24
 
@@ -449,13 +400,10 @@ against the board file before it was kept; the triage:
   the same J2 pin field or J1's pins. DC or static nets.
 
 **Real, new, and acted on or open**
-- **Stackup.** PCBWay's published standard 4-layer 1.6 mm build is 7628
-  prepreg at **0.1855 mm** after lamination, Dk 4.74, over a 1.03 mm core,
-  Dk 4.6, with **1 oz inner copper**; the board encoded the provisional
-  0.2104 mm and 17.5 µm inner. **Updated 2026-09-24** (see *Stackup*); DRC
-  unchanged at 0 / 0 / 0. The analyzer's per-segment impedance reads
-  49.7 Ω on every USB segment, L1 and L3 alike, with no width recorded — a
-  placeholder, not a stackup calculation, and not used here.
+- **Stackup.** The board carried a provisional stackup; it now carries
+  PCBWay's published one (see *Stackup*). DRC unchanged. The analyzer's
+  per-segment impedance (49.7 Ω on every USB segment, L1 and L3 alike) is a
+  placeholder, not a stackup calculation, and is not used here.
 - **USB impedance, estimated** (IPC-2141 microstrip formula, not a field
   solver; Hammerstad agrees within a few ohms): the as-routed 0.20 / 0.20 mm
   pair is **~101 Ω** on the PCBWay
@@ -479,7 +427,7 @@ against the board file before it was kept; the triage:
   pattern shows; the analyzer scores each sub-pad as a separate exposed pad.
 - *Via in pad, untented* (VP-001): board vias are tented both sides by
   default. The flagged ones are inside U6's GND sub-pads (back still tented;
-  0.25 mm holes) and inside the bare L4 test pads (nothing soldered).
+  0.2 mm holes) and inside the bare L4 test pads (nothing soldered).
 - *Missing stitching via at layer change* (RP-001) on UART, BOOT, EN, PG,
   CC and V5: DC, static, or 230 kbaud signals.
 - *Trace width below IPC-2221 at 10 °C rise* (on the provisional 17.5 µm
@@ -496,9 +444,9 @@ against the board file before it was kept; the triage:
 **Thermal, by hand** (the analyzer skipped it for want of power data): U3
 dissipates ~0.12–0.15 W at 335 mA, assuming 88–90 % efficiency. TI's θJA of
 61.8 °C/W (DSG, datasheet §7.4) gives a 6–9 °C rise. U1 and U2 each dissipate
-tens of milliwatts at most. **DFM** (PCBWay 5/5 mil, 0.25 mm): 0 violations,
-0.161 mm minimum spacing, 0.125 mm annular ring — **which gate 3 found is
-below PCBWay's via minimum**; see *Review gate 3*.
+tens of milliwatts at most. **DFM**: 0 violations, 0.161 mm minimum
+spacing — but the analyzer accepted the 0.125 mm via ring that gate 3 then
+found below PCBWay's minimum.
 
 ## Review gate 3 — PCBWay pre-order, 2026-09-24
 

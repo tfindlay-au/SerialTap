@@ -106,119 +106,29 @@ be justified on its own terms, it is not a convention worth keeping.
 
 ## Current state
 
-Design documented, nothing built — but the toolchain is now exercised rather
-than assumed, and it cost a rewrite: see
-[ADR 0005](docs/adr/0005-kicad-native-capture.md).
+**r1p0 is ready to order; nothing is built yet.** Every stage below is done and
+recorded — the detail lives in the linked documents, not here.
 
-**Done**
+| Stage | State | Record |
+|---|---|---|
+| Power-path simulation | `rail-sag`, `inrush` and `buck-load-step` pass. The appliance rail must supply **300–370 mA**; 470 µF bulk is right; the buck holds a 40 → 335 mA step with ≥285 mV margin | [sim/README.md](sim/README.md) |
+| Protocol | **GEA3**, confirmed two-way 2026-09-19 — no hardware consequence | [ADR 0006](docs/adr/0006-gea3-not-hon.md), [docs/gea3.md](docs/gea3.md) |
+| Parts | **All 22 BOM lines pinned** by MPN with footprint and datasheet; ~US$13.82/board; C4 is the thinnest line (single source) | [bom/README.md](bom/README.md), SPDD §7.4 |
+| Library | Complete and in-repo: every footprint has a 3D model and a courtyard | [lib/README.md](lib/README.md) |
+| Schematic | Hand-drawn, KiCad 10, ERC clean, netlist checked against every invariant. `RILIM` 66.5 kΩ (351–449 mA). No TVS on USB VBUS — **decided** | [docs/schematic-capture.md](docs/schematic-capture.md) |
+| Layout | Placed and routed; DRC 0 / 0 / 0 with schematic parity; PCBWay stackup (1 oz inner); vias 0.2 / 0.5 mm. Departures recorded as exceptions — notably **one via on USB D−**, which topology forces | [docs/layout-rules.md](docs/layout-rules.md) |
+| Review gates | kicad-happy gate 1 (schematic), gate 2 (layout — no blockers) and gate 3 (PCBWay pre-order — via ring fixed) all run | [schematic-capture.md](docs/schematic-capture.md), [layout-rules.md](docs/layout-rules.md) |
+| Mechanical | 22 × 54 mm, **no mounting holes**; the board keeps the OEM outline and sits in its slot | [bench-plan Part 3](docs/bench-plan.md) |
 
-- `sim/rail-sag` and `sim/inrush` (2026-09-12, **both re-run 2026-09-20**). The
-  appliance rail must supply **300–370 mA**, not the 250 mA originally assumed;
-  470 µF is the right bulk value and more capacitance would not rescue a weak
-  rail. Both decks were found **unrunnable in a clean checkout** and are now
-  fixed: `models/behavioral.lib` had been deleted by accident, and `rail-sag`
-  set a 0 Ω resistor that LTspice rejects outright. No conclusion reversed. See
-  [sim/README.md](sim/README.md)
-- The service connector is a **5-pin JST XA**, not 4-pin (2026-09-12)
-- KiCad project set up and verified: 4-layer stackup, DRC rules from
-  [layout-rules.md](docs/layout-rules.md) confirmed *enforced*, ERC and DRC both
-  clean and running
-- **Every major active is pinned by MPN with reasoning** (SPDD §7.4): buck
-  TPS62162, inductor XGL4020-222MEC, translator TXU0204, eFuse TPS2553,
-  ideal-diode OR LM66200, ESD array TPD4E05U06QDQARQ1, module
-  ESP32-C3-MINI-1-H4X, bulk PCL1A471MCL1GS, both connectors
-- **The protocol is GE Appliances GEA3, not hOn** (2026-09-19). Decoded, then
-  confirmed two-way on the appliance. Public, with a C library and an existing
-  ESPHome component. No hardware consequence, and it *validates* ADR 0001.
-  [ADR 0006](docs/adr/0006-gea3-not-hon.md), [docs/gea3.md](docs/gea3.md)
-- **The rail load test no longer gates fabrication** (2026-09-19). Its only
-  design output was one resistor. [ADR 0007](docs/adr/0007-rail-limit-inferred-not-measured.md)
-- **The passives and switches are pinned** (2026-09-20). Chosen as two consistent families
-  rather than line by line, and every choice datasheet-backed: X7R at ≥25 V
-  throughout because the TPS62162's stability table assumes DC-bias variation
-  stays inside ±20%, and 1% resistors throughout because the eFuse's `RILIM`
-  requires it. Capture also lost the bulk capacitor's own symbol — C4 was
-  drawn with the generic `C`, costing its MPN, footprint and polarity marking.
-  Fixed, and test pads are now excluded from the BOM rather than appearing as
-  ten phantom purchases
-- **The service connector was being read from the wrong end** (2026-09-20).
-  Corrected everywhere: the order is 5 V, TX, RX, spare, GND, and old pin *n*
-  is new pin *6 − n*. Nothing measured changed — the bench voltages and the
-  5.84/4.62 kΩ bias readings were taken against physical pins — but every
-  document that cited a pin number did. Direction is now settled by the working
-  TinyS3 link rather than inference: TinyS3 TX drives pin 2, pin 3 drives
-  TinyS3 RX. The schematic was rewired to match
-- **The schematic exists** (2026-09-20). Drawn by hand into
-  `pcb/serialtap-r1p0.kicad_sch` from
-  [docs/schematic-capture.md](docs/schematic-capture.md), which Codex left as
-  the wiring contract. ERC clean, netlist-checked against every invariant, and
-  `RILIM` now has a value: **66.5 kΩ 1%**, a 351–449 mA limit once tolerance is
-  counted — above the board's 250 mA peak, below the rail's OEM-implied
-  capability. `FAULT`, `PG` and `ST` go to test pads, not GPIOs
-- **Every pinned part is sourceable, and the eFuse blocker is retired**
-  (2026-09-20). `TPS2553DBVR` — the plain non-latching part — is stocked at LCSC
-  (44k) and Mouser (882); Digi-Key is out until 2026-10-26, which is what the
-  2026-09-19 check actually saw. No single distributor can fill the board, and
-  the thinnest line is now the Nichicon bulk cap at 69 pieces in one place.
-  ~US$11.46/board. [bom/README.md](bom/README.md)
+**Next:** upload `pcb/fab/serialtap-r1p0/` to PCBWay, inspect their gerber
+viewer, re-check C4 and U5 stock, and order with the specification in
+[layout-rules.md § Review gate 3](docs/layout-rules.md#review-gate-3--pcbway-pre-order-2026-09-24).
 
-**Gates to fabrication**
+**Still owed, not gating** ([ADR 0007](docs/adr/0007-rail-limit-inferred-not-measured.md)):
 
-1. **Project library.** ~~Gate~~ **Closed.** Complete for every pinned part as
-   of 2026-09-19 and validating under `kicad-cli`: 10 footprints, a 3D model on
-   every footprint, nothing referencing outside the repo. Grown to 23 symbols on
-   2026-09-20 with the generics capture needed (R, C, LED, switch, test point,
-   power symbols), all copied in from KiCad 10 rather than referenced
-2. **Remaining part detail.** ~~Gate~~ **Closed 2026-09-20.** **All 22 BOM
-   lines carry an MPN, a footprint and a datasheet.** One KOA RK73H series for
-   every resistor value, one Samsung CL series in X7R ≥25 V for every ceramic,
-   a Lite-On LED chosen for temperature grade over brightness, and C&K
-   `KMR211NGLFS` switches. Board cost ~US$13.82 ([bom/](bom/)). The switch
-   datasheet moved R9 from 10 kΩ to 2.2 kΩ — C&K specify a 1 mA minimum contact
-   current and a 10 kΩ pull-up would have switched 0.33 mA (SPDD §7.4)
-3. **Schematic capture.** ~~Gate~~ **Closed 2026-09-20.** 43 components, 57
-   nets, one A3 sheet, KiCad 10 native. `kicad-cli sch erc --severity-all`: 0
-   violations, and every review invariant checked against the *extracted
-   netlist* rather than the drawing. `kicad-happy` review gate 1 run: 2 errors
-   and 2 warnings, triaged in
-   [docs/schematic-capture.md](docs/schematic-capture.md) — one is real (no TVS
-   on USB VBUS, which reaches the LM66200's 6 V absolute maximum unclamped) and
-   one is the passives above. The VBUS TVS is **decided: not fitted**
-   (2026-09-20) — USB is a one-off flashing interface, like a pogo header
-4. **`sim/buck-load-step`** — corrected 2026-09-20 with fixed-output TPS62162
-   `FB` tied to AGND. It passes the 40 → 335 mA load step with ≥285 mV margin.
-5. **Layout.** Placed and routed 2026-09-22 (`a80c933`): DRC shows
-   silkscreen findings only, with 0 unconnected and 0 schematic-parity issues.
-   The departures from the layout rules are recorded in
-   [layout-rules.md](docs/layout-rules.md#recorded-exceptions--r1p0-as-routed-2026-09-22).
-   Since then (2026-09-23/24): silkscreen DRC cleared, fiducials placed, the
-   USB pair's legs moved off the shell-tab reliefs, U3's VOS rerouted to sense
-   at C6, the stackup set to **PCBWay's published 7628 / 1 oz-inner build**,
-   and every hand-checkable item on the pre-release checklist passed except the
-   USB pair, which stands as a recorded exception (the D− via). DRC 0 / 0 / 0. **Review gate 2 run: no blockers**
-   ([triage](docs/layout-rules.md#review-gate-2--kicad-happy-after-layout-2026-09-24)).
-   **Review gate 3 run 2026-09-24:** one real defect, fixed. The via annular
-   ring was 0.125 mm against PCBWay's 0.15 mm minimum, so vias are now drilled
-   0.2 mm. The fab package, order specification and panel/tab notes are in
-   [layout-rules.md](docs/layout-rules.md#review-gate-3--pcbway-pre-order-2026-09-24).
-   Still to do: inspect the gerbers in PCBWay's viewer after upload, then order
-
-**Mechanical, measured 2026-09-20:** 22 × 54 mm confirmed with calipers, **no
-mounting holes**, no intrusions, and connector placement unconstrained. That
-closes bench-plan Part 3 and frees the floorplan. Retention is **not** an open
-question (2026-09-22): the board keeps the OEM outline and sits in its slot.
-
-**Not gates, but cheap and still owed** ([ADR 0007](docs/adr/0007-rail-limit-inferred-not-measured.md))
-
-- A meter in series with the TinyS3's 5 V lead. First measured current in the
-  project. Needs no added load
+- A meter in series with the TinyS3's 5 V lead — the project's first measured
+  current. Needs no added load
 - Cold power-cycle the appliance twice. The board needed a manual reset on its
-  first power-up from the rail and that is unexplained. The one open item that
-  could still change the design
-- RX pull-up measurement **complete**: 5.84/5.80 kΩ to GND and 4.62 kΩ to 5 V;
-  both UART series resistors are now 330 Ω, 1%
-- ~~Connector pin-order direction~~ **Settled 2026-09-20.** The connector had
-  been read from the wrong end: the order is **5 V, TX, RX, spare, GND**, and
-  direction comes from the working TinyS3 link, not inference. Every document
-  in the repo now uses the corrected numbers. What **pin 4** carries is still
-  unknown, and still blocks only the harness
+  first power-up from the rail, unexplained — **the one open item that could
+  still change the design**
+- What connector **pin 4** carries is unknown; it blocks only the harness

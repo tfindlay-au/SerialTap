@@ -437,14 +437,14 @@ matters most for an open-hardware release.
 
 | Parameter | Value |
 |---|---|
-| Stackup | 4-layer: L1 signal+parts / L2 GND / L3 rails+escapes / L4 GND |
+| Stackup | 4-layer: L1 signal+parts / L2 GND / L3 rails+escapes / L4 GND, on PCBWay's standard 1.6 mm build with 1 oz inner copper |
 | Outline | **22 × 54 mm** — drop-in for the OEM Haier board. JST on one short edge, USB-C on an adjacent long edge, antenna at the far short edge |
 | Fab class | PCBWay 5/5 mil, 0.2 mm drill (0.25 mm until 2026-09-24 — see layout-rules.md) |
-| Impedance | Not controlled; USB pair geometry targeted from the stackup |
-| Assembly | Single-sided, all parts on top. All SMD except the JST XA port connector, which is through-hole and needs a selective- or hand-solder step |
+| Impedance | Not controlled; USB pair estimated at ~101 Ω on the real stackup |
+| Assembly | Single-sided, all parts on top. All SMD except the JST XA port connector and the USB-C receptacle, which are through-hole and need a selective- or hand-solder step |
 | Quantity | 5 (first run) |
 | Enclosure | None — bare board |
-| Mounting | Mounting holes |
+| Mounting | None — no mounting holes; the board sits in the OEM board's slot (measured 2026-09-20) |
 | Antenna | C3-MINI-1 placed at a board edge, keepout on all layers, buck switching node kept clear |
 
 4 layers because the switcher and a PCB antenna share a small board; a solid
@@ -458,8 +458,9 @@ circuits deserve real rules — the buck's input hot loop, the antenna keepout,
 and the USB pair — and the ground plane is never split.
 
 The C3's USB is Full Speed (12 Mbps), so controlled impedance is not ordered;
-the pair is still routed as a proper pair with ~90 Ω geometry derived from
-PCBWay's published stackup, because doing so costs nothing.
+the pair is still routed as a proper, tightly coupled pair. Its 0.20 / 0.20 mm
+geometry comes out at ~101 Ω on PCBWay's published stackup, an estimate that
+is inside USB's 90 Ω ±15 % (see layout-rules.md, review gate 2).
 
 Bare board is a deliberate choice. It means exposed electronics near HVAC
 condensate and mains wiring — acceptable for a personal install, not for
