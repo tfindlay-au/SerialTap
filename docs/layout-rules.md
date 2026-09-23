@@ -247,7 +247,12 @@ here, with the reason, rather than left for a reviewer to rediscover.
    runs to J2 on L1, but D− drops through a via at (138.6, 110.75) and reaches
    B7 on L3 (corrected 2026-09-22 — first recorded as "a TVS stub on L3"; both
    TVS stubs are on L1, 2.0 mm on D− and 1.5 mm on D+). See the USB check
-   below the checklist.
+   below the checklist. The via is where D− has to cross D+: J2's pin order
+   is the reverse of U6's, so the crossing is a matter of topology and cannot
+   be designed out on L1 (2026-09-23). The only via-free route would move the
+   layer change into J2's own A6–B6 link and cost ground reference and
+   spacing. At USB Full Speed the via has no electrical effect.
+   **Accepted 2026-09-23.**
 4. **CC2 passes under the USB-C body.** Three segments, all on L1, no vias
    (checked 2026-09-22). The USB4085 shell is metal and grounded, so
    soldermask is the only insulation between it and the trace. CC2 is a
@@ -276,7 +281,7 @@ here, with the reason, rather than left for a reviewer to rediscover.
 - [ ] Buck input loop contains no vias; ceramic within 2 mm of the IC
 - [ ] Switch node area minimised, not poured
 - [ ] Feedback trace clear of SW node and inductor
-- [ ] USB pair: no vias, no plane gap beneath, matched within 5 mm
+- [ ] USB pair: no vias, no plane gap beneath, matched within 5 mm (one via on D− excepted — *Recorded exceptions* 3)
 - [ ] TVS sits ahead of series resistors, at the connector (distance to J1 excepted — *Recorded exceptions* 1)
 - [ ] Both VCCA and VCCB decoupled on every translator
 - [ ] No floating translator inputs
@@ -304,11 +309,10 @@ Against the checklist:
 
 - **Matched within 5 mm: passes**, narrowly, in the worst orientation.
 - **No vias: fails.** One, on D−, at (138.6, 110.75).
-- **No plane gap beneath: fails in two places.** D+'s vertical leg at
-  x = 137.75 runs along the edge of the thermal reliefs of J2's two front
-  shell tabs, losing L2 for roughly 3 mm. And from U5 to J2 the pair splits:
-  D+ runs under the bottom pin row on L1, D− over the top row on L3, both
-  across the pins' antipads and ~2.6 mm apart.
+- **No plane gap beneath: fails in one place** (was two — see the
+  2026-09-23 note below). From U5 to J2 the pair splits: D+ runs under the
+  bottom pin row on L1, D− over the top row on L3, both across the pins'
+  antipads and ~2.6 mm apart.
 - **≥0.6 mm from other signals: fails.** The closest aggressors are VBUS pad
   A9 (0.14 mm), a CC1 trace (0.20 mm) and the BOOT pad (0.45 mm). All three
   are DC or static nets.
@@ -320,3 +324,32 @@ Against the checklist:
 4–20 ns edges make a 40 mm line electrically short, and a 4.7 mm skew is
 ~30 ps against an 83 ns bit. The failures are against the rule as written,
 not against a working link.
+
+**Vertical legs moved clear of the shell tabs, 2026-09-23.** D+'s vertical leg
+ran at x = 137.75 along the thermal reliefs of J2's two front shell tabs and
+lost L2 for 3.15 mm of a 5.05 mm span (63 of 129 samples at 0.05 mm). Both legs
+moved 0.95 mm west, to x = 136.80 (D+) and 136.40 (D−), keeping the 0.20 mm
+gap. The GND stitching via at (136.5, 106.0) sat on the new path and moved to
+(135.5, 106.0); it carries no track, only L2–L4. Re-measured with the same
+scripts: every sample along both legs now has L2 beneath it, lengths are
+unchanged (the top run shortens by what the bottom run gains), and DRC stays at
+0 violations, 0 unconnected, 0 parity.
+
+**Fix (b) as proposed does not work.** Checked 2026-09-23. The proposal was to
+land D− on A7 on L1, beside D+. The problem is topology, not spacing. Heading
+away from U6, the pair carries D+ on its left. J2 wants D− on the left, from
+whichever side and direction the pair reaches either pin row: the receptacle
+reverses U6's order. U5 is also a branch off the pair, and one line has to
+pass the other to reach it. So a pair that stays together as far as J2 needs
+one crossing. On one signal layer, a crossing is a via, and the via at
+(138.6, 110.75) is that crossing.
+
+**The only via-free route splits the pair at the connector.** D+ alone goes
+through the 0.55 mm corridor between the shell tab at (138.45, 107.53) and A12, and along
+the channel between the pin rows to B6. D− lands on A7 from below, and U5's
+D+ is fed on a stub from A6. Measured on the board as it stands: this route
+has no L2 under D+ for 1.60 of 6.20 mm, against 0.95 of 5.70 mm today. It runs
+0.175–0.225 mm from GND, VBUS, SBU1 and CC2 pads. U5 would sit on a ~3.6 mm
+stub. And in A-side orientation, D+ would still reach A6 through the A6–B6
+link on L3. The layer change would move into J2's own pin barrels, not go
+away. **Not made:** the via is kept, and accepted as *Recorded exceptions* 3.

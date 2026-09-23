@@ -11741,7 +11741,7 @@
 		(uuid "b943b722-584c-49a7-9d3d-bd453b4f9f1f")
 	)
 	(via
-		(at 136.5 106)
+		(at 135.5 106)
 		(size 0.5)
 		(drill 0.25)
 		(layers "F.Cu" "B.Cu")
@@ -12693,7 +12693,7 @@
 		(uuid "e4088086-6f3d-46a4-9662-a3531587dc69")
 	)
 	(segment
-		(start 137.35 110.75)
+		(start 136.4 110.75)
 		(end 140.62 110.75)
 		(width 0.2)
 		(layer "F.Cu")
@@ -12701,8 +12701,8 @@
 		(uuid "0aa1700f-fa87-46a8-ac18-4b9525b3e391")
 	)
 	(segment
-		(start 137.35 104.25)
-		(end 137.35 110.75)
+		(start 136.4 104.25)
+		(end 136.4 110.75)
 		(width 0.2)
 		(layer "F.Cu")
 		(net "/USB_DM")
@@ -12710,7 +12710,7 @@
 	)
 	(segment
 		(start 116.4 104.25)
-		(end 137.35 104.25)
+		(end 136.4 104.25)
 		(width 0.2)
 		(layer "F.Cu")
 		(net "/USB_DM")
@@ -12790,14 +12790,14 @@
 	)
 	(segment
 		(start 115.6 103.85)
-		(end 137.75 103.85)
+		(end 136.8 103.85)
 		(width 0.2)
 		(layer "F.Cu")
 		(net "/USB_DP")
 		(uuid "6c1b5fa0-571a-4c52-8fc9-9b455f464bea")
 	)
 	(segment
-		(start 137.75 110.25)
+		(start 136.8 110.25)
 		(end 140.62 110.25)
 		(width 0.2)
 		(layer "F.Cu")
@@ -12821,8 +12821,8 @@
 		(uuid "891de6c3-bb77-45db-bd72-e4f052563456")
 	)
 	(segment
-		(start 137.75 103.85)
-		(end 137.75 110.25)
+		(start 136.8 103.85)
+		(end 136.8 110.25)
 		(width 0.2)
 		(layer "F.Cu")
 		(net "/USB_DP")
