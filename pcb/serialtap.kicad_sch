@@ -6,7 +6,7 @@
 	(paper "A3")
 	(title_block
 		(title "SerialTap")
-		(rev "r1p0")
+		(rev "")
 		(comment 1 "Appliance 5 V serial service port -> Home Assistant")
 		(comment 2 "Capture is the source of truth - see docs/adr/0005-kicad-native-capture.md")
 		(comment 3 "Copyright 2026 Timothy Findlay. Licensed under CERN-OHL-P v2.")
@@ -8335,7 +8335,7 @@
 			(uuid "e6da8889-dece-437a-8f37-b72296390d85")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "C11")
 					(unit 1)
@@ -8417,7 +8417,7 @@
 			(uuid "fecf5334-ef92-4276-8945-48326143f179")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR04")
 					(unit 1)
@@ -8570,7 +8570,7 @@
 			(uuid "3923d088-533c-4edc-82e7-510eb64211ad")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "J2")
 					(unit 1)
@@ -8831,7 +8831,7 @@
 			(uuid "bfe44142-ea3b-4bf0-8755-391b15121941")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "U6")
 					(unit 1)
@@ -8913,7 +8913,7 @@
 			(uuid "7ee874bf-3357-4a9d-82ee-091624b1ca1f")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR14")
 					(unit 1)
@@ -8996,7 +8996,7 @@
 			(uuid "c2a47026-782a-4970-8c68-dd6420b1d0e2")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#FLG1")
 					(unit 1)
@@ -9125,7 +9125,7 @@
 			(uuid "9505e574-f6ce-414c-8a76-4edef3556581")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "U3")
 					(unit 1)
@@ -9207,7 +9207,7 @@
 			(uuid "223b580f-999a-458c-8eca-397fc01da3de")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR23")
 					(unit 1)
@@ -9315,7 +9315,7 @@
 			(uuid "8af8c0c8-3843-4e88-8bd4-04a3b9f8cf14")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "R6")
 					(unit 1)
@@ -9397,7 +9397,7 @@
 			(uuid "95631ca7-19a6-468a-8eb6-1ec8f304ad42")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR22")
 					(unit 1)
@@ -9479,7 +9479,7 @@
 			(uuid "ebf3e394-b48e-40fd-8c95-eddd3b9135dd")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR42")
 					(unit 1)
@@ -9561,7 +9561,7 @@
 			(uuid "40644be9-2b4f-426d-8174-3d01a0160e76")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR25")
 					(unit 1)
@@ -9643,7 +9643,7 @@
 			(uuid "d12184ee-ae5b-424c-8ed1-0739b1924026")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR61")
 					(unit 1)
@@ -9725,7 +9725,7 @@
 			(uuid "85c61e12-0bbc-473c-88cd-f312e2bfb9ba")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "TP6")
 					(unit 1)
@@ -9807,7 +9807,7 @@
 			(uuid "a013235b-d077-46a8-84ce-4e2b7bc32700")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR29")
 					(unit 1)
@@ -9913,7 +9913,7 @@
 			(uuid "5c925900-d78d-4b58-8963-8832ddcd108a")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "C3")
 					(unit 1)
@@ -9995,7 +9995,7 @@
 			(uuid "abb9c773-f44b-44d8-84dc-10d14f94b355")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR40")
 					(unit 1)
@@ -10077,7 +10077,7 @@
 			(uuid "8cef4b6a-7403-4597-8854-bcb785904de0")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR01")
 					(unit 1)
@@ -10159,7 +10159,7 @@
 			(uuid "c1167e2b-dbcf-42b5-84d5-10e8ff3cd35d")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR12")
 					(unit 1)
@@ -10241,7 +10241,7 @@
 			(uuid "fa11b0a4-5dd3-4b03-8a21-a8ee00484c5a")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR06")
 					(unit 1)
@@ -10377,7 +10377,7 @@
 			(uuid "0d8010c5-b76d-4bc3-8e67-baf14f5f6aaf")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "U4")
 					(unit 1)
@@ -10483,7 +10483,7 @@
 			(uuid "b09f3db5-1aec-4a63-870a-55890fa32b29")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "C7")
 					(unit 1)
@@ -10565,7 +10565,7 @@
 			(uuid "72200799-b1e5-4f9e-8187-1e55dafc557e")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR16")
 					(unit 1)
@@ -10647,7 +10647,7 @@
 			(uuid "b300839b-5443-46c7-829e-db1e3f581edf")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "TP5")
 					(unit 1)
@@ -10755,7 +10755,7 @@
 			(uuid "80307d3a-e544-4285-8cb5-525983b78b86")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "R9")
 					(unit 1)
@@ -10837,7 +10837,7 @@
 			(uuid "df0a05bb-fc19-4614-8ad1-964c5ec166c3")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR56")
 					(unit 1)
@@ -10919,7 +10919,7 @@
 			(uuid "a56b07ea-f43a-4e21-8b3c-f874324bc152")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR52")
 					(unit 1)
@@ -11001,7 +11001,7 @@
 			(uuid "4975ee8d-6729-455b-8eed-8d2c780ca8fb")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR28")
 					(unit 1)
@@ -11083,7 +11083,7 @@
 			(uuid "dab2e243-1eab-4732-8dc1-780e9bdbd2d7")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR20")
 					(unit 1)
@@ -11201,7 +11201,7 @@
 			(uuid "abd6266c-5209-4f49-86c3-ea1878e0c207")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "U1")
 					(unit 1)
@@ -11326,7 +11326,7 @@
 			(uuid "5753b40b-89b0-4fce-8c90-a90a4bd1044d")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "U2")
 					(unit 1)
@@ -11434,7 +11434,7 @@
 			(uuid "1762c9e5-6522-4efe-8a19-77c2c81df429")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "D1")
 					(unit 1)
@@ -11516,7 +11516,7 @@
 			(uuid "8d42dc82-2705-4340-8133-88450451444c")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR07")
 					(unit 1)
@@ -11598,7 +11598,7 @@
 			(uuid "1d4ffbd3-8c45-4708-8349-0543c106eddb")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR63")
 					(unit 1)
@@ -11680,7 +11680,7 @@
 			(uuid "3bdda7bc-43ce-44bc-83bd-603814e5fd92")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR65")
 					(unit 1)
@@ -11762,7 +11762,7 @@
 			(uuid "2e040c69-a12f-4639-8ec9-b61ccf23b50c")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR34")
 					(unit 1)
@@ -11844,7 +11844,7 @@
 			(uuid "095c7f0d-ab11-46e4-870a-faac934ff07f")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR31")
 					(unit 1)
@@ -11926,7 +11926,7 @@
 			(uuid "13c9d9b2-4c7f-4a5e-8d7f-cf8457ede2dc")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR48")
 					(unit 1)
@@ -12008,7 +12008,7 @@
 			(uuid "d03ffb0a-32bf-49ca-8770-15f9b7fbd525")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR64")
 					(unit 1)
@@ -12090,7 +12090,7 @@
 			(uuid "ff2c5d9f-a6b4-4b78-8316-5528d6de55bd")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR35")
 					(unit 1)
@@ -12196,7 +12196,7 @@
 			(uuid "1d9f0343-1b72-4b2e-8f6f-dedbd112c0b0")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "C1")
 					(unit 1)
@@ -12278,7 +12278,7 @@
 			(uuid "fce01284-a280-4140-8a4d-04cdbc1131d7")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR13")
 					(unit 1)
@@ -12384,7 +12384,7 @@
 			(uuid "9ec4372f-fbcb-4842-8dcb-f9f1b3423e70")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "C10")
 					(unit 1)
@@ -12466,7 +12466,7 @@
 			(uuid "0c77181b-d5a5-46be-808c-b2d9f248a7da")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR41")
 					(unit 1)
@@ -12548,7 +12548,7 @@
 			(uuid "7f3873b1-91d4-4fc1-8a18-c97f79d109fe")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR27")
 					(unit 1)
@@ -12630,7 +12630,7 @@
 			(uuid "f707b7d6-8fe0-4b7a-8d1f-f7298daea7f8")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "TP9")
 					(unit 1)
@@ -12712,7 +12712,7 @@
 			(uuid "76853532-fca1-40aa-801a-bc02715cceb0")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR53")
 					(unit 1)
@@ -12794,7 +12794,7 @@
 			(uuid "f92c3de1-e68c-441f-8c33-a73b168de290")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR55")
 					(unit 1)
@@ -12876,7 +12876,7 @@
 			(uuid "2fe05e4e-bb08-4b51-8901-753008279037")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR49")
 					(unit 1)
@@ -12958,7 +12958,7 @@
 			(uuid "df126eea-f0c5-4e0f-8849-edb17ef61afe")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR21")
 					(unit 1)
@@ -13066,7 +13066,7 @@
 			(uuid "18ce9fd6-2e75-4ec8-86b7-13ec544bfdfb")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "R2")
 					(unit 1)
@@ -13172,7 +13172,7 @@
 			(uuid "793a0bf2-0c14-4e8c-818c-0733e5781e7f")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "C6")
 					(unit 1)
@@ -13254,7 +13254,7 @@
 			(uuid "35b6e4bf-1cf4-4756-897c-761cf03cd017")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR50")
 					(unit 1)
@@ -13362,7 +13362,7 @@
 			(uuid "cdef8639-5a99-4768-8b3b-f893d356b434")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "R8")
 					(unit 1)
@@ -13470,7 +13470,7 @@
 			(uuid "169a9fbb-06a1-42a3-8972-86e239c0aaa1")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "R10")
 					(unit 1)
@@ -13579,7 +13579,7 @@
 			(uuid "446e02eb-6083-45b7-8b3f-02cf11736638")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "SW1")
 					(unit 1)
@@ -13662,7 +13662,7 @@
 			(uuid "6fbb3e64-3893-4352-8ea7-56e4ff3f7a61")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#FLG4")
 					(unit 1)
@@ -13745,7 +13745,7 @@
 			(uuid "add276d8-3a6f-4edd-83e4-d77b0d1f4f95")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#FLG3")
 					(unit 1)
@@ -13827,7 +13827,7 @@
 			(uuid "9c660652-7793-4322-8e9e-a6f8f46b5a6d")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR44")
 					(unit 1)
@@ -13935,7 +13935,7 @@
 			(uuid "22a66d93-0a88-4501-863f-fa864f552e2a")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "R5")
 					(unit 1)
@@ -14017,7 +14017,7 @@
 			(uuid "5d86912f-e312-45c3-8300-73b83bab9b6c")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR02")
 					(unit 1)
@@ -14099,7 +14099,7 @@
 			(uuid "4fcaf9f8-09b7-4422-80cc-02147a0d4340")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR17")
 					(unit 1)
@@ -14181,7 +14181,7 @@
 			(uuid "81c327ff-1a85-46d5-8ed5-7bc2293d19b3")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR39")
 					(unit 1)
@@ -14263,7 +14263,7 @@
 			(uuid "367a05d5-8935-4599-8271-fd2d3b1aec5c")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR24")
 					(unit 1)
@@ -14345,7 +14345,7 @@
 			(uuid "1db0c977-12db-4245-88d5-2036c412271f")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR60")
 					(unit 1)
@@ -14427,7 +14427,7 @@
 			(uuid "c7d697a3-f19a-46fd-8cc6-0b3b4ccc263d")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR43")
 					(unit 1)
@@ -14509,7 +14509,7 @@
 			(uuid "75827466-cad9-4782-8f3c-12169f5fd502")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR62")
 					(unit 1)
@@ -14591,7 +14591,7 @@
 			(uuid "5cdcfcb8-ad2b-46b4-81f6-e195d6442250")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "TP4")
 					(unit 1)
@@ -14673,7 +14673,7 @@
 			(uuid "14b7d581-1045-4dc2-86bf-1e99032dae84")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR11")
 					(unit 1)
@@ -14779,7 +14779,7 @@
 			(uuid "0f774b04-e756-4b0e-865d-cc0c8c8bf764")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "C4")
 					(unit 1)
@@ -14887,7 +14887,7 @@
 			(uuid "7b7bfc29-bb67-4c8d-8253-75a2f5bcd4bb")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "R3")
 					(unit 1)
@@ -14970,7 +14970,7 @@
 			(uuid "4d8fbaf8-c577-47d0-8fd9-764473ce2f01")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#FLG2")
 					(unit 1)
@@ -15076,7 +15076,7 @@
 			(uuid "c88d6c7c-b57c-4a49-8d83-8e0f335bd269")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "C2")
 					(unit 1)
@@ -15158,7 +15158,7 @@
 			(uuid "2d19d906-d208-4c71-82fe-853263417488")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR54")
 					(unit 1)
@@ -15240,7 +15240,7 @@
 			(uuid "1fe3467e-4102-477c-8bed-ed01afb6540a")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR58")
 					(unit 1)
@@ -15322,7 +15322,7 @@
 			(uuid "a38182c1-11ef-48e5-8b90-a645be05f803")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "TP1")
 					(unit 1)
@@ -15428,7 +15428,7 @@
 			(uuid "d7a95caa-9e4f-42c9-862d-311c790589f8")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "L1")
 					(unit 1)
@@ -15537,7 +15537,7 @@
 			(uuid "5e342cec-dd0c-492e-845a-da3a519d6ff5")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "SW2")
 					(unit 1)
@@ -15619,7 +15619,7 @@
 			(uuid "83a9650b-87cb-49a1-82d6-b468d68d21e0")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR38")
 					(unit 1)
@@ -15725,7 +15725,7 @@
 			(uuid "9059745f-9388-4e0c-8e36-1aa84ca9719b")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "C8")
 					(unit 1)
@@ -15833,7 +15833,7 @@
 			(uuid "6a7ea2bf-766c-4305-8b1f-03eb52ffd4e6")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "R7")
 					(unit 1)
@@ -15915,7 +15915,7 @@
 			(uuid "aea35990-27df-4e31-85d7-8c4abc5524d1")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR36")
 					(unit 1)
@@ -15997,7 +15997,7 @@
 			(uuid "4b235f58-88cc-4a13-8189-99673622acc2")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR51")
 					(unit 1)
@@ -16079,7 +16079,7 @@
 			(uuid "225b607d-d190-4228-8c36-1abbac1bd80c")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR15")
 					(unit 1)
@@ -16196,7 +16196,7 @@
 			(uuid "12c0bde0-023c-4eb6-8614-303f930966be")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "J1")
 					(unit 1)
@@ -16278,7 +16278,7 @@
 			(uuid "e1b0590e-e345-4976-822f-b732cbf4a023")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR46")
 					(unit 1)
@@ -16360,7 +16360,7 @@
 			(uuid "5c9cf03e-682a-4216-8a97-386bb72ef1a0")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR10")
 					(unit 1)
@@ -16442,7 +16442,7 @@
 			(uuid "8e83da35-13aa-415e-8443-1e265019a9a3")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR18")
 					(unit 1)
@@ -16524,7 +16524,7 @@
 			(uuid "28f0c8a7-ffc3-4ca9-8005-a5b1fd287bcb")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR19")
 					(unit 1)
@@ -16606,7 +16606,7 @@
 			(uuid "e014f607-7d06-44e2-8bde-c4b56518d4fe")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR03")
 					(unit 1)
@@ -16688,7 +16688,7 @@
 			(uuid "edfe0cdd-7534-46db-856e-0a7a96cb6ea8")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR47")
 					(unit 1)
@@ -16770,7 +16770,7 @@
 			(uuid "cb61de94-ea9a-4ef2-887b-369022303d19")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR32")
 					(unit 1)
@@ -16902,7 +16902,7 @@
 			(uuid "514c4d29-e3cc-4bea-8f96-f13b979dc1cb")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "U5")
 					(unit 1)
@@ -17008,7 +17008,7 @@
 			(uuid "8291e396-53f8-47ef-8ede-37d90c67fbe0")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "C5")
 					(unit 1)
@@ -17090,7 +17090,7 @@
 			(uuid "d6769063-f2df-4afc-8d99-fd02c266123f")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR09")
 					(unit 1)
@@ -17172,7 +17172,7 @@
 			(uuid "0a924ee0-dd36-4105-8b47-705557dcf1c9")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "TP10")
 					(unit 1)
@@ -17254,7 +17254,7 @@
 			(uuid "ee65f1f4-5dfa-4f4c-8da7-de02a588ecf8")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR33")
 					(unit 1)
@@ -17360,7 +17360,7 @@
 			(uuid "1cd7bf13-759a-4bcc-8b27-89be473bff5f")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "R1")
 					(unit 1)
@@ -17442,7 +17442,7 @@
 			(uuid "6c4dcd12-5e41-43b5-8226-52bf48d9c3b8")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR08")
 					(unit 1)
@@ -17524,7 +17524,7 @@
 			(uuid "a5434cff-969a-4bfd-8583-acfac70d2f17")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR57")
 					(unit 1)
@@ -17606,7 +17606,7 @@
 			(uuid "12ab5d68-42da-4be8-87c4-7c26648aad29")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR45")
 					(unit 1)
@@ -17712,7 +17712,7 @@
 			(uuid "171d2528-9d9d-4f64-8f02-55df0fae2964")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "C9")
 					(unit 1)
@@ -17794,7 +17794,7 @@
 			(uuid "5f84ef74-d351-4797-86b9-c3f2e84b73cc")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR37")
 					(unit 1)
@@ -17876,7 +17876,7 @@
 			(uuid "b608e334-e571-4a37-8d18-8eb2ec7ea691")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR59")
 					(unit 1)
@@ -17958,7 +17958,7 @@
 			(uuid "ef71ca35-7c7c-4b66-81e0-3a28860ab630")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "TP3")
 					(unit 1)
@@ -18040,7 +18040,7 @@
 			(uuid "f14200e5-042a-4f8e-86b8-be49cf44c674")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR30")
 					(unit 1)
@@ -18122,7 +18122,7 @@
 			(uuid "71ae8454-9346-42bb-82a8-a69dff2bcd9d")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "TP8")
 					(unit 1)
@@ -18204,7 +18204,7 @@
 			(uuid "09b772b9-04fd-4c2c-8031-c964df5f3b1e")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR26")
 					(unit 1)
@@ -18286,7 +18286,7 @@
 			(uuid "9f76c14f-b89a-4bde-8511-456e551a20f9")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "#PWR05")
 					(unit 1)
@@ -18368,7 +18368,7 @@
 			(uuid "5f4039e3-8cba-4d7d-86e3-e8bcba09ea29")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "TP2")
 					(unit 1)
@@ -18450,7 +18450,7 @@
 			(uuid "66a90d70-3333-4192-8c9f-fe412bd72f62")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "TP7")
 					(unit 1)
@@ -18558,7 +18558,7 @@
 			(uuid "cf0b0020-f30d-4e07-86a2-e6bc5530bdf6")
 		)
 		(instances
-			(project "serialtap-r1p0"
+			(project "serialtap"
 				(path "/f16ccc08-3cce-4868-a812-df9e52d3043b"
 					(reference "R4")
 					(unit 1)

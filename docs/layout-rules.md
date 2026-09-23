@@ -26,7 +26,7 @@ fills in around them.
 | L3 | 5 V and 3V3 pours, plus escape routing |
 | L4 | **Ground.** Second return path and shield under the buck. No components. |
 
-**Encoded in `pcb/serialtap-r1p0.kicad_pcb`: PCBWay's published standard
+**Encoded in `pcb/serialtap.kicad_pcb`: PCBWay's published standard
 4-layer 1.6 mm build** ([multi-layer laminated structure](https://www.pcbway.com/multi-layer-laminated-structure.html),
 70 % residual-copper variant, which suits a near-solid L2): 35 µm outer
 (0.5 oz plated to 1 oz), **7628 RC46 % prepreg 0.1855 mm, Dk 4.74**, 35 µm
@@ -171,7 +171,7 @@ JST pin --> TVS array --> 330 Ω series R --> translator B-side
 
 ## Design rules (PCBWay 5/5 mil, 0.2 mm drill)
 
-These are encoded in `pcb/serialtap-r1p0.kicad_pro` and enforced
+These are encoded in `pcb/serialtap.kicad_pro` and enforced
 by `kicad-cli pcb drc` — verified 2026-09-12 by feeding DRC a deliberately
 undersized track and confirming it was rejected against the 0.127 mm minimum.
 Net classes `Default` (0.20 mm), `Power` (0.50 mm) and `USB` (0.20 mm / 0.13 mm
@@ -225,7 +225,7 @@ eFuse limit, so current capacity is never the binding constraint here.
   (buck input ceramics, translator decoupling).
 - Pin-1 and polarity markers on silkscreen, still visible after assembly.
 - Designators readable and unambiguous; none hidden under parts.
-- Keep components ≥3 mm from the board edge where possible. r1p0 cannot —
+- Keep components ≥3 mm from the board edge where possible. This board cannot —
   the OEM outline is full — so the panel is tab-routed with tabs placed away
   from the parts at the edge (*Review gate 3*).
 - ~~Mounting holes with keepout~~ **N/A — there are none** (measured
@@ -234,7 +234,7 @@ eFuse limit, so current capacity is never the binding constraint here.
 - Test points: 1.5 mm exposed copper pads, labelled on silkscreen, reachable with a
   probe without removing the board.
 
-## Recorded exceptions — r1p0 as routed, 2026-09-22
+## Recorded exceptions — as routed, 2026-09-22
 
 Where the routed board departs from a rule above, the departure is recorded
 here, with the reason, rather than left for a reviewer to rediscover.
@@ -467,7 +467,7 @@ now 0.2 mm (see *Design rules*). Everything else passes.
 | Inner isolation ring ≥ 7 mil | 0.25 mm hole clearance | pass |
 | V-score needs a board ≥ 60–80 mm wide | 22 × 54 mm | **cannot V-score** — tab-route |
 
-**Fab package** — `pcb/fab/serialtap-r1p0/`, regenerated from the board
+**Fab package** — `pcb/fab/`, regenerated from the board
 and gitignored until release:
 - Gerbers, X2 format: F/In1/In2/B copper, both masks, top paste, both
   silkscreens, Edge.Cuts, plus the `.gbrjob`. KiCad names inner files after
@@ -479,14 +479,14 @@ and gitignored until release:
 - Excellon drill files in mm, PTH and NPTH separate, with PDF maps: 110 vias
   and U3's 2 thermal vias at 0.2 mm, J2 pins 0.4 mm, J2 slots 0.6 mm, J1
   pins 0.95 mm, J1's peg 1.25 mm NPTH.
-- `serialtap-r1p0-top-pos.csv` — **top side only**. The ten L4 test pads are
+- `serialtap-top-pos.csv` — **top side only**. The ten L4 test pads are
   not flagged exclude-from-position in their footprint, so a both-sides
   export would list them and suggest bottom assembly. Coordinates are
   KiCad-absolute (negative Y), the same frame as the gerbers.
-- `serialtap-r1p0-bom-pcbway.csv` — 22 lines, 33 parts, in PCBWay's column
+- `serialtap-bom-pcbway.csv` — 22 lines, 33 parts, in PCBWay's column
   format, generated from the schematic. Every line has an MPN and a
   manufacturer; designators match the position file one for one.
-- `serialtap-r1p0-assembly-top.pdf` — F.Fab, F.Silkscreen and the outline, for
+- `serialtap-assembly-top.pdf` — F.Fab, F.Silkscreen and the outline, for
   polarity and pin 1.
 
 Gerber analyzer: all layers present, both drill files, 54.0 × 22.0 mm. Its

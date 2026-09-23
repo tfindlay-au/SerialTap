@@ -55,7 +55,7 @@
 	)
 	(property ki_fp_filters "USB*C*Receptacle*")
 	(sheetname "/")
-	(sheetfile "serialtap-r1p0.kicad_sch")
+	(sheetfile "serialtap.kicad_sch")
 	(attr through_hole)
 	(duplicate_pad_numbers_are_jumpers no)
 	(fp_line

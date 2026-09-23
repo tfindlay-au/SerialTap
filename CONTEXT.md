@@ -56,9 +56,9 @@ The external equipment the board talks to over UART. It drives 5 V logic levels
 and is the reason level translation exists at all.
 
 ### Board
-One physical PCB design at a given revision, written `rNpM` — `r1p0`, `r1p1`,
-and so on. The revision is part of the file name rather than a directory, so a
-revision is a set of files in `pcb/`, not a folder.
+The physical PCB design: the files `pcb/serialtap.kicad_*`. It has no revision
+in its name — its version is a git commit, and a fab order is tagged so a board
+in hand traces back to the commit it was built from.
 
 ### Port
 The board's single level-translated UART channel, translated in both directions
@@ -189,7 +189,7 @@ and no appliance. It does not prove drive strength into a loaded line.
 ### Build artifact
 Anything produced by `kicad-cli` from the design files: gerbers, drill files,
 the BOM and CPL, the schematic PDF, STEP and image renders. These live under
-`pcb/serialtap-rNpM/` and are never hand-edited — regenerate them instead.
+`pcb/fab/` (gitignored until release) and are never hand-edited — regenerate them instead.
 
 The design files themselves — `.kicad_sch`, `.kicad_pcb`, `.kicad_pro` — are
 **not** build artifacts. They are drawn and maintained by hand, and they are the

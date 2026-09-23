@@ -514,7 +514,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "serialtap-r1p0.kicad_pro",
+    "filename": "serialtap.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -797,8 +797,8 @@
     "subpart_id_separator": 0,
     "top_level_sheets": [
       {
-        "filename": "serialtap-r1p0.kicad_sch",
-        "name": "serialtap-r1p0",
+        "filename": "serialtap.kicad_sch",
+        "name": "serialtap",
         "uuid": "00000000-0000-0000-0000-000000000000"
       }
     ],

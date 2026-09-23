@@ -1,6 +1,6 @@
-# Schematic capture contract — SerialTap r1p0
+# Schematic capture contract — SerialTap
 
-This is the wiring target for `pcb/serialtap-r1p0.kicad_sch`. It records the
+This is the wiring target for `pcb/serialtap.kicad_sch`. It records the
 settled connectivity so schematic capture is a transcription and review task,
 not another architecture discussion.
 
@@ -94,7 +94,7 @@ line reaches its ESD channel before the UART series resistor or USB trace.
 
 ## Capture record — 2026-09-20
 
-Captured into [`pcb/serialtap-r1p0.kicad_sch`](../pcb/serialtap-r1p0.kicad_sch),
+Captured into [`pcb/serialtap.kicad_sch`](../pcb/serialtap.kicad_sch),
 KiCad 10 native format (`version 20260306`), one A3 sheet in seven labelled
 blocks: service port, USB-C, power path, level translation, ESP32-C3, test
 access, ERC power sources. **43 components, 57 nets.**

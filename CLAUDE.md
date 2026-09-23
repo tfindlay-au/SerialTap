@@ -41,7 +41,7 @@ These are not negotiable defaults to be optimised away.
 
 | Tool | Role |
 |---|---|
-| KiCad **10** | **Source of truth.** Schematic → netlist → PCB, all of it in `pcb/serialtap-rNpM/` ([ADR 0005](docs/adr/0005-kicad-native-capture.md)) |
+| KiCad **10** | **Source of truth.** Schematic → netlist → PCB, all of it in `pcb/serialtap.kicad_*` ([ADR 0005](docs/adr/0005-kicad-native-capture.md)) |
 | `kicad-cli` | `/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli` — ERC, DRC, gerber/drill/BOM/CPL export, STEP and image renders |
 | LTspice | Power-path simulation only. `sim/` — standalone SPICE netlists, hand-written and outside the KiCad flow. Chosen because Homebrew cannot build ngspice on macOS 12 |
 | kicad-happy | Installed plugin (v2.2.1, 11 skills). Design review over the generated `.kicad_sch` / `.kicad_pcb` — EMC, power, ESD, thermal, BOM lifecycle, PCBWay DFM |
@@ -86,8 +86,10 @@ And: **never split the ground plane.**
 
 ## Conventions
 
-- Board and revision naming: `serialtap-r1p0`, `serialtap-r1p1`, …
-  The revision is in the **filename**, not a folder: `pcb/serialtap-r1p0.kicad_sch`
+- The board is `serialtap`: `pcb/serialtap.kicad_sch`, `.kicad_pcb`, `.kicad_pro`.
+  **No revision in file or folder names** — git is the version control. Tag the
+  commit each fab order is built from, so a physical board traces back to its
+  sources (renamed from `serialtap-r1p0` on 2026-09-24)
 - Say **level translator**, not "leveler" — the project was formerly
   `esp32leveler` and that name caused persistent confusion with spirit levels
 - Fab class: PCBWay 5/5 mil, 0.2 mm drill (vias 0.2 / 0.5 mm, 0.15 mm ring),
@@ -106,7 +108,7 @@ be justified on its own terms, it is not a convention worth keeping.
 
 ## Current state
 
-**r1p0 is ready to order; nothing is built yet.** Every stage below is done and
+**The board is ready to order; nothing is built yet.** Every stage below is done and
 recorded — the detail lives in the linked documents, not here.
 
 | Stage | State | Record |
@@ -120,7 +122,7 @@ recorded — the detail lives in the linked documents, not here.
 | Review gates | kicad-happy gate 1 (schematic), gate 2 (layout — no blockers) and gate 3 (PCBWay pre-order — via ring fixed) all run | [schematic-capture.md](docs/schematic-capture.md), [layout-rules.md](docs/layout-rules.md) |
 | Mechanical | 22 × 54 mm, **no mounting holes**; the board keeps the OEM outline and sits in its slot | [bench-plan Part 3](docs/bench-plan.md) |
 
-**Next:** upload `pcb/fab/serialtap-r1p0/` to PCBWay, inspect their gerber
+**Next:** tag the commit, upload `pcb/fab/` to PCBWay, inspect their gerber
 viewer, re-check C4 and U5 stock, and order with the specification in
 [layout-rules.md § Review gate 3](docs/layout-rules.md#review-gate-3--pcbway-pre-order-2026-09-24).
 

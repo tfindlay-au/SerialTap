@@ -255,7 +255,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/75fb91d5-054f-46a3-88af-0fff3a026c87")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -439,7 +439,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/9dfb5d82-ecf9-4511-8255-16b9c0aae4e7")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -623,7 +623,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/bf657174-c457-4197-8ec1-675043498a14")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -1039,7 +1039,7 @@
 		)
 		(path "/478daeaa-d75d-46d0-821b-d26ff33f60a9")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -1266,7 +1266,7 @@
 		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/47b23be8-0781-4eac-81a1-deb5eef59d2c")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -1488,7 +1488,7 @@
 		)
 		(path "/0d2cf88b-5d34-4d3f-8b0f-d34b0080a95d")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -2410,7 +2410,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/d21a94e7-3a27-457e-8f79-a7b24dccaecc")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -2594,7 +2594,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/d8821e31-64a3-4b8a-85b8-6e93b10733b8")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -2886,7 +2886,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/e72e4183-a984-45c3-87aa-d543cf8b1997")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -3070,7 +3070,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/b00cb3e9-0b18-46fe-8365-90f0546a83fb")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -3245,7 +3245,7 @@
 		)
 		(path "/ae16f1e3-d03f-4684-89a6-023c3616eaf7")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -3536,7 +3536,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/1828269f-3556-435c-8245-eb12268f7631")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -3828,7 +3828,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/728adedb-e568-41f3-837b-e1b9dc470737")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -4004,7 +4004,7 @@
 		(property ki_fp_filters "USB*C*Receptacle*")
 		(path "/0366235d-6a46-4e0f-8b53-85c6ef17fe65")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(attr through_hole)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -4473,7 +4473,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/3791b5d6-ec48-4507-8e5d-fca013b6516c")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -4657,7 +4657,7 @@
 		)
 		(path "/401178c1-e5d6-4fd3-80df-10d7579b0ee7")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -5045,7 +5045,7 @@
 		(property ki_fp_filters "CP_*")
 		(path "/8e71c5c9-07ea-4ff7-842c-eee66f10067b")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -5518,7 +5518,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/fed803df-e20b-4b09-8eb2-6bf40e38c568")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -5702,7 +5702,7 @@
 		(property ki_fp_filters "*WSON*EP*2x2mm*P0.5mm*")
 		(path "/136e5074-dc4c-4cc6-835b-b9365c5038c1")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -6117,7 +6117,7 @@
 		)
 		(path "/330779db-c628-416b-8fc2-314ac555238d")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -6492,7 +6492,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/7a7b7974-d7c5-4573-8ed8-d3fc4f3a502a")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -6677,7 +6677,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/01a1b421-24d4-4ea4-8fc5-181b48df42d2")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -6861,7 +6861,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/b72d336b-4c3b-4f5a-8041-1ea86800f5a8")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -7045,7 +7045,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/75460237-4689-4d08-848b-5c6700ab581f")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -7229,7 +7229,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/60fdedb1-1cc0-462b-842c-0933ed9ff757")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -7402,7 +7402,7 @@
 		(property ki_fp_filters "Choke_* *Coil* Inductor_* L_*")
 		(path "/a9eccb80-aabd-4885-8304-01eb8dc63592")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -7664,7 +7664,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/91149f86-6ae9-4dcd-8e5b-87fce130959c")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -7848,7 +7848,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/271ffa14-c51d-49ec-8d13-9bf887aa4105")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -8024,7 +8024,7 @@
 		(property ki_fp_filters "USON*2.5x1.0mm*P0.5mm*")
 		(path "/d06d106b-ee2b-4f32-8f69-19048c07dd03")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -8371,7 +8371,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/7418317d-834a-44a8-8915-9bdf0e701852")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -8546,7 +8546,7 @@
 		)
 		(path "/76c7d6bf-2e6e-4d70-8dbe-df82bf91aafb")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -8837,7 +8837,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/599d7cc5-6533-4627-89be-4ccab212dcfd")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -9021,7 +9021,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/3442c520-af2e-439d-8e34-56616fb74d79")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -9175,7 +9175,7 @@
 		(property ki_fp_filters "Pin* Test*")
 		(path "/360ef547-8df8-4839-8f16-010db2f5fe74")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -9290,7 +9290,7 @@
 		(property ki_fp_filters "Pin* Test*")
 		(path "/d63e4886-c3e3-48fc-874c-d4471917779e")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -9405,7 +9405,7 @@
 		(property ki_fp_filters "Pin* Test*")
 		(path "/ec13809f-f3f9-4335-8a4b-c69c31a88164")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -9520,7 +9520,7 @@
 		(property ki_fp_filters "Pin* Test*")
 		(path "/fb2182f9-e6fb-4f24-8da9-b23b642a006c")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -9635,7 +9635,7 @@
 		(property ki_fp_filters "Pin* Test*")
 		(path "/8d7bedba-d0ba-4e9e-88ed-e38010333446")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -9750,7 +9750,7 @@
 		(property ki_fp_filters "Pin* Test*")
 		(path "/f4c28858-3e79-46df-8821-8e1ee119bff4")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -9865,7 +9865,7 @@
 		(property ki_fp_filters "Pin* Test*")
 		(path "/24e39fd8-ccb7-4946-8586-ae70df009d46")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -9980,7 +9980,7 @@
 		(property ki_fp_filters "Pin* Test*")
 		(path "/684a07e3-7af5-4370-8b7d-4a87d95c084a")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -10095,7 +10095,7 @@
 		(property ki_fp_filters "Pin* Test*")
 		(path "/a86f2e23-21bb-4ec8-8e0c-76f7c7211f73")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")
@@ -10210,7 +10210,7 @@
 		(property ki_fp_filters "Pin* Test*")
 		(path "/f65b6e4c-a123-4449-89c1-dfcd4abe9e42")
 		(sheetname "/")
-		(sheetfile "serialtap-r1p0.kicad_sch")
+		(sheetfile "serialtap.kicad_sch")
 		(units
 			(unit
 				(name "A")

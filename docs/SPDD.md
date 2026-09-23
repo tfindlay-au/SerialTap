@@ -503,25 +503,24 @@ for the hardware.
 ├── lib/                        project library: symbols, footprints, 3D, datasheets
 ├── sim/                        standalone LTspice decks (§5.8)
 ├── pcb/
-│   ├── serialtap-rNpM.kicad_sch    source of truth
-│   ├── serialtap-rNpM.kicad_pcb
-│   ├── serialtap-rNpM.kicad_pro
-│   ├── GERBER-serialtap-rNpM/      fab output, regenerated
-│   ├── BOM-serialtap-rNpM.csv
-│   ├── CPL-serialtap-rNpM.csv
-│   ├── serialtap-rNpM-sch.pdf
-│   └── serialtap-rNpM-ibom.html
+│   ├── serialtap.kicad_sch     source of truth
+│   ├── serialtap.kicad_pcb
+│   ├── serialtap.kicad_pro
+│   └── fab/                    regenerated output: gerbers, drill, BOM, CPL,
+│                               assembly and schematic PDFs; gitignored until release
+├── bom/                        sourcing BOM and cost notes
 ├── esphome/                    ESPHome package, incl. loopback self-test build
 └── test/                       loopback plug build notes, acceptance checklist
 ```
 
-Board name is `serialtap`; revisions are `serialtap-r1p0`, `serialtap-r1p1`, …
+Board name is `serialtap`, and that is the whole file name — **no revision is
+carried in file or folder names**. Freezing a design is what version control is
+for: the commit a fab order is built from is tagged, and a revision suffix
+would only duplicate the tag, badly (renamed from `serialtap-r1p0`,
+2026-09-24).
 
-**Flat.** Everything for the board lives directly in `pcb/`, with the revision
-carried in the file name rather than in a folder. One board and a handful of
-files do not need a directory tree, and freezing a revision is what version
-control is already for — a folder per revision would only duplicate what a tag
-does better.
+**Flat.** Everything for the board lives directly in `pcb/`. One board and a
+handful of files do not need a directory tree.
 
 ## 11. Requirements traceability
 
