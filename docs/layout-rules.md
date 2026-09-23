@@ -53,7 +53,10 @@ Zones run along the 54 mm axis:
                                                long edge
 ```
 
-- Antenna at one short edge, outline relieved so it overhangs.
+- Antenna at one short edge, outline relieved so it overhangs. **Superseded
+  2026-09-22:** the board keeps the OEM rectangle, so the antenna sits 0.25 mm
+  inside the edge with a copper-free keepout on all four layers instead —
+  checked 2026-09-23 under the pre-release checklist.
 - **JST on the far short edge; USB-C on a long edge beside it.** They do not
   both fit across 22 mm: a 5-position XA header is ~14.6 mm and a USB-C
   receptacle ~8.9 mm, which needs ~26 mm with edge clearance between them.
@@ -92,6 +95,9 @@ may sit *near* it.
 **One library gap this exposed:** the `LM66200` footprint has **no courtyard**
 on `F.CrtYd`. Every other footprint has one. KiCad's courtyard-overlap DRC
 check therefore cannot protect U2 during placement — fix before laying out.
+**Fixed** — every footprint on the board has a courtyard (checked 2026-09-23),
+and the `missing_courtyard` DRC check, which had been set to *ignore*, is now
+an *error* so a future footprint cannot slip in without one.
 
 ## Per-circuit rules
 
@@ -120,6 +126,8 @@ The critical net is not the switch node — it is the **input loop**:
   keepout. This includes ground pours. Follow Espressif's module datasheet
   keepout dimensions exactly.
 - Module at the board edge with the antenna region overhanging the outline.
+  **Superseded 2026-09-22** by the OEM outline: the antenna end sits 0.25 mm
+  inside the edge, over the all-layer keepout (see *Floorplan*).
 - Nothing routed on L3 beneath the antenna either.
 - Ring the keepout boundary with ground stitching vias.
 - Installation note for the harness docs: keep ≥15 mm clear of metal.
@@ -276,23 +284,69 @@ here, with the reason, rather than left for a reviewer to rediscover.
 
 ## Pre-release review checklist
 
-- [ ] Antenna keepout clear on **all four** layers, including pours
-- [ ] L2 ground plane unbroken end to end
-- [ ] Buck input loop contains no vias; ceramic within 2 mm of the IC
-- [ ] Switch node area minimised, not poured
-- [ ] Feedback trace clear of SW node and inductor
+Items checked 2026-09-23 were measured from the board file (KiCad Python API
+and `kicad-cli`), not read off the render. Notes follow the list.
+
+- [x] Antenna keepout clear on **all four** layers, including pours
+- [x] L2 ground plane unbroken end to end
+- [x] Buck input loop contains no vias; ceramic within 2 mm of the IC
+- [x] Switch node area minimised, not poured
+- [x] Feedback trace clear of SW node and inductor (rerouted 2026-09-24 — see note)
 - [ ] USB pair: no vias, no plane gap beneath, matched within 5 mm (one via on D− excepted — *Recorded exceptions* 3)
-- [ ] TVS sits ahead of series resistors, at the connector (distance to J1 excepted — *Recorded exceptions* 1)
-- [ ] Both VCCA and VCCB decoupled on every translator
-- [ ] No floating translator inputs
-- [ ] All test points present, labelled, accessible
+- [x] TVS sits ahead of series resistors, at the connector (distance to J1 excepted — *Recorded exceptions* 1)
+- [x] Both VCCA and VCCB decoupled on every translator
+- [x] No floating translator inputs
+- [x] All test points present, labelled, accessible
 - [x] 3 fiducials placed asymmetrically (2026-09-22 — see *Recorded exceptions* 6)
-- [ ] Silkscreen: 0.8 mm / 0.15 mm text, clear of pads and board edge
-- [ ] DRC clean at 5/5 mil, 0.25 mm (`kicad-cli pcb drc`)
+- [x] Silkscreen: 0.8 mm / 0.15 mm text, clear of pads and board edge
+- [x] DRC clean at 5/5 mil, 0.25 mm (`kicad-cli pcb drc`)
 - [ ] `kicad-happy` PCB review clean: thermal vias, plane voids, trace width,
       impedance, DFM score
 - [ ] `kicad-happy` `pcbway` pre-order checklist passed
 - [ ] Gerbers rendered and visually inspected before upload
+
+### Checklist notes — 2026-09-23
+
+- **Antenna.** U6's keepout (102.2–107.6, 104.25–117.45; 5.4 × 13.2 mm,
+  matching the antenna area in Espressif's land pattern, datasheet
+  Fig. 11-1) has zero filled area from any of the three pours, and no track,
+  via or pad in it. The board edge is 0.25 mm beyond the module end.
+- **L2.** One connected fill, no tracks on the layer. The only large void is
+  J2's pin field, ~6.5 × 2.7 mm: at 0.85 mm pitch the through-hole antipads
+  in each row merge. That is inherent to a through-hole USB-C; nothing but
+  J2's own nets and the last millimetre of the USB pair crosses it. U3's
+  thermal-pad vias join L2 through thermal-relief spokes rather than solid —
+  left for gate 2 to judge (dissipation at 335 mA is small).
+- **Buck input.** C5 → VIN (pin 2) → PGND (pin 1) → C5 entirely on L1, no via
+  on the loop; the GND and V5 vias nearby are branches off it. C5 is 1.48 mm
+  from VIN and 0.65 mm from PGND, pad edge to pad edge.
+- **Switch node.** One 0.40 × 2.15 mm track from pin 7 to L1. Not poured.
+- **Feedback — failed 2026-09-23, rerouted 2026-09-24.** U3 is the
+  fixed-output part, so FB is tied to AGND and the sense line is VOS (pin 6).
+  As first routed, VOS ran down x = 135.4 and along y = 120.9 on L1 — on the
+  edge of L1's body, 0.3 mm from the SW pad — to L1's *output pad*, 6.8 mm
+  from C6. TI asks for the sense at the output capacitor, away from the
+  inductor and SW (TPS62162 datasheet §11.1). Rerouted: pin 6 → via
+  (135.4, 119.3) → L3 → via (143.1, 120.5) at C6's pad, which is the
+  topology of TI's own layout example (Figure 42): VOS drops to another layer
+  and comes up at the output capacitor, with L2 between it and SW. Two
+  departures remain, both judged harmless. The L3 track also carries the
+  3V3 rail west to the module — an estimated ~15 mΩ, ~5 mV at 335 mA, which
+  the loop corrects toward the load. And pin 6's exit runs 0.15 mm from the
+  SW track for ~0.75 mm, which adjacent pins make unavoidable; TI's example
+  has the same. FB (pin 5) reaches GND through its own via: a DC tie, fine
+  as it is. DRC unchanged at 0 / 0 / 0.
+- **TVS order.** On both UART lines the path from J1 reaches U5's tap (at
+  the vias at (139.3, 111.75) and (139.9, 112.6)) before it reaches R1/R2.
+- **Translator.** C7 (VCCA) 0.86 mm and C8 (VCCB) 1.08 mm from U4. On the
+  RUT package the unused inputs A2 (pin 3) and B4 (pin 7) are tied to GND,
+  OE (pin 12) to VCCA; the unused outputs A4Y and B2Y are left open, as
+  outputs should be.
+- **Test points.** All ten on L4 with a 1.0 / 0.15 mm reference on
+  B.Silkscreen; closest pair 2.6 mm centre to centre (TP6–TP7).
+- **Silkscreen and DRC.** Text height, stroke, silk-to-pad and silk-to-edge
+  are all DRC checks here; `kicad-cli pcb drc --severity-all
+  --schematic-parity` reports 0 violations, 0 unconnected, 0 parity.
 
 ### USB pair as routed — measured 2026-09-22
 
