@@ -150,7 +150,7 @@ each appliance gets a documented harness.
 | Mechanical | Bare board, mounting holes, no enclosure |
 | Stackup | 4-layer: L1 sig+parts / L2 GND / L3 rails / L4 GND |
 | Outline | 22 × 54 mm; JST on one short edge, USB-C on the adjacent long edge, antenna at the far short edge |
-| Fab class | PCBWay 5/5 mil, 0.25 mm drill; impedance not controlled |
+| Fab class | PCBWay 5/5 mil, 0.2 mm drill (0.25 mm until 2026-09-24); impedance not controlled |
 | Indicators | Power LED only; no status or activity LEDs |
 | Test points | Pads on 5 V, 3V3, GND, and both sides of each translator channel |
 | First run | 5 boards, single-sided assembly (all parts on top) |

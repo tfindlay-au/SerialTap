@@ -90,7 +90,9 @@ And: **never split the ground plane.**
   The revision is in the **filename**, not a folder: `pcb/serialtap-r1p0.kicad_sch`
 - Say **level translator**, not "leveler" — the project was formerly
   `esp32leveler` and that name caused persistent confusion with spirit levels
-- Fab class: PCBWay 5/5 mil, 0.25 mm drill, 4-layer, single-sided assembly
+- Fab class: PCBWay 5/5 mil, 0.2 mm drill (vias 0.2 / 0.5 mm, 0.15 mm ring),
+  4-layer, single-sided assembly — drill moved from 0.25 mm on 2026-09-24 to meet
+  PCBWay's via annular-ring minimum; see [layout-rules.md](docs/layout-rules.md)
 - Licence: CERN-OHL-P v2 (hardware), MIT (firmware and docs). Both permissive;
   see `NOTICE` for which files fall under which, and for the third-party
   material that is under neither
@@ -195,8 +197,11 @@ than assumed, and it cost a rewrite: see
    and every hand-checkable item on the pre-release checklist passed except the
    USB pair, which stands as a recorded exception (the D− via). DRC 0 / 0 / 0. **Review gate 2 run: no blockers**
    ([triage](docs/layout-rules.md#review-gate-2--kicad-happy-after-layout-2026-09-24)).
-   Still to do: review gate 3 (PCBWay pre-order, with panelisation notes for
-   the parts near the edge), then render and inspect the gerbers
+   **Review gate 3 run 2026-09-24:** one real defect, fixed. The via annular
+   ring was 0.125 mm against PCBWay's 0.15 mm minimum, so vias are now drilled
+   0.2 mm. The fab package, order specification and panel/tab notes are in
+   [layout-rules.md](docs/layout-rules.md#review-gate-3--pcbway-pre-order-2026-09-24).
+   Still to do: inspect the gerbers in PCBWay's viewer after upload, then order
 
 **Mechanical, measured 2026-09-20:** 22 × 54 mm confirmed with calipers, **no
 mounting holes**, no intrusions, and connector placement unconstrained. That

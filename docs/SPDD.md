@@ -439,7 +439,7 @@ matters most for an open-hardware release.
 |---|---|
 | Stackup | 4-layer: L1 signal+parts / L2 GND / L3 rails+escapes / L4 GND |
 | Outline | **22 × 54 mm** — drop-in for the OEM Haier board. JST on one short edge, USB-C on an adjacent long edge, antenna at the far short edge |
-| Fab class | PCBWay 5/5 mil, 0.25 mm drill |
+| Fab class | PCBWay 5/5 mil, 0.2 mm drill (0.25 mm until 2026-09-24 — see layout-rules.md) |
 | Impedance | Not controlled; USB pair geometry targeted from the stackup |
 | Assembly | Single-sided, all parts on top. All SMD except the JST XA port connector, which is through-hole and needs a selective- or hand-solder step |
 | Quantity | 5 (first run) |

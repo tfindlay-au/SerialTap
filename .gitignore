@@ -31,3 +31,6 @@ import/
 # kicad-cli ERC and DRC reports: regenerated on demand
 *-erc.rpt
 *-drc.rpt
+
+# Fabrication outputs: regenerated from the board, not committed until release
+/pcb/fab/

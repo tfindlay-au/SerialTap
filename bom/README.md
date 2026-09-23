@@ -43,7 +43,7 @@ then checked for stock, never picked *because* it was in stock.
 |---|---|---|---:|---:|
 | 330 Ω 1% 0603 | R1, R2 | RK73H1JTTD3300F | 3,017 | 0.0051 |
 | 5.1 kΩ 1% 0603 | R3, R4, R8 | RK73H1JTTD5101F | 13,741 | 0.0076 |
-| 10 kΩ 1% 0603 | R9, R10 | RK73H1JTTD1002F | **1,192** | 0.0038 |
+| 10 kΩ 1% 0603 | R10 (R9 was 10 kΩ until it moved to 2.2 kΩ, 2026-09-20) | RK73H1JTTD1002F | **1,192** | 0.0038 |
 | 66.5 kΩ 1% 0603 | R5 | RK73H1JTTD6652F | 2,192 | 0.0154 |
 | 100 kΩ 1% 0603 | R6, R7 | RK73H1JTTD1003F | 11,115 | 0.0043 |
 | 100 nF 50 V X7R 0603 | C1, C7, C8, C9 | CL10B104KB8NNNC | 268,519 | 0.0115 |

@@ -1,7 +1,8 @@
 # Layout rules — SerialTap
 
 Binding rules for board layout in KiCad 10. Referenced by
-[SPDD §8](SPDD.md). Numbers assume PCBWay's **5/5 mil, 0.25 mm drill** class.
+[SPDD §8](SPDD.md). Numbers assume PCBWay's **5/5 mil, 0.2 mm drill** class (0.25 mm until
+2026-09-24 — see *Design rules*).
 
 ## Priority order
 
@@ -126,7 +127,7 @@ The critical net is not the switch node — it is the **input loop**:
 - Inductor immediately at the SW pin. Short, direct.
 - Feedback: 0.127–0.2 mm, sensed at the **output** capacitor, routed away from
   SW and never beneath the inductor. Ground-guard if space allows.
-- Thermal pad: via array, 0.25 mm drill, tented with mask on L4. Windowpane the
+- Thermal pad: via array, 0.2 mm drill, tented with mask on L4. Windowpane the
   paste stencil to ~60–70 % coverage to limit wicking and voiding.
 - Stitch L2–L4 with vias around the buck.
 
@@ -187,7 +188,7 @@ JST pin --> TVS array --> 330 Ω series R --> translator B-side
 - Perimeter ground stitching every ~5 mm.
 - No unstitched copper islands.
 
-## Design rules (PCBWay 5/5 mil, 0.25 mm drill)
+## Design rules (PCBWay 5/5 mil, 0.2 mm drill)
 
 These are encoded in `pcb/serialtap-r1p0/serialtap-r1p0.kicad_pro` and enforced
 by `kicad-cli pcb drc` — verified 2026-09-12 by feeding DRC a deliberately
@@ -199,13 +200,26 @@ gap) are defined there too.
 |---|---|
 | Min trace width | 0.127 mm |
 | Min clearance | 0.127 mm |
-| Min drill | 0.25 mm |
-| Default via | 0.25 mm drill / 0.50 mm pad |
-| Min annular ring | 0.125 mm |
+| Min drill | 0.2 mm |
+| Default via | 0.2 mm drill / 0.50 mm pad |
+| Min annular ring | 0.15 mm |
 | Copper to board edge | 0.3 mm (0.5 mm preferred for planes) |
 | Silkscreen to pad | 0.15 mm; no silk over pads |
 | Silkscreen text | **0.8 mm high, 0.15 mm stroke minimum** |
 | Solder mask dam | 0.1 mm min |
+
+**Drill and annular ring changed 2026-09-24.** The rules had been 0.25 mm
+drill with a 0.125 mm minimum annular ring, and every via was 0.25 / 0.5 mm.
+PCBWay's capabilities page says "For pads with vias in the middle, Min width
+for Annular Ring is 0.15mm(6mil)", so all 110 vias and U3's two thermal vias
+were 0.025 mm short — and DRC could not catch it, because the rule itself
+was 0.125 mm. Fixed by keeping the 0.5 mm pads and drilling 0.2 mm, which
+moves no copper: the alternative, 0.55 mm pads on the 0.25 mm drill, left
+U5's pin-3 GND via 0.004 mm too wide for its corridor between D− and
+PORT_TX. PCBWay charges extra only below 0.2 mm, and 1.6 mm ÷ 0.2 mm is 8:1,
+their standard aspect-ratio limit. The rules are now 0.2 mm minimum drill,
+0.2 / 0.5 mm default via, 0.15 mm minimum annular ring — so DRC enforces the
+fab's number from here on.
 
 **Silkscreen values checked against PCBWay, 2026-09-22.** PCBWay's
 capabilities page gives a minimum legend height of 0.8 mm and a minimum
@@ -312,7 +326,7 @@ and `kicad-cli`), not read off the render. Notes follow the list.
 - [x] DRC clean at 5/5 mil, 0.25 mm (`kicad-cli pcb drc`)
 - [x] `kicad-happy` PCB review clean: thermal vias, plane voids, trace width,
       impedance, DFM score (gate 2, 2026-09-24 — no blockers; triage below)
-- [ ] `kicad-happy` `pcbway` pre-order checklist passed
+- [x] `kicad-happy` `pcbway` pre-order checklist passed (gate 3, 2026-09-24 — see below)
 - [ ] Gerbers rendered and visually inspected before upload
 
 ### Checklist notes — 2026-09-23
@@ -483,4 +497,90 @@ against the board file before it was kept; the triage:
 dissipates ~0.12–0.15 W at 335 mA, assuming 88–90 % efficiency. TI's θJA of
 61.8 °C/W (DSG, datasheet §7.4) gives a 6–9 °C rise. U1 and U2 each dissipate
 tens of milliwatts at most. **DFM** (PCBWay 5/5 mil, 0.25 mm): 0 violations,
-0.161 mm minimum spacing, 0.125 mm annular ring.
+0.161 mm minimum spacing, 0.125 mm annular ring — **which gate 3 found is
+below PCBWay's via minimum**; see *Review gate 3*.
+
+## Review gate 3 — PCBWay pre-order, 2026-09-24
+
+Checked against PCBWay's published
+[capabilities](https://www.pcbway.com/capabilities.html) (fetched
+2026-09-24), not remembered figures. **One real defect, fixed:** every via's
+annular ring was 0.125 mm against PCBWay's 0.15 mm via minimum. The drill is
+now 0.2 mm (see *Design rules*). Everything else passes.
+
+| PCBWay limit | This board | |
+|---|---|---|
+| Trace / space ≥ 4/4 mil (4-layer) | 5/5 mil rules; 0.2 mm narrowest track | pass |
+| Via annular ring ≥ 0.15 mm | 0.15 mm (was 0.125) | **fixed** |
+| Min drill 0.15 mm; extra charge below 0.2 mm | 0.2 mm | pass, standard price |
+| Aspect ratio ≤ 8 (standard) | 1.6 / 0.2 = 8 | at the limit |
+| Plated slot ≥ 0.5 mm | J2 shell tabs: four 0.6 mm routed slots | pass |
+| Copper to edge ≥ 0.25 mm (CNC) | 0.3 mm DRC rule | pass |
+| Inner isolation ring ≥ 7 mil | 0.25 mm hole clearance | pass |
+| V-score needs a board ≥ 60–80 mm wide | 22 × 54 mm | **cannot V-score** — tab-route |
+
+**Fab package** — `pcb/fab/serialtap-r1p0/`, regenerated from the board
+and gitignored until release:
+- Gerbers, X2 format: F/In1/In2/B copper, both masks, top paste, both
+  silkscreens, Edge.Cuts, plus the `.gbrjob`. KiCad names inner files after
+  the custom layer names (`GND (L2).g1` and so on); they are renamed to
+  `In1_Cu` / `In2_Cu` / `B_Cu`, because spaces and brackets are a known way
+  to trip fab upload parsers. The X2 `FileFunction` inside each file carries
+  the layer order either way. There is no bottom paste file: nothing is
+  assembled on L4.
+- Excellon drill files in mm, PTH and NPTH separate, with PDF maps: 110 vias
+  and U3's 2 thermal vias at 0.2 mm, J2 pins 0.4 mm, J2 slots 0.6 mm, J1
+  pins 0.95 mm, J1's peg 1.25 mm NPTH.
+- `serialtap-r1p0-top-pos.csv` — **top side only**. The ten L4 test pads are
+  not flagged exclude-from-position in their footprint, so a both-sides
+  export would list them and suggest bottom assembly. Coordinates are
+  KiCad-absolute (negative Y), the same frame as the gerbers.
+- `serialtap-r1p0-bom-pcbway.csv` — 22 lines, 33 parts, in PCBWay's column
+  format, generated from the schematic. Every line has an MPN and a
+  manufacturer; designators match the position file one for one.
+- `serialtap-r1p0-assembly-top.pdf` — F.Fab, F.Silkscreen and the outline, for
+  polarity and pin 1.
+
+Gerber analyzer: all layers present, both drill files, 54.0 × 22.0 mm. Its
+one warning, that layer extents differ, is expected: copper and mask stop
+short of the outline.
+
+### What to put on the order
+
+| Field | Value |
+|---|---|
+| Layers | 4 |
+| Size | 54 × 22 mm (single board; panel below) |
+| Thickness | 1.6 mm |
+| Stackup | PCBWay standard 4-layer, **1 oz inner, 1 oz outer** (see *Stackup*) |
+| Min track / space | 5/5 mil |
+| Min hole | 0.2 mm |
+| Solder mask / silkscreen | Black (set in the board stackup) / white (assumed; not set in the file) |
+| Surface finish | ENIG |
+| Via process | Tented. The only exposed vias are the ones inside pads: U6's GND pads, U3's thermal pad and the L4 test pads |
+| Impedance control | No. USB is Full Speed, and its geometry is estimated at ~101 Ω |
+| Notes | Plated slots on J2 (four 0.6 mm, in the PTH drill file) |
+| Assembly | Turnkey, **top side only**, 33 parts / 22 lines; **2 through-hole** parts (J1, J2) to be hand or selective soldered |
+
+**Panel — ask PCBWay to panelise, tab-routed, not V-scored**, with rails on
+the long edges for the SMT line. Put breakaway tabs only where no part is
+within 1 mm of the edge. Measured from the antenna end: **top edge
+x ≈ 1–5 and 47–53 mm, bottom edge x ≈ 1–6 and 48–53 mm**. Keep them off the
+top edge from 5.8–17.3 mm (SW1 and SW2 at 0.3 mm) and 35.5–46.1 mm (J2,
+flush). Keep them off the whole bottom edge from 7.6–46.2 mm (C4 at 0.1 mm,
+L1 at 0.0 mm, and the MLCCs C1, C9, C11 and R10 at 0.7–0.9 mm, which crack
+under break-out stress). Keep them off both short edges: the module
+antenna is flush on the left, and J1 is flush on the right.
+
+**Assembly notes for PCBWay:** C4 (polymer) and D1 are polarised. U6 is a
+moisture-sensitive module; follow Espressif's storage and baking guidance.
+The fiducials are FID1–FID3 on the board itself. Nothing goes on the bottom.
+
+**Sourcing risk** (from [bom/README.md](../bom/README.md), stock as of
+2026-09-20, now stale): C4 was single-source at 69 pieces; TPD4E05U06QDQARQ1
+was sample-only at LCSC. PCBWay's turnkey buyers source by MPN worldwide,
+but re-check these two before paying.
+
+**Still open:** the last checklist item — render the gerbers themselves and
+inspect them. PCBWay's own viewer, after upload and before paying, is the
+check that matters, because it shows what their CAM actually read.
