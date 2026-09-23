@@ -189,8 +189,14 @@ than assumed, and it cost a rewrite: see
    silkscreen findings only, with 0 unconnected and 0 schematic-parity issues.
    The departures from the layout rules are recorded in
    [layout-rules.md](docs/layout-rules.md#recorded-exceptions--r1p0-as-routed-2026-09-22).
-   Still to do: silkscreen tidy, fiducials, the pre-release checklist, then
-   review gates 2 and 3
+   Since then (2026-09-23/24): silkscreen DRC cleared, fiducials placed, the
+   USB pair's legs moved off the shell-tab reliefs, U3's VOS rerouted to sense
+   at C6, the stackup set to **PCBWay's published 7628 / 1 oz-inner build**,
+   and every hand-checkable item on the pre-release checklist passed except the
+   USB pair, which stands as a recorded exception (the D− via). DRC 0 / 0 / 0. **Review gate 2 run: no blockers**
+   ([triage](docs/layout-rules.md#review-gate-2--kicad-happy-after-layout-2026-09-24)).
+   Still to do: review gate 3 (PCBWay pre-order, with panelisation notes for
+   the parts near the edge), then render and inspect the gerbers
 
 **Mechanical, measured 2026-09-20:** 22 × 54 mm confirmed with calipers, **no
 mounting holes**, no intrusions, and connector placement unconstrained. That

@@ -38,6 +38,16 @@ for a 1.6 mm four-layer board, **not** PCBWay's published stackup — they are
 placed so KiCad has a physically sensible board to work with, and the rule above
 still stands: get the real numbers before computing the USB geometry.
 
+**Replaced with PCBWay's published stackup, 2026-09-24.** From PCBWay's
+[multi-layer laminated structure](https://www.pcbway.com/multi-layer-laminated-structure.html)
+page, standard 4-layer 1.6 mm, 70 % inner residual copper (L2 is a near-solid
+plane, so the high-residual variant fits): 0.5 oz outer base plated to 1 oz
+(35 µm), **7628 RC46 % prepreg 0.1855 mm after lamination, Dk 4.74**, 1 oz
+(35 µm) inner copper, **1.03 mm core, Dk 4.6**, symmetric. Finished
+thickness 1.61 mm ±10 %. Loss tangent is not published; 0.02 is kept.
+Encoded in the board file and confirmed as read back by the analyzer.
+**Order with 1 oz inner copper** — the stackup assumes it.
+
 ## Floorplan
 
 Board outline **22 × 54 mm**, chosen to drop into the OEM Haier board's place.
@@ -300,8 +310,8 @@ and `kicad-cli`), not read off the render. Notes follow the list.
 - [x] 3 fiducials placed asymmetrically (2026-09-22 — see *Recorded exceptions* 6)
 - [x] Silkscreen: 0.8 mm / 0.15 mm text, clear of pads and board edge
 - [x] DRC clean at 5/5 mil, 0.25 mm (`kicad-cli pcb drc`)
-- [ ] `kicad-happy` PCB review clean: thermal vias, plane voids, trace width,
-      impedance, DFM score
+- [x] `kicad-happy` PCB review clean: thermal vias, plane voids, trace width,
+      impedance, DFM score (gate 2, 2026-09-24 — no blockers; triage below)
 - [ ] `kicad-happy` `pcbway` pre-order checklist passed
 - [ ] Gerbers rendered and visually inspected before upload
 
@@ -407,3 +417,70 @@ has no L2 under D+ for 1.60 of 6.20 mm, against 0.95 of 5.70 mm today. It runs
 stub. And in A-side orientation, D+ would still reach A6 through the A6–B6
 link on L3. The layer change would move into J2's own pin barrels, not go
 away. **Not made:** the via is kept, and accepted as *Recorded exceptions* 3.
+
+## Review gate 2 — kicad-happy after layout, 2026-09-24
+
+Run against `ec7624f`: schematic, PCB (`--full --proximity`), cross-domain,
+EMC and thermal analyzers, kicad-happy 2.2.1, output in
+`analysis/2026-09-24_0016/` (gitignored). SPICE not run by the skill: LTspice
+is installed as an app but not on the path, and the power-path decks in `sim/`
+already cover what the skill would simulate. Lifecycle audit not run (it was
+not the question at this gate). **No blockers.** Every finding was checked
+against the board file before it was kept; the triage:
+
+**Real, and already known**
+- USB pair over J2's pin-field void and the D− via without an adjacent stitch
+  (RP-002, GP-001, RP-001) — *Recorded exceptions* 3 and the L2 note above.
+- USB_VBUS, CC2 and PORT_5V at 91–94 % reference coverage (GP-001): all cross
+  the same J2 pin field or J1's pins. DC or static nets.
+
+**Real, new, and acted on or open**
+- **Stackup.** PCBWay's published standard 4-layer 1.6 mm build is 7628
+  prepreg at **0.1855 mm** after lamination, Dk 4.74, over a 1.03 mm core,
+  Dk 4.6, with **1 oz inner copper**; the board encoded the provisional
+  0.2104 mm and 17.5 µm inner. **Updated 2026-09-24** (see *Stackup*); DRC
+  unchanged at 0 / 0 / 0. The analyzer's per-segment impedance reads
+  49.7 Ω on every USB segment, L1 and L3 alike, with no width recorded — a
+  placeholder, not a stackup calculation, and not used here.
+- **USB impedance, estimated** (IPC-2141 microstrip formula, not a field
+  solver; Hammerstad agrees within a few ohms): the as-routed 0.20 / 0.20 mm
+  pair is **~101 Ω** on the PCBWay
+  build, inside USB's 90 Ω ±15 % (76.5–103.5 Ω) but near its top; soldermask
+  lowers it by a few ohms. The rule's 0.20 / 0.13 mm would give ~92 Ω. Not
+  worth rerouting at Full Speed. An outside review's "76.5 Ω on PCBWay" used a
+  0.1035 mm prepreg that PCBWay does not publish as standard.
+- **Parts near the edge** (PM-002): C4 0.15 mm, L1 0.10 mm, SW1 and SW2
+  0.35 mm, and the MLCCs C1, C9, C11 and R10 at 0.77–0.92 mm (courtyard to
+  edge). Copper-to-edge is DRC-clean at 0.3 mm; the risk is depaneling
+  stress, which is a gate 3 matter: ask PCBWay for routed rails, no V-score,
+  and breakaway tabs away from those parts.
+
+**Checked and dismissed**
+- *GND plane split, 16 islands* (PS-002): an analyzer artefact. The
+  "isolated" pads (U6's GND row, U2.4/5, U4.7) join through vias placed
+  mid-track, which the analyzer's union-find does not merge. KiCad's own
+  connectivity reports 0 unconnected with schematic parity.
+- *U6 thermal vias insufficient, 1 of 5* (TV-001 ×8): the module's centre
+  ground is nine 1.45 mm sub-pads with one via each, as Espressif's land
+  pattern shows; the analyzer scores each sub-pad as a separate exposed pad.
+- *Via in pad, untented* (VP-001): board vias are tented both sides by
+  default. The flagged ones are inside U6's GND sub-pads (back still tented;
+  0.25 mm holes) and inside the bare L4 test pads (nothing soldered).
+- *Missing stitching via at layer change* (RP-001) on UART, BOOT, EN, PG,
+  CC and V5: DC, static, or 230 kbaud signals.
+- *Trace width below IPC-2221 at 10 °C rise* (on the provisional 17.5 µm
+  inner copper): each thin L3 segment was traced to what it feeds. The V3V3
+  0.3 / 0.4 mm branches feed pull-ups and U4's VCCA, the V5 0.3 mm branches
+  the LED, U4's VCCB and TP1 — milliamps. The module's feed is 0.5 mm (0.44 A
+  at 10 °C against 0.40 A needed), the buck's input is the V5 pour, and
+  USB_VBUS's 0.4 mm (0.37 A) carries ~0.25–0.3 A only while flashing. With
+  PCBWay's 1 oz inner copper every figure roughly doubles.
+- *U3 harmonics in the 30–88 MHz band* (SW-001): generic to any 2.25 MHz
+  buck; the layout mitigations (tight input loop, unpoured SW node) are in
+  place.
+
+**Thermal, by hand** (the analyzer skipped it for want of power data): U3
+dissipates ~0.12–0.15 W at 335 mA, assuming 88–90 % efficiency. TI's θJA of
+61.8 °C/W (DSG, datasheet §7.4) gives a 6–9 °C rise. U1 and U2 each dissipate
+tens of milliwatts at most. **DFM** (PCBWay 5/5 mil, 0.25 mm): 0 violations,
+0.161 mm minimum spacing, 0.125 mm annular ring.
