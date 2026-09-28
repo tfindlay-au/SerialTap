@@ -254,6 +254,11 @@ corrected 2026-09-20 deck ties the fixed-output part's `FB` pin to AGND and
 passes the 40 → 335 mA load step with at least 285 mV margin to 3.0 V. Results
 are in [sim/README.md](../sim/README.md).
 
+**2026-09-28:** `rail-sag` and `inrush` now model the bulk capacitor with
+Nichicon's own model for the PCL1A471MCL1GS, supplied on request, and use the
+fitted 400 mA eFuse limit. Every result is unchanged. The model's typical ESR
+is 8.6 mΩ against the datasheet's 17 mΩ maximum, which confirms the part.
+
 Simulation lives **outside** the KiCad flow. KiCad 10's built-in ngspice can
 simulate a schematic, but the questions here are about a power path that spans
 an appliance, a cable and a converter — most of which is not on the board and

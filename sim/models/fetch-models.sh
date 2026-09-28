@@ -57,15 +57,26 @@ else
     echo "    buck-load-step needs it; see the comment in this script."
 fi
 
+
+# --- Nichicon PCL1A471MCL1GS bulk capacitor: MANUAL step --------------------
+# rail-sag and inrush model C4 with Nichicon's own 7-element RC-ladder model,
+# PCL1A471MCL1GS_v100.lib, supplied by Nichicon's Fukui engineering department
+# on request (their report FTR26-041, 2026-09-28). It was sent to the project,
+# not published for redistribution, so like TI's it is not committed. Request
+# it from Nichicon and place it at  sim/models/vendor/PCL1A471MCL1GS_v100.lib
+# The part page (https://www.nichicon.com/en-us/part/pcl1a471mcl1gs/680/) also
+# lists a model; it has not been compared with this one.
+#
+# The model is plain PSpice (L, R and C only), so the only conversion is the
+# CRLF line endings. Checked against the datasheet before use: 475 uF total,
+# 2.79 ohm at 120 Hz, ESR 8.6 mOhm at 100 kHz (typical; datasheet max 17).
+if [ -f vendor/PCL1A471MCL1GS_v100.lib ]; then
+    echo "==> Nichicon PCL1A471MCL1GS model present"
+    tr -d '\r' < vendor/PCL1A471MCL1GS_v100.lib > pcl1a471mcl1gs.lib
+else
+    echo "==> MISSING: vendor/PCL1A471MCL1GS_v100.lib"
+    echo "    rail-sag and inrush need it; see the comment in this script."
+fi
+
 echo
 echo "Done. Decks .include these from sim/models/."
-
-# Nichicon publishes a SPICE model for the bulk capacitor, PCL1A471MCL1GS, at
-#   https://www.nichicon.com/en-us/part/pcl1a471mcl1gs/680/
-# It is deliberately NOT fetched. The decks model that capacitor as CBULKX, a
-# lumped C with series ESR, and the only parameter that matters at their
-# timescales is that ESR - now 17 mOhm from the datasheet rather than the 25 mOhm
-# previously assumed. A vendor model would add frequency-dependent ESR above
-# 100 kHz, which neither rail-sag (millisecond bursts) nor inrush (a single
-# constant-current ramp) can resolve. Fetch it if a deck ever asks a question at
-# switching frequency.

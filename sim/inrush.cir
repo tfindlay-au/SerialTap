@@ -13,22 +13,24 @@
 * include resetting the appliance. V(jst) collapsing is that failure.
 *
 *   VAPP -[CLIM: appliance limit]- Vsense -Rcable- Rfuse -Cin- [CLIM: eFuse]-
-*        -[ideal diode]- 5V rail - CBULK + ceramics - buck - C3 (idle)
+*        -[ideal diode]- 5V rail - C4 (Nichicon) + ceramics - buck - C3 (idle)
 * ===========================================================================
 
 .include models/behavioral.lib
+.include models/pcl1a471mcl1gs.lib
 
 .param VAPP   = 5.0
 .param IAPP   = 300m    ; appliance limit - SWEPT
 .param RAPP   = 0.5
 .param RCABLE = 0.25
-.param RFUSE  = 0.20
+.param RFUSE  = 0.0     ; No PTC fitted (SPDD 5.3, ADR 0004). Was 0.20, stale
 .param IEF    = 300m    ; eFuse limit set by the programming resistor - SWEPT
 .param RDSEF  = 0.090
 .param CINEF  = 0.1u    ; ceramic on the eFuse input
 
-.param CBULK   = 470u
-.param ESRBULK = 17m  ; PCL1A471MCL1GS datasheet, 100 kHz 20C (was 25m, assumed)
+* C4, PCL1A471MCL1GS 470 uF polymer: Nichicon's own 7-element model, placed by
+* models/fetch-models.sh. It replaced a lumped 470 uF + 17 mOhm on 2026-09-28;
+* see sim/README.md "The vendor models".
 .param CCER    = 22u
 .param ESRCER  = 5m
 .param RLED    = 5k
@@ -51,12 +53,12 @@ Vapp   app 0 PWL(0 0 {TPLUG} {VAPP})
 Xclapp app appo CLIM ILIM={IAPP} RON={RAPP}
 Vsense appo jst 0
 Rcable jst  fi  {RCABLE}
-Rfuse  fi   efi {RFUSE}
+Rfuse  fi   efi {max(RFUSE,1u)}   ; LTspice rejects a 0 ohm resistor
 Cinef  efi  0   {CINEF}
 Xefuse efi  efo CLIM ILIM={IEF} RON={RDSEF}
 Dor    efo  v5  IDEALD
 
-Xbulk  v5 0 CBULKX C={CBULK} ESR={ESRBULK}
+Xbulk  v5 0 PCL1A471MCL1GS          ; C4
 Xcer   v5 0 CBULKX C={CCER}  ESR={ESRCER}
 Rled   v5 0 {RLED}
 
@@ -67,15 +69,21 @@ Xbuck  v5 0 ctl BUCKLOAD VOUT={VOUT} ETA={ETA} VUV={VBUCKUV}
 * sweeps
 *   IEF   candidate eFuse programming points. A real TPS2553-class part holds
 *         its limit to about +/-20%, so read these as NOMINAL and check both
-*         ends of that band against the appliance.
+*         ends of that band against the appliance. 351m / 400m / 449m are
+*         the fitted RILIM = 66.5 kOhm: low end, nominal, high end.
 *   IAPP  what the appliance can supply. 250 mA is the sustained-transmit
 *         figure rail-sag produced; 300/500 mA are the more comfortable cases.
 * ===========================================================================
-.step param IEF  list 150m 200m 250m 300m 400m 500m 750m
+.step param IEF  list 150m 200m 250m 300m 351m 400m 449m 500m 750m
 .step param IAPP list 250m 300m 500m
 
 .tran 0 {TSTOP} 0 10u
-.options plotwinsize=0
+.options plotwinsize=0 method=gear
+* Gear, not LTspice's default modified trapezoidal: C4's vendor model puts
+* 3.1 nH in series with 6.6 mOhm, a ~0.5 ns time constant against a 10-20 us
+* step. Under trap that stiffness made isolated steps return all-zero
+* measurements with no error logged (2026-09-28: IAPP=250m at 20% duty). Gear
+* removes them; elsewhere it moves v5min by under 0.3 mV.
 .save V(v5) V(jst) V(efi) I(Vsense)
 
 * ispike   the sub-microsecond contact event: the discharged 0.1 uF on the

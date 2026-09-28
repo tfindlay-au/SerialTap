@@ -11,7 +11,7 @@
 * Modelled path (JST only - USB-C is not live in this deck):
 *
 *   VAPP -[CLIM: appliance limit]- Vsense -Rcable- Rfuse -[CLIM: eFuse]-
-*        -[ideal diode]- 5V rail -+- CBULK(+ESR) -+- ceramics -+- LED
+*        -[ideal diode]- 5V rail -+- C4 (Nichicon) -+- ceramics -+- LED
 *                                 |
 *                                 +- buck as a CONSTANT-POWER load -> 3V3 -> C3
 *
@@ -20,6 +20,7 @@
 * ===========================================================================
 
 .include models/behavioral.lib
+.include models/pcl1a471mcl1gs.lib
 
 * --- appliance rail (the unknown being characterised) -----------------------
 .param VAPP  = 5.0      ; open-circuit service-rail voltage
@@ -32,13 +33,16 @@
 +                       ; shutdown and reverse blocking make one redundant, and
 +                       ; its 0.2-0.5 ohm would cost ~75 mV at 250 mA on a rail
 +                       ; with no headroom (SPDD 5.3, ADR 0004)
-.param IEF    = 0.60    ; eFuse current limit - set by inrush.cir; must sit
-+                       ; clear of the transmit burst
+.param IEF    = 400m    ; eFuse current limit: RILIM 66.5 kOhm, TI's 400 mA
++                       ; row; part and resistor tolerance put it at
++                       ; 351-449 mA (docs/schematic-capture.md). Was 0.60,
++                       ; stale; it must still sit clear of the transmit burst
 .param RDSEF  = 0.090   ; eFuse pass resistance (TPS2553 class)
 
 * --- 5 V rail storage ---------------------------------------------------------
-.param CBULK   = 470u   ; polymer / hybrid aluminium (SPDD 7.1)
-.param ESRBULK = 17m  ; PCL1A471MCL1GS datasheet, 100 kHz 20C (was 25m, assumed)
+* C4, PCL1A471MCL1GS 470 uF polymer: Nichicon's own 7-element model, placed by
+* models/fetch-models.sh. It replaced a lumped 470 uF + 17 mOhm on 2026-09-28;
+* see sim/README.md "The vendor models".
 .param CCER    = 22u    ; all 5 V ceramics, DC-bias derated (SPDD 7.1)
 .param ESRCER  = 5m
 .param RLED    = 5k     ; power LED branch, ~1 mA
@@ -83,7 +87,7 @@ Rfuse  fi   efi {max(RFUSE,1u)}   ; guard: LTspice rejects a 0 ohm resistor.
 Xefuse efi  efo CLIM ILIM={IEF} RON={RDSEF}
 Dor    efo  v5  IDEALD                  ; ideal-diode OR, JST branch (FR-6)
 
-Xbulk  v5 0 CBULKX C={CBULK} ESR={ESRBULK}
+Xbulk  v5 0 PCL1A471MCL1GS          ; C4
 Xcer   v5 0 CBULKX C={CCER}  ESR={ESRCER}
 Rled   v5 0 {RLED}
 
@@ -99,15 +103,17 @@ Xbuck  v5 0 ctl BUCKLOAD VOUT={VOUT} ETA={ETA} VUV={VBUCKUV}
 *          2.2m   91% duty - association / OTA. Effectively sustained
 *                 transmit: the case bulk capacitance CANNOT ride out,
 *                 and the condition SPDD 12.1 step 8 insists on testing.
-*   CBULK the other half of SPDD 5.8's brief - what extra bulk would buy.
-*         220u / 470u (the design value) / 1000u.
 * ===========================================================================
 .step param IAPP list 50m 75m 100m 110m 120m 130m 150m 175m 200m 225m 250m 275m 300m
 .step param TPER list 10m 4m 2.2m
-.step param CBULK list 220u 470u 1000u
 
 .tran 0 {TSTOP} 0 20u
-.options plotwinsize=0
+.options plotwinsize=0 method=gear
+* Gear, not LTspice's default modified trapezoidal: C4's vendor model puts
+* 3.1 nH in series with 6.6 mOhm, a ~0.5 ns time constant against a 10-20 us
+* step. Under trap that stiffness made isolated steps return all-zero
+* measurements with no error logged (2026-09-28: IAPP=250m at 20% duty). Gear
+* removes them; elsewhere it moves v5min by under 0.3 mV.
 .save V(v5) V(jst) V(ctl) I(Vsense)
 
 .meas TRAN v5min    MIN V(v5)     FROM {TMEAS} TO {TSTOP}

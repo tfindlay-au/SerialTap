@@ -32,9 +32,12 @@ it carries no warranty.
 
 THIRD-PARTY MATERIAL NOT COVERED BY THE ABOVE
 
-  - Vendor SPICE models fetched by sim/models/fetch-models.sh are the property
-    of their respective vendors and are deliberately NOT redistributed here.
-    The script downloads them; the licence terms are the vendor's.
+  - Vendor SPICE models used by the decks in sim/ are the property of their
+    respective vendors and are deliberately NOT redistributed here. That
+    includes Nichicon's model for the PCL1A471MCL1GS, which Nichicon supplied
+    to the project directly. sim/models/fetch-models.sh downloads what can be
+    downloaded and documents the manual steps for the rest; the licence terms
+    are the vendor's.
 
   - Symbols, footprints and 3D models in lib/ sourced from vendors, from the
     KiCad project or from SnapEDA remain under whatever terms their originators

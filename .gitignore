@@ -34,3 +34,8 @@ import/
 
 # Fabrication outputs: regenerated from the board, not committed until release
 /pcb/fab/
+
+# Nichicon's SPICE model for C4 and its report FTR26-041, supplied to the project
+# on request and not for redistribution. The decks use a copy placed in
+# sim/models/vendor/; see sim/models/fetch-models.sh
+/lib/20260928_FTR26-041/

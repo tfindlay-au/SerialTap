@@ -35,7 +35,9 @@ SPDD §5.4 quotes the step as 30 → 250 mA. Those are the **5 V-side** figures;
 seen from the buck's output, where a load step actually happens, the same event
 is 40 → 335 mA, which is what `buck-load-step` applies.
 
-## The vendor model
+## The vendor models
+
+### TPS62162 buck
 
 `buck-load-step` is the one deck a behavioural block cannot answer — overshoot,
 undershoot and settling belong to the control loop, the inductor and the output
@@ -104,12 +106,53 @@ step.
 selected TPS62162 and the inductor is the selected XGL4020-222MEC. Re-run after
 pinning the real input/output capacitor MPNs.
 
+### PCL1A471MCL1GS bulk capacitor (C4)
+
+`rail-sag` and `inrush` model C4 with **Nichicon's own model**, a 7-element RC
+ladder (3.1 nH in series with three R–C branches totalling 475 µF). Nichicon's
+engineering department supplied it on request with report FTR26-041,
+2026-09-28. It replaced `CBULKX`, a lumped 470 µF with a flat 17 mΩ ESR.
+
+- **Not committed, for the same reason as TI's.** It was sent to the project,
+  not published for redistribution. `sim/.gitignore` already excludes
+  `models/vendor/` and `models/*.lib`; `fetch-models.sh` documents the manual
+  step and converts the CRLF line endings, which is the only conversion it
+  needs — the model is plain L, R and C.
+- **Checked against the datasheet before use**, by AC sweep:
+
+  | | `CBULKX` (retired) | Nichicon model |
+  |---|---|---|
+  | \|Z\| at 120 Hz | 2.82 Ω | 2.79 Ω |
+  | ESR at 100 kHz | 17 mΩ | **8.6 mΩ** |
+  | ESR at 1 MHz | 17 mΩ | 7.7 mΩ |
+  | Self-resonance | — | 159 kHz |
+
+  The model's ESR is half the datasheet figure because 17 mΩ is the
+  datasheet's *maximum*; the model is a typical part. So the old deck was
+  conservative, not wrong. The model is small-signal, at 20 °C and 0 V bias;
+  polymer capacitance barely moves with bias, so that is a fair basis.
+- **It changes no result.** Run side by side on a 5 mA grid, the minimum
+  appliance current is identical at every duty (110 / 170 / 245 mA), and
+  `v5min` differs by at most 11 mV wherever both pass. Every `inrush` case
+  passes or fails the same way. That is what the average-current finding below
+  predicts: the capacitor's detail cannot move a number set by mean draw.
+- **The decks run Gear integration because of it.** 3.1 nH over 6.6 mΩ is a
+  ~0.5 ns time constant against a 10–20 µs step, and under LTspice's default
+  trapezoidal method isolated steps came back with **all-zero measurements and
+  no error in the log** — a false `NO` in the table. `method=gear` removes them
+  and moves every other `v5min` by under 0.3 mV. If a row of zeros ever
+  reappears, suspect the solver before the circuit.
+- **The 220 µF / 1000 µF sweep was retired with `CBULKX`.** A vendor model is
+  one part at one value. The sizing question it answered is settled below; the
+  sweep is in git history if it is ever reopened.
+
 ## Model fidelity
 
 `models/behavioral.lib` holds **behavioural** blocks, not vendor models. They
 describe the terminal behaviour the datasheets promise over the timescales
 these decks care about (~µs to ~1 s). Where a vendor model exists for the part
-finally chosen, it replaces the block.
+finally chosen, it replaces the block — as TI's has for the buck in
+`buck-load-step`, and Nichicon's for C4 in `rail-sag` and `inrush`.
 
 What they deliberately do not contain, and what therefore cannot be concluded
 from these decks:
@@ -191,6 +234,13 @@ current is. (Before the 2026-09-20 corrections the 1000 µF column showed a
 10 mA advantage at light duty; with the real capacitor's lower ESR that
 advantage disappears.)
 
+**Re-run 2026-09-28 on Nichicon's model for C4** (see "The vendor models"),
+with the eFuse limit corrected to the fitted 400 mA (it read 600 mA) and
+`inrush`'s `RFUSE` corrected to 0 Ω (it still carried the removed PTC's
+0.2 Ω). The 470 µF column above is reproduced exactly — 110 / 175 / 250 mA —
+and no `inrush` pass or fail moved. The 220 µF and 1000 µF columns are from the
+retired lumped-capacitor sweep.
+
 ### The eFuse limit
 
 `inrush` is unambiguous: the eFuse limit must sit **strictly below** the
@@ -200,8 +250,17 @@ whole ramp — 8–17 ms of an undefined state that may reset the appliance, whi
 is the failure [ADR 0004](../docs/adr/0004-current-limited-inrush.md) exists to
 prevent.
 
-Ramp time is just Q/I: 9.4 ms at 250 mA into 492 µF, and the appliance is asked
-for a flat current for that whole time — no peak beyond the limit itself.
+Ramp time is just Q/I: 9.5 ms at 250 mA into 497 µF (C4's 475 µF plus the
+ceramics), and the appliance is asked for a flat current for that whole time —
+no peak beyond the limit itself.
+
+`inrush` now also steps the **fitted** limit — `RILIM` = 66.5 kΩ, 351 / 400 /
+449 mA across its tolerance. All three are polite to a 500 mA rail and none to
+a 300 mA one, which is the rule above applied to the real part: this board
+assumes the rail sources more than 449 mA. That is
+[ADR 0007](../docs/adr/0007-rail-limit-inferred-not-measured.md)'s inference
+from the ~590 mA the OEM module drew, not a new finding, and it is what the
+series current measurement at bring-up will test.
 
 Sizing, with `TOL` the chosen part's current-limit accuracy:
 
